@@ -1,0 +1,367 @@
+diff -r 941d22975314 src/lang/english.txt
+--- src/lang/english.txt	Fri Feb 27 21:01:31 2009 +0100
++++ src/lang/english.txt	Fri Feb 27 21:07:12 2009 +0100
+@@ -3500,6 +3500,13 @@
+ 
+ ########
+ 
++#### GUI list filter 
++STR_FILTER                                                      :{BLACK}Filter
++STR_FILTER_OSKTITLE                                             :{BLACK}Enter a filter string
++STR_FILTER_MATCH_CASE                                           :{BLACK}Match case
++STR_FILTER_CLEAR                                                :{BLACK}Clear filter
++########
++
+ STR_FUND_NEW_INDUSTRY                                           :{BLACK}Fund
+ STR_PROSPECT_NEW_INDUSTRY                                       :{BLACK}Prospect
+ STR_BUILD_NEW_INDUSTRY                                          :{BLACK}Build
+diff -r 941d22975314 src/signs_gui.cpp
+--- src/signs_gui.cpp	Fri Feb 27 21:01:31 2009 +0100
++++ src/signs_gui.cpp	Fri Feb 27 21:07:12 2009 +0100
+@@ -20,12 +20,25 @@
+ 
+ #include "table/strings.h"
+ 
++struct FilterInfo {
++	const char *string;
++	bool case_sensitive;
++};
++
+ struct SignList {
+-	typedef GUIList<const Sign *> GUISignList;
++	typedef GUIList<const Sign *, FilterInfo> GUISignList;
+ 
+ 	static const Sign *last_sign;
+ 	GUISignList signs;
+ 
++	char filter_string[MAX_LENGTH_SIGN_NAME_BYTES];
++	bool match_case;
++
++	SignList(){
++		memset(filter_string, '\0', sizeof(this->filter_string));
++		this->match_case = false;
++	}
++
+ 	void BuildSignsList()
+ 	{
+ 		if (!this->signs.NeedRebuild()) return;
+@@ -37,6 +50,7 @@
+ 		const Sign *si;
+ 		FOR_ALL_SIGNS(si) *this->signs.Append() = si;
+ 
++		this->FilterSignList();
+ 		this->signs.Compact();
+ 		this->signs.RebuildDone();
+ 	}
+@@ -66,23 +80,137 @@
+ 		/* Reset the name sorter sort cache */
+ 		this->last_sign = NULL;
+ 	}
++
++	/** Filter sign list by sign name (case sensitive setting in FilterInfo) */
++	static bool CDECL SignNameFilter(const Sign * const *a, FilterInfo filter_info)
++	{
++		/* Get sign string */
++		char buf1[64];
++		SetDParam(0, (*a)->index);
++		GetString(buf1, STR_SIGN_NAME, lastof(buf1));
++
++		return (filter_info.case_sensitive ? strstr(buf1, filter_info.string) : strcasestr(buf1, filter_info.string)) != NULL;
++	}
++
++	void FilterSignList()
++	{
++		FilterInfo filter_info = {this->filter_string, this->match_case};
++		this->signs.Filter(&SignNameFilter, filter_info);
++	}
+ };
+ 
+ const Sign *SignList::last_sign = NULL;
+ 
+-struct SignListWindow : Window, SignList {
+-	SignListWindow(const WindowDesc *desc, WindowNumber window_number) : Window(desc, window_number)
++/** Enum referring to the widgets of the sign list window */
++enum SignListWidgets {
++	SIGN_LIST_WIDGET_CAPTION = 1,
++	SIGN_LIST_WIDGET_LIST = 3,
++	SIGN_LIST_WIDGET_SCROLLBAR,
++	SIGN_LIST_WIDGET_FILTER_TEXT,
++	SIGN_LIST_WIDGET_FILTER_MATCH_CASE_BTN,
++	SIGN_LIST_WIDGET_FILTER_CLEAR_BTN,
++};
++
++struct SignListWindow : QueryStringBaseWindow, SignList {
++private:
++	int selected_sign;
++
++public:
++	SignListWindow(const WindowDesc *desc, WindowNumber window_number) : QueryStringBaseWindow(MAX_LENGTH_SIGN_NAME_BYTES, desc)
+ 	{
+-		this->vscroll.cap = 12;
++		this->vscroll.cap = 11;
+ 		this->resize.step_height = 10;
+ 		this->resize.height = this->height - 10 * 7; // minimum if 5 in the list
+ 
++		this->InitializeFilterTextWidget();
++		this->SetFilterString("");
++		this->selected_sign = -1;
++
+ 		this->signs.ForceRebuild();
+ 		this->signs.NeedResort();
+ 
+ 		this->FindWindowPlacementAndResize(desc);
+ 	}
+ 
++	void InitializeFilterTextWidget()
++	{
++		this->afilter = CS_ALPHANUMERAL;
++		this->LowerWidget(SIGN_LIST_WIDGET_FILTER_TEXT);
++
++		/* Display an empty string in the edit box */
++		GetString(this->edit_str_buf, STR_EMPTY, lastof(this->edit_str_buf));
++
++		this->edit_str_buf[lengthof(this->edit_str_buf) - 1] = '\0';
++
++		InitializeTextBuffer(&this->text, this->edit_str_buf, MAX_LENGTH_SIGN_NAME_BYTES, 255); // Allow MAX_LENGTH_SIGN_NAME_BYTES characters (including \0)
++
++		this->InvalidateWidget(SIGN_LIST_WIDGET_FILTER_TEXT);
++	}
++
++	void SetFilterString(const char* new_filter_string)
++	{
++		/* clear this->filter_string */
++		memset(this->filter_string, '\0', sizeof(this->filter_string));
++
++		/* check if there is a new filter string */ 
++		if (new_filter_string != 0 && strlen(new_filter_string) != 0) {
++			/* Copy new filter string */
++			strncpy(this->filter_string, new_filter_string, strlen(new_filter_string));
++			this->filter_string[strlen(new_filter_string)] = '\0';
++
++			this->signs.SetFilterState(true);
++		}
++		else
++			this->signs.SetFilterState(false);
++
++		this->UpdateList();
++	}
++
++	void UpdateList()
++	{
++		/* Rebuild list of signs that are displayed. */
++		this->signs.ForceRebuild();
++
++		/* Re-paint widgets that need to be repainted */
++		this->InvalidateWidget(SIGN_LIST_WIDGET_LIST);
++		this->InvalidateWidget(SIGN_LIST_WIDGET_SCROLLBAR);
++		this->InvalidateWidget(SIGN_LIST_WIDGET_CAPTION);
++	}
++
++	void SelectNextSign()
++	{
++		this->selected_sign++;
++		if (this->selected_sign != -1 && (unsigned int) this->selected_sign >= this->signs.Length()) {
++			this->selected_sign = this->signs.Length () - 1;
++		}
++
++		/* Scroll down a half page if moving below last line  */
++		if (this->selected_sign >= this->vscroll.cap + this->vscroll.pos)
++		{
++			int pos = Clamp(this->vscroll.pos + this->vscroll.cap/2 + 1,  0, this->vscroll.count - this->vscroll.cap);
++			this->vscroll.pos = pos;
++			this->SetDirty();
++		}
++	}
++
++	void SelectPreviousSign()
++	{
++		this->selected_sign--;
++		if (this->selected_sign < 0) {
++			this->selected_sign = 0;
++		} else if ((unsigned int) this->selected_sign >= this->signs.Length()) {
++			this->selected_sign = this->signs.Length () - 1;
++		}
++
++		/* Scroll up a half page if moving above first line  */
++		if (this->selected_sign < this->vscroll.pos)
++		{
++			int pos = Clamp(this->vscroll.pos - this->vscroll.cap/2 - 1,  0, this->vscroll.count - this->vscroll.cap);
++			this->vscroll.pos = pos;
++			this->SetDirty();
++		}
++	}
++
+ 	virtual void OnPaint()
+ 	{
+ 		BuildSignsList();
+@@ -92,6 +220,7 @@
+ 
+ 		SetDParam(0, this->vscroll.count);
+ 		this->DrawWidgets();
++		this->DrawEditBox(SIGN_LIST_WIDGET_FILTER_TEXT);
+ 
+ 		/* No signs? */
+ 		int y = 16; // offset from top of widget
+@@ -107,25 +236,114 @@
+ 			if (si->owner != OWNER_NONE) DrawCompanyIcon(si->owner, 4, y + 1);
+ 
+ 			SetDParam(0, si->index);
+-			DrawString(22, y, STR_SIGN_NAME, TC_YELLOW);
++			if (this->selected_sign == i)
++				DrawString(22, y, STR_SIGN_NAME, TC_BLUE);
++			else
++				DrawString(22, y, STR_SIGN_NAME, TC_YELLOW);
+ 			y += 10;
+ 		}
+ 	}
+ 
+ 	virtual void OnClick(Point pt, int widget)
+ 	{
+-		if (widget == 3) {
+-			uint32 id_v = (pt.y - 15) / 10;
++		switch (widget) {
++			case SIGN_LIST_WIDGET_LIST:
++			{ // <- needed or the compiler will complain
++				uint32 id_v = (pt.y - 15) / 10;
+ 
+-			if (id_v >= this->vscroll.cap) return;
+-			id_v += this->vscroll.pos;
+-			if (id_v >= this->vscroll.count) return;
++				if (id_v >= this->vscroll.cap) return;
++				id_v += this->vscroll.pos;
++				if (id_v >= this->vscroll.count) return;
+ 
+-			const Sign *si = this->signs[id_v];
+-			ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++				const Sign *si = this->signs[id_v];
++				ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++				break;
++			}
++
++			case SIGN_LIST_WIDGET_FILTER_CLEAR_BTN:
++				this->InitializeFilterTextWidget();
++				this->SetFilterString(0);
++				this->selected_sign = -1;
++				break;
++
++			case SIGN_LIST_WIDGET_FILTER_MATCH_CASE_BTN:
++				this->match_case = !this->match_case;
++				if (this->match_case) {
++					this->LowerWidget(SIGN_LIST_WIDGET_FILTER_MATCH_CASE_BTN);
++				} else {
++					this->RaiseWidget(SIGN_LIST_WIDGET_FILTER_MATCH_CASE_BTN);
++				}
++				this->UpdateList();
++				break;
++
+ 		}
+ 	}
+ 
++	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
++	{
++		EventState state = ES_NOT_HANDLED;
++		switch (this->HandleEditBoxKey(SIGN_LIST_WIDGET_FILTER_TEXT, key, keycode, state)) {
++			case HEBR_EDITING:
++				break;
++
++			case HEBR_CONFIRM: // Enter pressed -> goto first sign in list
++			{
++				uint n_signs = this->signs.Length();
++				if (n_signs >= 1) {
++					/* highlight first sign if selected_sign is == -1 or if a sign below the end of list is selected */
++					uint sign_id = this->selected_sign == -1 || (uint)this->selected_sign >= n_signs? 0 : this->selected_sign;
++					if (n_signs > sign_id) {
++						const Sign* si = this->signs[sign_id];
++						ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++					}
++				}
++				return state;
++			}
++
++			case HEBR_CANCEL: // ESC pressed, clear filter
++				this->InitializeFilterTextWidget(); // Empty the text in the EditBox widget
++				this->SetFilterString(0);             // Use empty text as filter text (= view all signs)
++				this->focused_widget = 0;           // Unfocus the text box
++				this->selected_sign = -1;           // Deselect sign in sign list
++				return state;
++
++			case HEBR_NOT_FOCUSED: // The filter text box is not globaly focused
++				if (keycode == 'F') { // Hotkey to enable filter box
++					this->SetFocusedWidget(SIGN_LIST_WIDGET_FILTER_TEXT);
++					SetFocusedWindow(this); // The user has asked to give focus to the text box, so make sure this window is focused.
++					state = ES_HANDLED;
++				}
++				break;
++
++			default:
++				NOT_REACHED();
++		}
++
++		switch (keycode) {
++			case WKC_UP:
++				this->SelectPreviousSign();
++				break;
++
++			case WKC_DOWN:
++				this->SelectNextSign();
++		}
++
++		if (state == ES_HANDLED) OnOSKInput(SIGN_LIST_WIDGET_FILTER_TEXT);
++
++		return state;
++	}
++
++	virtual void OnOSKInput(int wid)
++	{
++		this->SetFilterString(this->text.buf);
++		this->UpdateList();
++	}
++
++	virtual void OnMouseLoop()
++	{
++		this->HandleEditBox(SIGN_LIST_WIDGET_FILTER_TEXT);
++	}
++
+ 	virtual void OnResize(Point new_size, Point delta)
+ 	{
+ 		this->vscroll.cap += delta.y / 10;
+@@ -133,7 +351,10 @@
+ 
+ 	virtual void OnInvalidateData(int data)
+ 	{
+-		if (data == 0) {
++		/* data == 0: new or deleted sign
++		 * data == 1: sign is renamed
++		 */
++		if (data == 0 || strlen(this->filter_string) != 0) {
+ 			this->signs.ForceRebuild();
+ 		} else {
+ 			this->signs.ForceResort();
+@@ -143,10 +364,13 @@
+ 
+ static const Widget _sign_list_widget[] = {
+ {   WWT_CLOSEBOX,   RESIZE_NONE,  COLOUR_GREY,     0,    10,     0,    13, STR_00C5,              STR_018B_CLOSE_WINDOW},
+-{    WWT_CAPTION,  RESIZE_RIGHT,  COLOUR_GREY,    11,   345,     0,    13, STR_SIGN_LIST_CAPTION, STR_018C_WINDOW_TITLE_DRAG_THIS},
++{    WWT_CAPTION,  RESIZE_RIGHT,  COLOUR_GREY,    11,   345,     0,    13, STR_SIGN_LIST_CAPTION, STR_018C_WINDOW_TITLE_DRAG_THIS},   // SIGN_LIST_WIDGET_CAPTION
+ {  WWT_STICKYBOX,     RESIZE_LR,  COLOUR_GREY,   346,   357,     0,    13, 0x0,                   STR_STICKY_BUTTON},
+-{      WWT_PANEL,     RESIZE_RB,  COLOUR_GREY,     0,   345,    14,   137, 0x0,                   STR_NULL},
+-{  WWT_SCROLLBAR,    RESIZE_LRB,  COLOUR_GREY,   346,   357,    14,   125, 0x0,                   STR_0190_SCROLL_BAR_SCROLLS_LIST},
++{      WWT_PANEL,     RESIZE_RB,  COLOUR_GREY,     0,   345,    14,   125, 0x0,                   STR_NULL},                          // SIGN_LIST_WIDGET_LIST
++{  WWT_SCROLLBAR,    RESIZE_LRB,  COLOUR_GREY,   346,   357,    14,   125, 0x0,                   STR_0190_SCROLL_BAR_SCROLLS_LIST},  // SIGN_LIST_WIDGET_SCROLLBAR
++{    WWT_EDITBOX,    RESIZE_RTB,  COLOUR_GREY,     0,   165,   126,   137, STR_FILTER_OSKTITLE,   STR_NULL},                          // SIGN_LIST_WIDGET_FILTER_TEXT
++{ WWT_PUSHTXTBTN,    RESIZE_LRTB, COLOUR_GREY,     166, 255,   126,   137, STR_FILTER_MATCH_CASE, STR_NULL},                          // SIGN_LIST_WIDGET_FILTER_MATCH_CASE_BTN
++{    WWT_TEXTBTN,    RESIZE_LRTB, COLOUR_GREY,     256, 345,   126,   137, STR_FILTER_CLEAR,      STR_NULL},                          // SIGN_LIST_WIDGET_FILTER_CLEAR_BTN
+ {  WWT_RESIZEBOX,   RESIZE_LRTB,  COLOUR_GREY,   346,   357,   126,   137, 0x0,                   STR_RESIZE_BUTTON},
+ {   WIDGETS_END},
+ };
+diff -r 941d22975314 src/toolbar_gui.cpp
+--- src/toolbar_gui.cpp	Fri Feb 27 21:01:31 2009 +0100
++++ src/toolbar_gui.cpp	Fri Feb 27 21:07:12 2009 +0100
+@@ -1093,6 +1093,7 @@
+ 			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
+ 			case WKC_CTRL  | 'G': MenuClickWorldScreenshot(); break;
+ 			case WKC_CTRL | WKC_ALT | 'C': if (!_networking) ShowCheatWindow(); break;
++			case WKC_CTRL | 'L': ShowSignList(); break;
+ 			case 'A': if (CanBuildVehicleInfrastructure(VEH_TRAIN)) ShowBuildRailToolbar(_last_built_railtype, 4); break; // Invoke Autorail
+ 			case 'L': ShowTerraformToolbar(); break;
+ 			case 'M': ShowSmallMap(); break;

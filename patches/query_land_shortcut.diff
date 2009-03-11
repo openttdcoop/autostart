@@ -1,0 +1,22 @@
+diff -r fb410873064b src/main_gui.cpp
+--- src/main_gui.cpp	Fri Feb 27 20:52:28 2009 +0100
++++ src/main_gui.cpp	Fri Feb 27 20:53:42 2009 +0100
+@@ -26,6 +26,7 @@
+ #include "toolbar_gui.h"
+ #include "statusbar_gui.h"
+ #include "tilehighlight_func.h"
++#include "gui.h"
+ 
+ #include "network/network.h"
+ #include "network/network_func.h"
+@@ -306,6 +307,10 @@
+ 			case 'X':
+ 				ResetRestoreAllTransparency();
+ 				break;
++				
++			case 'G':
++				PlaceLandBlockInfo();
++				break;
+ 
+ #ifdef ENABLE_NETWORK
+ 			case WKC_RETURN: case 'T': // smart chat; send to team if any, otherwise to all

@@ -1,0 +1,88 @@
+diff -r c731704096bb src/economy.cpp
+--- src/economy.cpp	Fri Feb 27 20:54:23 2009 +0100
++++ src/economy.cpp	Fri Feb 27 20:55:23 2009 +0100
+@@ -1427,6 +1427,8 @@
+ 		}
+ 	}
+ 
++	InvalidateWindow(WC_INDUSTRY_VIEW, i->index);
++
+ 	TriggerIndustry(i, INDUSTRY_TRIGGER_RECEIVED_CARGO);
+ 	StartStopIndustryTileAnimation(i, IAT_INDUSTRY_RECEIVED_CARGO);
+ }
+diff -r c731704096bb src/industry_cmd.cpp
+--- src/industry_cmd.cpp	Fri Feb 27 20:54:23 2009 +0100
++++ src/industry_cmd.cpp	Fri Feb 27 20:55:23 2009 +0100
+@@ -456,6 +456,8 @@
+ 		}
+ 	}
+ 
++	if (moved_cargo) InvalidateWindow(WC_INDUSTRY_VIEW, i->index);
++
+ 	if (moved_cargo && !StartStopIndustryTileAnimation(i, IAT_INDUSTRY_DISTRIBUTES_CARGO)) {
+ 		uint newgfx = GetIndustryTileSpec(GetIndustryGfx(tile))->anim_production;
+ 
+diff -r c731704096bb src/industry_gui.cpp
+--- src/industry_gui.cpp	Fri Feb 27 20:54:23 2009 +0100
++++ src/industry_gui.cpp	Fri Feb 27 20:55:23 2009 +0100
+@@ -539,6 +539,43 @@
+ 			y += 10;
+ 		}
+ 
++		first = true;
++		for (uint j = 0; j < lengthof(i->produced_cargo_waiting); j++) {
++			if (i->produced_cargo[j] == CT_INVALID) continue;
++			if (first) {
++				if (has_accept) y += 10;
++				DrawStringTruncated(2, y, STR_INDUSTRY_PRODUCTION_THIS_MONTH, TC_FROMSTRING, this->widget[IVW_INFO].right - 2);
++				y += 10;
++				this->production_offset_y = y;
++				first = false;
++			}
++
++			SetDParam(0, i->produced_cargo[j]);
++			SetDParam(1, i->this_month_production[j]);
++			SetDParam(2, GetCargoSuffix(j + 3, CST_VIEW, i, i->type, ind));
++
++			SetDParam(3, i->this_month_production[j] == 0 ? 0 : (i->this_month_transported[j] * 100 / i->this_month_production[j]));
++			DrawStringTruncated(4, y, STR_482B_TRANSPORTED, TC_FROMSTRING, this->widget[IVW_INFO].right - 4);
++			y += 10;
++		}
++
++		first = true;
++		for (uint j = 0; j < lengthof(i->produced_cargo_waiting); j++) {
++			if (i->produced_cargo[j] == CT_INVALID) continue;
++			if (first) {
++				if (has_accept) y += 10;
++				DrawStringTruncated(2, y, STR_INDUSTRY_WAITING_CARGO, TC_FROMSTRING, this->widget[IVW_INFO].right - 2);
++				y += 10;
++				this->production_offset_y = y;
++				first = false;
++			}
++
++			SetDParam(0, i->produced_cargo[j]);
++			SetDParam(1, i->produced_cargo_waiting[j]);
++			DrawStringTruncated(4, y, STR_INDUSTRY_WAITING_CARGO_DETAIL, TC_FROMSTRING, this->widget[IVW_INFO].right - 4);
++			y += 10;
++		}
++
+ 		/* Get the extra message for the GUI */
+ 		if (HasBit(ind->callback_flags, CBM_IND_WINDOW_MORE_TEXT)) {
+ 			uint16 callback_res = GetIndustryCallback(CBID_INDUSTRY_WINDOW_MORE_TEXT, 0, 0, i, i->type, i->xy);
+diff -r c731704096bb src/lang/english.txt
+--- src/lang/english.txt	Fri Feb 27 20:54:23 2009 +0100
++++ src/lang/english.txt	Fri Feb 27 20:55:23 2009 +0100
+@@ -1976,8 +1976,12 @@
+ STR_4828_PRODUCES                                               :{BLACK}Produces: {YELLOW}{STRING}{STRING}, {STRING}{STRING}
+ ############ range for produces ends
+ 
+-STR_482A_PRODUCTION_LAST_MONTH                                  :{BLACK}Production last month:
++STR_482A_PRODUCTION_LAST_MONTH                                  :{BLACK}Production (cargo distributed) last month:
+ STR_482B_TRANSPORTED                                            :{YELLOW}{CARGO}{STRING}{BLACK} ({COMMA}% transported)
++STR_INDUSTRY_PRODUCTION_THIS_MONTH                              :{BLACK}Production (cargo distributed) this month:
++STR_INDUSTRY_WAITING_CARGO                                      :{BLACK}Cargo waiting to be distributed:
++STR_INDUSTRY_WAITING_CARGO_DETAIL                               :{YELLOW}{CARGO}
++
+ STR_482C_CENTER_THE_MAIN_VIEW_ON                                :{BLACK}Centre the main view on industry location
+ STR_482D_NEW_UNDER_CONSTRUCTION                                 :{BLACK}{BIGFONT}New {STRING} under construction near {TOWN}!
+ STR_482E_NEW_BEING_PLANTED_NEAR                                 :{BLACK}{BIGFONT}New {STRING} being planted near {TOWN}!

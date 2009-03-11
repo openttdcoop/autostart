@@ -1,0 +1,54 @@
+diff -r 84a175058db1 src/town_cmd.cpp
+--- src/town_cmd.cpp	Fri Feb 27 21:00:55 2009 +0100
++++ src/town_cmd.cpp	Fri Feb 27 21:01:30 2009 +0100
+@@ -2419,7 +2419,7 @@
+ 	return cost;
+ }
+ 
+-static void UpdateTownGrowRate(Town *t)
++void UpdateTownGrowRate(Town *t)
+ {
+ 	/* Increase company ratings if they're low */
+ 	const Company *c;
+diff -r 84a175058db1 src/town_gui.cpp
+--- src/town_gui.cpp	Fri Feb 27 21:00:55 2009 +0100
++++ src/town_gui.cpp	Fri Feb 27 21:01:30 2009 +0100
+@@ -93,6 +93,25 @@
+ 
+ 	virtual void OnPaint()
+ 	{
++		int16 oldrat[MAX_COMPANIES], newrat[MAX_COMPANIES];
++		assert(sizeof(oldrat) == sizeof(this->town->ratings) && sizeof(newrat) == sizeof(this->town->ratings));
++		memcpy(oldrat, this->town->ratings, sizeof(this->town->ratings));
++		int32 oldgrow = _settings_game.economy.town_growth_rate;
++		byte oldmonths = this->town->fund_buildings_months;
++		_settings_game.economy.town_growth_rate = 0;
++		this->town->fund_buildings_months = 0;
++		byte oldflags = this->town->flags12;
++
++		extern void UpdateTownGrowRate(Town *t);
++		UpdateTownGrowRate(this->town);
++
++		memcpy(newrat, this->town->ratings, sizeof(this->town->ratings));
++
++		memcpy(this->town->ratings, oldrat, sizeof(this->town->ratings));
++		_settings_game.economy.town_growth_rate = oldgrow;
++		this->town->fund_buildings_months = oldmonths;
++		this->town->flags12 = oldflags;
++
+ 		int numact;
+ 		uint buttons = GetMaskOfTownActions(&numact, _local_company, this->town);
+ 
+@@ -138,6 +157,12 @@
+ 				}
+ 
+ 				DrawString(28, y, STR_2024, TC_FROMSTRING);
++
++				SetDParam(0, this->town->ratings[c->index]);
++				DrawString(this->width - 60, y, STR_JUST_INT, TC_YELLOW);
++				SetDParam(0, newrat[c->index] - this->town->ratings[c->index]);
++				DrawString(this->width - 20, y, STR_JUST_INT, TC_YELLOW);
++
+ 				y += 10;
+ 			}
+ 		}

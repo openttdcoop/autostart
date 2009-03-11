@@ -1,0 +1,59 @@
+diff -r a9a52bd21122 src/mixer.cpp
+--- src/mixer.cpp	Fri Feb 27 20:55:24 2009 +0100
++++ src/mixer.cpp	Fri Feb 27 20:55:51 2009 +0100
+@@ -25,7 +25,7 @@
+ 	uint flags;
+ };
+ 
+-static MixerChannel _channels[8];
++static MixerChannel _channels[64];
+ static uint32 _play_rate;
+ 
+ /**
+diff -r a9a52bd21122 src/spritecache.cpp
+--- src/spritecache.cpp	Fri Feb 27 20:55:24 2009 +0100
++++ src/spritecache.cpp	Fri Feb 27 20:55:51 2009 +0100
+@@ -16,8 +16,8 @@
+ 
+ #include "table/sprites.h"
+ 
+-/* Default of 4MB spritecache */
+-uint _sprite_cache_size = 4;
++/* Default of 64MB spritecache */
++uint _sprite_cache_size = 64;
+ 
+ typedef SimpleTinyEnumT<SpriteType, byte> SpriteTypeByte;
+ 
+diff -r a9a52bd21122 src/vehicle.cpp
+--- src/vehicle.cpp	Fri Feb 27 20:55:24 2009 +0100
++++ src/vehicle.cpp	Fri Feb 27 20:55:51 2009 +0100
+@@ -240,7 +240,7 @@
+ 
+ /* Size of the hash, 6 = 64 x 64, 7 = 128 x 128. Larger sizes will (in theory) reduce hash
+  * lookup times at the expense of memory usage. */
+-const int HASH_BITS = 7;
++const int HASH_BITS = 9;
+ const int HASH_SIZE = 1 << HASH_BITS;
+ const int HASH_MASK = HASH_SIZE - 1;
+ const int TOTAL_HASH_SIZE = 1 << (HASH_BITS * 2);
+diff -r a9a52bd21122 src/viewport.cpp
+--- src/viewport.cpp	Fri Feb 27 20:55:24 2009 +0100
++++ src/viewport.cpp	Fri Feb 27 20:55:51 2009 +0100
+@@ -43,6 +43,8 @@
+ #include "table/sprites.h"
+ #include "table/strings.h"
+ 
++static const int VIEWPORT_DRAW_MEM = 65536 * 32;
++
+ PlaceProc *_place_proc;
+ Point _tile_fract_coords;
+ ZoomLevel _saved_scrollpos_zoom;
+@@ -1523,7 +1525,7 @@
+  * If we do, the sprite memory will overflow. */
+ static void ViewportDrawChk(const ViewPort *vp, int left, int top, int right, int bottom)
+ {
+-	if (ScaleByZoom(bottom - top, vp->zoom) * ScaleByZoom(right - left, vp->zoom) > 180000) {
++	if (ScaleByZoom(bottom - top, vp->zoom) * ScaleByZoom(right - left, vp->zoom) > VIEWPORT_DRAW_MEM) {
+ 		if ((bottom - top) > (right - left)) {
+ 			int t = (top + bottom) >> 1;
+ 			ViewportDrawChk(vp, left, top, right, t);

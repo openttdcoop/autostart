@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# $id$
+#
+# Reverts the source of path ($1)
+#
+
+if [ $# -eq 0 ]; then
+	echo "Usage: $0 <clientpath>"
+	exit
+fi
+. ./libs/svn.sh
+svn_revert $1
+
