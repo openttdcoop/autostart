@@ -1,6 +1,6 @@
-diff -r e966217f30e6 src/build_vehicle_gui.cpp
---- src/build_vehicle_gui.cpp	Fri Feb 27 21:00:17 2009 +0100
-+++ src/build_vehicle_gui.cpp	Fri Feb 27 21:00:55 2009 +0100
+diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
+--- src/build_vehicle_gui.cpp	Thu Mar 12 21:33:52 2009 +0100
++++ src/build_vehicle_gui.cpp	Thu Mar 12 21:48:55 2009 +0100
 @@ -31,6 +31,7 @@
  	BUILD_VEHICLE_WIDGET_CAPTION,
  	BUILD_VEHICLE_WIDGET_SORT_ASSENDING_DESCENDING,
@@ -9,7 +9,7 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
  	BUILD_VEHICLE_WIDGET_LIST,
  	BUILD_VEHICLE_WIDGET_SCROLLBAR,
  	BUILD_VEHICLE_WIDGET_PANEL,
-@@ -42,19 +43,24 @@
+@@ -42,19 +43,23 @@
  
  static const Widget _build_vehicle_widgets[] = {
  	{   WWT_CLOSEBOX,   RESIZE_NONE,  COLOUR_GREY,     0,    10,     0,    13, STR_00C5,                STR_018B_CLOSE_WINDOW },
@@ -27,23 +27,21 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
 +	{  WWT_SCROLLBAR,    RESIZE_LRB,  COLOUR_GREY,   282,   293,    26,    39, 0x0,                     STR_0190_SCROLL_BAR_SCROLLS_LIST },
 +	{      WWT_PANEL,    RESIZE_RTB,  COLOUR_GREY,     0,   293,    40,   161, 0x0,                     STR_NULL },
  
--	{ WWT_PUSHTXTBTN,     RESIZE_TB,  COLOUR_GREY,     0,   114,   162,   173, 0x0,                     STR_NULL },
+ 	{ WWT_PUSHTXTBTN,     RESIZE_TB,  COLOUR_GREY,     0,   114,   162,   173, 0x0,                     STR_NULL },
 -	{ WWT_PUSHTXTBTN,    RESIZE_RTB,  COLOUR_GREY,   115,   227,   162,   173, 0x0,                     STR_NULL },
 -	{  WWT_RESIZEBOX,   RESIZE_LRTB,  COLOUR_GREY,   228,   239,   162,   173, 0x0,                     STR_RESIZE_BUTTON },
-+	{ WWT_PUSHTXTBTN,     RESIZE_TB,  COLOUR_GREY,     0,   114,   162,   173, 0x0,                         STR_NULL },
-+	{ WWT_PUSHTXTBTN,    RESIZE_RTB,  COLOUR_GREY,   115,   281,   162,   173, 0x0,                         STR_NULL },
-+	{  WWT_RESIZEBOX,   RESIZE_LRTB,  COLOUR_GREY,   282,   293,   162,   173, 0x0,                         STR_RESIZE_BUTTON },
++	{ WWT_PUSHTXTBTN,    RESIZE_RTB,  COLOUR_GREY,   115,   281,   162,   173, 0x0,                     STR_NULL },
++	{  WWT_RESIZEBOX,   RESIZE_LRTB,  COLOUR_GREY,   282,   293,   162,   173, 0x0,                     STR_RESIZE_BUTTON },
  	{   WIDGETS_END},
  };
  
 +enum cargo_filter {
 +	CF_SHOW_ALL = -1
 +};
-+
+ 
  static bool _internal_sort_order; // descending/ascending
  static byte _last_sort_criteria[]    = {0, 0, 0, 0};
- static bool _last_sort_order[]       = {false, false, false, false};
-@@ -781,6 +787,12 @@
+@@ -687,6 +692,12 @@
  		AirportFTAClass::Flags flags;
  		RoadTypes roadtypes;
  	} filter;
@@ -56,7 +54,7 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
  	bool descending_sort_order;
  	byte sort_criteria;
  	bool regenerate_list;
-@@ -807,6 +819,26 @@
+@@ -713,6 +724,26 @@
  		this->sel_engine      = INVALID_ENGINE;
  		this->regenerate_list = false;
  
@@ -83,7 +81,7 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
  		this->sort_criteria         = _last_sort_criteria[type];
  		this->descending_sort_order = _last_sort_order[type];
  
-@@ -911,6 +943,8 @@
+@@ -817,6 +848,8 @@
  			if (this->filter.railtype != RAILTYPE_END && !HasPowerOnRail(rvi->railtype, this->filter.railtype)) continue;
  			if (!IsEngineBuildable(eid, VEH_TRAIN, _local_company)) continue;
  
@@ -92,7 +90,7 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  
  			if (rvi->railveh_type != RAILVEH_WAGON) {
-@@ -946,8 +980,11 @@
+@@ -852,8 +885,11 @@
  		const Engine *e;
  		FOR_ALL_ENGINES_OF_TYPE(e, VEH_ROAD) {
  			EngineID eid = e->index;
@@ -104,7 +102,7 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  
  			if (eid == this->sel_engine) sel_id = eid;
-@@ -964,7 +1001,10 @@
+@@ -870,7 +906,10 @@
  		const Engine *e;
  		FOR_ALL_ENGINES_OF_TYPE(e, VEH_SHIP) {
  			EngineID eid = e->index;
@@ -115,7 +113,7 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  
  			if (eid == this->sel_engine) sel_id = eid;
-@@ -988,10 +1028,13 @@
+@@ -894,10 +933,13 @@
  		const Engine *e;
  		FOR_ALL_ENGINES_OF_TYPE(e, VEH_AIRCRAFT) {
  			EngineID eid = e->index;
@@ -129,7 +127,7 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  			if (eid == this->sel_engine) sel_id = eid;
  		}
-@@ -1043,27 +1086,45 @@
+@@ -949,27 +991,45 @@
  				ShowDropDownMenu(this, _sort_listing[this->vehicle_type], this->sort_criteria, BUILD_VEHICLE_WIDGET_SORT_DROPDOWN, 0, 0);
  				break;
  
@@ -176,7 +174,7 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
  				break;
  			}
  
-@@ -1115,6 +1176,18 @@
+@@ -1021,6 +1081,18 @@
  		/* Set text of sort by dropdown */
  		this->widget[BUILD_VEHICLE_WIDGET_SORT_DROPDOWN].data = _sort_listing[this->vehicle_type][this->sort_criteria];
  
@@ -195,7 +193,7 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
  		this->DrawWidgets();
  
  		DrawEngineList(this->vehicle_type, this->widget[BUILD_VEHICLE_WIDGET_LIST].left + 2, this->widget[BUILD_VEHICLE_WIDGET_LIST].right, this->widget[BUILD_VEHICLE_WIDGET_LIST].top + 1, &this->eng_list, this->vscroll.pos, max, this->sel_engine, 0, DEFAULT_GROUP);
-@@ -1158,11 +1231,41 @@
+@@ -1064,11 +1136,41 @@
  
  	virtual void OnDropdownSelect(int widget, int index)
  	{
@@ -242,7 +240,7 @@ diff -r e966217f30e6 src/build_vehicle_gui.cpp
  		this->SetDirty();
  	}
  
-@@ -1179,7 +1282,7 @@
+@@ -1085,7 +1187,7 @@
  };
  
  static const WindowDesc _build_vehicle_desc = {
