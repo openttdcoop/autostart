@@ -1,6 +1,6 @@
-diff -r b3d363c24088 -r 55a457b8816c config.lib
---- config.lib	Thu Mar 12 18:42:25 2009 +0000
-+++ config.lib	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e config.lib
+--- config.lib	Sun Mar 15 21:49:37 2009 +0000
++++ config.lib	Fri Mar 20 18:33:34 2009 +0100
 @@ -868,7 +868,7 @@
  			log 1 "WARNING: in most cases it is not safe for network use"
  			log 1 "WARNING: USE WITH CAUTION!"
@@ -10,9 +10,9 @@ diff -r b3d363c24088 -r 55a457b8816c config.lib
  		elif [ -f "$ROOT_DIR/version" ]; then
  			revision="`cat $ROOT_DIR/version`"
  
-diff -r b3d363c24088 -r 55a457b8816c findversion.sh
---- findversion.sh	Thu Mar 12 18:42:25 2009 +0000
-+++ findversion.sh	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e findversion.sh
+--- findversion.sh	Sun Mar 15 21:49:37 2009 +0000
++++ findversion.sh	Fri Mar 20 18:33:34 2009 +0100
 @@ -105,10 +105,6 @@
  	REV_NR=""
  fi
@@ -24,9 +24,9 @@ diff -r b3d363c24088 -r 55a457b8816c findversion.sh
  CLEAN_REV=${REV}
  
  if [ -n "$BRANCH" ]; then
-diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
---- src/build_vehicle_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/build_vehicle_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/build_vehicle_gui.cpp
+--- src/build_vehicle_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/build_vehicle_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -31,6 +31,7 @@
  	BUILD_VEHICLE_WIDGET_CAPTION,
  	BUILD_VEHICLE_WIDGET_SORT_ASSENDING_DESCENDING,
@@ -67,7 +67,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
  
  static bool _internal_sort_order; // descending/ascending
  static byte _last_sort_criteria[]    = {0, 0, 0, 0};
-@@ -687,6 +692,12 @@
+@@ -690,6 +695,12 @@
  		AirportFTAClass::Flags flags;
  		RoadTypes roadtypes;
  	} filter;
@@ -80,7 +80,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
  	bool descending_sort_order;
  	byte sort_criteria;
  	bool regenerate_list;
-@@ -713,6 +724,26 @@
+@@ -716,6 +727,26 @@
  		this->sel_engine      = INVALID_ENGINE;
  		this->regenerate_list = false;
  
@@ -107,7 +107,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
  		this->sort_criteria         = _last_sort_criteria[type];
  		this->descending_sort_order = _last_sort_order[type];
  
-@@ -817,6 +848,8 @@
+@@ -820,6 +851,8 @@
  			if (this->filter.railtype != RAILTYPE_END && !HasPowerOnRail(rvi->railtype, this->filter.railtype)) continue;
  			if (!IsEngineBuildable(eid, VEH_TRAIN, _local_company)) continue;
  
@@ -116,7 +116,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  
  			if (rvi->railveh_type != RAILVEH_WAGON) {
-@@ -852,8 +885,11 @@
+@@ -855,8 +888,11 @@
  		const Engine *e;
  		FOR_ALL_ENGINES_OF_TYPE(e, VEH_ROAD) {
  			EngineID eid = e->index;
@@ -128,7 +128,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  
  			if (eid == this->sel_engine) sel_id = eid;
-@@ -870,7 +906,10 @@
+@@ -873,7 +909,10 @@
  		const Engine *e;
  		FOR_ALL_ENGINES_OF_TYPE(e, VEH_SHIP) {
  			EngineID eid = e->index;
@@ -139,7 +139,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  
  			if (eid == this->sel_engine) sel_id = eid;
-@@ -894,10 +933,13 @@
+@@ -897,10 +936,13 @@
  		const Engine *e;
  		FOR_ALL_ENGINES_OF_TYPE(e, VEH_AIRCRAFT) {
  			EngineID eid = e->index;
@@ -153,7 +153,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  			if (eid == this->sel_engine) sel_id = eid;
  		}
-@@ -949,27 +991,45 @@
+@@ -952,27 +994,45 @@
  				ShowDropDownMenu(this, _sort_listing[this->vehicle_type], this->sort_criteria, BUILD_VEHICLE_WIDGET_SORT_DROPDOWN, 0, 0);
  				break;
  
@@ -200,7 +200,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
  				break;
  			}
  
-@@ -1021,6 +1081,18 @@
+@@ -1024,6 +1084,18 @@
  		/* Set text of sort by dropdown */
  		this->widget[BUILD_VEHICLE_WIDGET_SORT_DROPDOWN].data = _sort_listing[this->vehicle_type][this->sort_criteria];
  
@@ -219,7 +219,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
  		this->DrawWidgets();
  
  		DrawEngineList(this->vehicle_type, this->widget[BUILD_VEHICLE_WIDGET_LIST].left + 2, this->widget[BUILD_VEHICLE_WIDGET_LIST].right, this->widget[BUILD_VEHICLE_WIDGET_LIST].top + 1, &this->eng_list, this->vscroll.pos, max, this->sel_engine, 0, DEFAULT_GROUP);
-@@ -1064,11 +1136,41 @@
+@@ -1067,11 +1139,41 @@
  
  	virtual void OnDropdownSelect(int widget, int index)
  	{
@@ -266,18 +266,18 @@ diff -r b3d363c24088 -r 55a457b8816c src/build_vehicle_gui.cpp
  		this->SetDirty();
  	}
  
-@@ -1085,7 +1187,7 @@
+@@ -1088,7 +1190,7 @@
  };
  
- static const WindowDesc _build_vehicle_desc = {
+ static const WindowDesc _build_vehicle_desc(
 -	WDP_AUTO, WDP_AUTO, 240, 174, 240, 256,
 +	WDP_AUTO, WDP_AUTO, 294, 174, 294, 256,
  	WC_BUILD_VEHICLE, WC_NONE,
  	WDF_STD_TOOLTIPS | WDF_STD_BTN | WDF_DEF_WIDGET | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE | WDF_CONSTRUCTION,
- 	_build_vehicle_widgets,
-diff -r b3d363c24088 -r 55a457b8816c src/command.cpp
---- src/command.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/command.cpp	Thu Mar 12 21:49:03 2009 +0100
+ 	_build_vehicle_widgets
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/command.cpp
+--- src/command.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/command.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -9,6 +9,8 @@
  #include "gui.h"
  #include "command_func.h"
@@ -330,16 +330,16 @@ diff -r b3d363c24088 -r 55a457b8816c src/command.cpp
 +				if (ci->last_build_coordinate != tile) {
 +					ci->last_build_coordinate = tile;
 +					Window *w = FindWindowById(WC_BIG_BROTHER_WINDOW, client);
-+					if (w != NULL) ScrollWindowTo(TileX(tile) * TILE_SIZE + TILE_SIZE / 2, TileY(tile) * TILE_SIZE + TILE_SIZE / 2, w, true);
++					if (w != NULL) ScrollWindowTo(TileX(tile) * TILE_SIZE + TILE_SIZE / 2, TileY(tile) * TILE_SIZE + TILE_SIZE / 2, TileHeight(tile), w, true);
 +				}
 +			}
 +		}
  	}
  
  	/* Actually try and execute the command. If no cost-type is given
-diff -r b3d363c24088 -r 55a457b8816c src/command_func.h
---- src/command_func.h	Thu Mar 12 18:42:25 2009 +0000
-+++ src/command_func.h	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/command_func.h
+--- src/command_func.h	Sun Mar 15 21:49:37 2009 +0000
++++ src/command_func.h	Fri Mar 20 18:33:34 2009 +0100
 @@ -6,6 +6,7 @@
  #define COMMAND_FUNC_H
  
@@ -359,9 +359,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/command_func.h
  
  #ifdef ENABLE_NETWORK
  
-diff -r b3d363c24088 -r 55a457b8816c src/date.cpp
---- src/date.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/date.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/date.cpp
+--- src/date.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/date.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -13,6 +13,9 @@
  #include "functions.h"
  #include "date_func.h"
@@ -406,9 +406,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/date.cpp
  	}
  
  	/* check if we entered a new month? */
-diff -r b3d363c24088 -r 55a457b8816c src/economy.cpp
---- src/economy.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/economy.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/economy.cpp
+--- src/economy.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/economy.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -1427,6 +1427,8 @@
  		}
  	}
@@ -418,9 +418,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/economy.cpp
  	TriggerIndustry(i, INDUSTRY_TRIGGER_RECEIVED_CARGO);
  	StartStopIndustryTileAnimation(i, IAT_INDUSTRY_RECEIVED_CARGO);
  }
-diff -r b3d363c24088 -r 55a457b8816c src/gui.h
---- src/gui.h	Thu Mar 12 18:42:25 2009 +0000
-+++ src/gui.h	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/gui.h
+--- src/gui.h	Sun Mar 15 21:49:37 2009 +0000
++++ src/gui.h	Fri Mar 20 18:33:34 2009 +0100
 @@ -12,6 +12,7 @@
  #include "tile_type.h"
  #include "strings_type.h"
@@ -437,9 +437,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/gui.h
  
  void BuildFileList();
  void SetFiosType(const byte fiostype);
-diff -r b3d363c24088 -r 55a457b8816c src/industry_cmd.cpp
---- src/industry_cmd.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/industry_cmd.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/industry_cmd.cpp
+--- src/industry_cmd.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/industry_cmd.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -456,6 +456,8 @@
  		}
  	}
@@ -449,9 +449,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/industry_cmd.cpp
  	if (moved_cargo && !StartStopIndustryTileAnimation(i, IAT_INDUSTRY_DISTRIBUTES_CARGO)) {
  		uint newgfx = GetIndustryTileSpec(GetIndustryGfx(tile))->anim_production;
  
-diff -r b3d363c24088 -r 55a457b8816c src/industry_gui.cpp
---- src/industry_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/industry_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/industry_gui.cpp
+--- src/industry_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/industry_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -539,6 +539,43 @@
  			y += 10;
  		}
@@ -496,9 +496,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/industry_gui.cpp
  		/* Get the extra message for the GUI */
  		if (HasBit(ind->callback_flags, CBM_IND_WINDOW_MORE_TEXT)) {
  			uint16 callback_res = GetIndustryCallback(CBID_INDUSTRY_WINDOW_MORE_TEXT, 0, 0, i, i->type, i->xy);
-diff -r b3d363c24088 -r 55a457b8816c src/lang/english.txt
---- src/lang/english.txt	Thu Mar 12 18:42:25 2009 +0000
-+++ src/lang/english.txt	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/lang/english.txt
+--- src/lang/english.txt	Sun Mar 15 21:49:37 2009 +0000
++++ src/lang/english.txt	Fri Mar 20 18:33:34 2009 +0100
 @@ -704,6 +704,7 @@
  STR_SIGN_LIST                                                   :Sign list
  STR_02DF_TOWN_DIRECTORY                                         :Town directory
@@ -562,7 +562,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/lang/english.txt
  STR_482C_CENTER_THE_MAIN_VIEW_ON                                :{BLACK}Centre the main view on industry location
  STR_482D_NEW_UNDER_CONSTRUCTION                                 :{BLACK}{BIGFONT}New {STRING} under construction near {TOWN}!
  STR_482E_NEW_BEING_PLANTED_NEAR                                 :{BLACK}{BIGFONT}New {STRING} being planted near {TOWN}!
-@@ -3105,6 +3130,7 @@
+@@ -3106,6 +3131,7 @@
  STR_NEWGRF_TOGGLE_PALETTE_TIP                                   :{BLACK}Toggle the palette of the selected NewGRF.{}Do this when the graphics from this NewGRF look pink in-game
  STR_NEWGRF_SET_PARAMETERS                                       :{BLACK}Set parameters
  STR_NEWGRF_FILENAME                                             :{BLACK}Filename: {SILVER}{RAW_STRING}
@@ -570,7 +570,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/lang/english.txt
  STR_NEWGRF_PALETTE                                              :{BLACK}Palette: {SILVER}{RAW_STRING}
  STR_NEWGRF_GRF_ID                                               :{BLACK}GRF ID: {SILVER}{RAW_STRING}
  STR_NEWGRF_MD5SUM                                               :{BLACK}MD5sum: {SILVER}{RAW_STRING}
-@@ -3140,19 +3166,23 @@
+@@ -3141,19 +3167,23 @@
  STR_NEWGRF_ADD_TIP                                              :{BLACK}Add a NewGRF file to the list
  STR_NEWGRF_REMOVE                                               :{BLACK}Remove
  STR_NEWGRF_REMOVE_TIP                                           :{BLACK}Remove the selected NewGRF file from the list
@@ -598,7 +598,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-@@ -3473,6 +3503,13 @@
+@@ -3477,6 +3507,13 @@
  
  ########
  
@@ -612,9 +612,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/lang/english.txt
  STR_FUND_NEW_INDUSTRY                                           :{BLACK}Fund
  STR_PROSPECT_NEW_INDUSTRY                                       :{BLACK}Prospect
  STR_BUILD_NEW_INDUSTRY                                          :{BLACK}Build
-diff -r b3d363c24088 -r 55a457b8816c src/main_gui.cpp
---- src/main_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/main_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/main_gui.cpp
+--- src/main_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/main_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -26,6 +26,7 @@
  #include "toolbar_gui.h"
  #include "statusbar_gui.h"
@@ -634,9 +634,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/main_gui.cpp
  
  #ifdef ENABLE_NETWORK
  			case WKC_RETURN: case 'T': // smart chat; send to team if any, otherwise to all
-diff -r b3d363c24088 -r 55a457b8816c src/mixer.cpp
---- src/mixer.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/mixer.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/mixer.cpp
+--- src/mixer.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/mixer.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -25,7 +25,7 @@
  	uint flags;
  };
@@ -646,9 +646,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/mixer.cpp
  static uint32 _play_rate;
  
  /**
-diff -r b3d363c24088 -r 55a457b8816c src/network/network_base.h
---- src/network/network_base.h	Thu Mar 12 18:42:25 2009 +0000
-+++ src/network/network_base.h	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/network/network_base.h
+--- src/network/network_base.h	Sun Mar 15 21:49:37 2009 +0000
++++ src/network/network_base.h	Fri Mar 20 18:33:34 2009 +0100
 @@ -9,6 +9,7 @@
  
  #include "network_type.h"
@@ -665,9 +665,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/network/network_base.h
  
  	NetworkClientInfo(ClientID client_id = INVALID_CLIENT_ID) : client_id(client_id) {}
  	~NetworkClientInfo() { client_id = INVALID_CLIENT_ID; }
-diff -r b3d363c24088 -r 55a457b8816c src/network/network_client.cpp
---- src/network/network_client.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/network/network_client.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/network/network_client.cpp
+--- src/network/network_client.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/network/network_client.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -514,9 +514,14 @@
  			_password_game_seed = p->Recv_uint32();
  			p->Recv_string(_password_server_unique_id, sizeof(_password_server_unique_id));
@@ -693,9 +693,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/network/network_client.cpp
  	cp.next     = NULL;
  
  	if (err != NULL) {
-diff -r b3d363c24088 -r 55a457b8816c src/network/network_command.cpp
---- src/network/network_command.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/network/network_command.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/network/network_command.cpp
+--- src/network/network_command.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/network/network_command.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -72,6 +72,7 @@
  		 */
  		c.frame = _frame_counter_max + 1;
@@ -713,10 +713,10 @@ diff -r b3d363c24088 -r 55a457b8816c src/network/network_command.cpp
  
  		_local_command_queue = _local_command_queue->next;
  		free(cp);
-diff -r b3d363c24088 -r 55a457b8816c src/network/network_gui.cpp
---- src/network/network_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/network/network_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
-@@ -1487,6 +1487,12 @@
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/network/network_gui.cpp
+--- src/network/network_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/network/network_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
+@@ -1489,6 +1489,12 @@
  	ShowNetworkChatQueryWindow(DESTTYPE_BROADCAST, 0);
  }
  
@@ -729,7 +729,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/network/network_gui.cpp
  static void ClientList_None(byte client_no)
  {
  	/* No action ;) */
-@@ -1524,6 +1530,9 @@
+@@ -1526,6 +1532,9 @@
  		GetString(this->action[i], STR_NETWORK_CLIENTLIST_SPEAK_TO_ALL, lastof(this->action[i]));
  		this->proc[i++] = &ClientList_SpeakToAll;
  
@@ -739,9 +739,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/network/network_gui.cpp
  		if (_network_own_client_id != ci->client_id) {
  			/* We are no spectator and the company we want to give money to is no spectator and money gifts are allowed */
  			if (IsValidCompanyID(_network_playas) && IsValidCompanyID(ci->client_playas) && _settings_game.economy.give_money) {
-diff -r b3d363c24088 -r 55a457b8816c src/network/network_internal.h
---- src/network/network_internal.h	Thu Mar 12 18:42:25 2009 +0000
-+++ src/network/network_internal.h	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/network/network_internal.h
+--- src/network/network_internal.h	Sun Mar 15 21:49:37 2009 +0000
++++ src/network/network_internal.h	Fri Mar 20 18:33:34 2009 +0100
 @@ -125,6 +125,9 @@
  
  void NetworkTCPQueryServer(NetworkAddress address);
@@ -760,9 +760,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/network/network_internal.h
  };
  
  void NetworkAddCommandQueue(CommandPacket cp, NetworkClientSocket *cs = NULL);
-diff -r b3d363c24088 -r 55a457b8816c src/network/network_server.cpp
---- src/network/network_server.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/network/network_server.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/network/network_server.cpp
+--- src/network/network_server.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/network/network_server.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -483,6 +483,7 @@
  	cs->Send_Command(p, cp);
  	p->Send_uint32(cp->frame);
@@ -772,7 +772,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/network/network_server.cpp
  	cs->Send_Packet(p);
  }
 @@ -927,12 +928,14 @@
- 			//  first place. This filters that out.
+ 			 *  first place. This filters that out. */
  			cp.callback = (new_cs != cs) ? NULL : callback;
  			cp.my_cmd = (new_cs == cs);
 +			cp.client = ci->client_id;
@@ -786,9 +786,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/network/network_server.cpp
  	NetworkAddCommandQueue(cp);
  }
  
-diff -r b3d363c24088 -r 55a457b8816c src/newgrf_gui.cpp
---- src/newgrf_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/newgrf_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/newgrf_gui.cpp
+--- src/newgrf_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/newgrf_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -958,12 +958,12 @@ diff -r b3d363c24088 -r 55a457b8816c src/newgrf_gui.cpp
 -};
 -
 -/* Window definition for the add a newgrf window */
--static const WindowDesc _newgrf_add_dlg_desc = {
+-static const WindowDesc _newgrf_add_dlg_desc(
 -	WDP_CENTER, WDP_CENTER, 307, 237, 307, 337,
 -	WC_SAVELOAD, WC_NONE,
 -	WDF_STD_TOOLTIPS | WDF_DEF_WIDGET | WDF_STD_BTN | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE,
--	_newgrf_add_dlg_widgets,
--};
+-	_newgrf_add_dlg_widgets
+-);
 -
  static GRFPresetList _grf_preset_list;
  
@@ -1673,12 +1673,12 @@ diff -r b3d363c24088 -r 55a457b8816c src/newgrf_gui.cpp
 -};
 -
 -/* Window definition of the manage newgrfs window */
--static const WindowDesc _newgrf_desc = {
+-static const WindowDesc _newgrf_desc(
 -	WDP_CENTER, WDP_CENTER, 300, 263, 300, 263,
 -	WC_GAME_OPTIONS, WC_NONE,
 -	WDF_STD_TOOLTIPS | WDF_STD_BTN | WDF_DEF_WIDGET | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE,
--	_newgrf_widgets,
--};
+-	_newgrf_widgets
+-);
 -
  /** Callback function for the newgrf 'apply changes' confirmation window
   * @param w Window which is calling this callback
@@ -1745,12 +1745,12 @@ diff -r b3d363c24088 -r 55a457b8816c src/newgrf_gui.cpp
 +{   WIDGETS_END },
 +};
  
-+static const WindowDesc _newgrf_desc = {
++static const WindowDesc _newgrf_desc(
 +	WDP_CENTER, WDP_CENTER, 600, 262, 600, 262,
 +	WC_GAME_OPTIONS, WC_NONE,
 +	WDF_STD_TOOLTIPS | WDF_DEF_WIDGET | WDF_STD_BTN | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE,
-+	_newgrf_widgets,
-+};
++	_newgrf_widgets
++);
  
  /** Setup the NewGRF gui
   * @param editable allow the user to make changes to the grfconfig in the window
@@ -1762,9 +1762,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r b3d363c24088 -r 55a457b8816c src/openttd.cpp
---- src/openttd.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/openttd.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/openttd.cpp
+--- src/openttd.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/openttd.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -157,6 +157,8 @@
  		"  -G seed             = Set random seed\n"
  #if defined(ENABLE_NETWORK)
@@ -1807,9 +1807,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/openttd.cpp
  #endif /* ENABLE_NETWORK */
  		case 'r': ParseResolution(&resolution, mgo.opt); break;
  		case 't': startyear = atoi(mgo.opt); break;
-diff -r b3d363c24088 -r 55a457b8816c src/rail_gui.cpp
---- src/rail_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/rail_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/rail_gui.cpp
+--- src/rail_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/rail_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -2165,19 +2165,19 @@ diff -r b3d363c24088 -r 55a457b8816c src/rail_gui.cpp
 +};
 +
  /** High level window description of the default station-build window */
- static const WindowDesc _station_builder_desc = {
+ static const WindowDesc _station_builder_desc(
  	WDP_AUTO, WDP_AUTO, 148, 200, 148, 200,
 @@ -1349,13 +1598,24 @@
- 	_newstation_builder_widgets,
- };
+ 	_newstation_builder_widgets
+ );
  
 +/** High level window description of the newGRF station-build window */
-+static const WindowDesc _imp_newstation_builder_desc = {
++static const WindowDesc _imp_newstation_builder_desc(
 +	WDP_AUTO, WDP_AUTO, 304, 290, 304, 290,
 +	WC_BUILD_STATION, WC_BUILD_TOOLBAR,
 +	WDF_STD_TOOLTIPS | WDF_STD_BTN | WDF_DEF_WIDGET,
-+	_imp_newstation_builder_widgets,
-+};
++	_imp_newstation_builder_widgets
++);
 +
  /** Open station build window */
  static void ShowStationBuilder(Window *parent)
@@ -2193,9 +2193,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/rail_gui.cpp
  	}
  }
  
-diff -r b3d363c24088 -r 55a457b8816c src/screenshot.cpp
---- src/screenshot.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/screenshot.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/screenshot.cpp
+--- src/screenshot.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/screenshot.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -16,6 +16,9 @@
  #include "map_func.h"
  #include "saveload/saveload.h"
@@ -2312,9 +2312,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/screenshot.cpp
  		default: return false;
  	}
  }
-diff -r b3d363c24088 -r 55a457b8816c src/screenshot.h
---- src/screenshot.h	Thu Mar 12 18:42:25 2009 +0000
-+++ src/screenshot.h	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/screenshot.h
+--- src/screenshot.h	Sun Mar 15 21:49:37 2009 +0000
++++ src/screenshot.h	Fri Mar 20 18:33:34 2009 +0100
 @@ -13,10 +13,12 @@
  enum ScreenshotType {
  	SC_NONE,
@@ -2330,10 +2330,10 @@ diff -r b3d363c24088 -r 55a457b8816c src/screenshot.h
  void SetScreenshotType(ScreenshotType t);
  bool IsScreenshotRequested();
  
-diff -r b3d363c24088 -r 55a457b8816c src/settings.cpp
---- src/settings.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/settings.cpp	Thu Mar 12 21:49:03 2009 +0100
-@@ -1535,6 +1535,8 @@
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/settings.cpp
+--- src/settings.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/settings.cpp	Fri Mar 20 18:33:34 2009 +0100
+@@ -1536,6 +1536,8 @@
  	 SDTC_BOOL(gui.keep_all_autosave,                    S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.autosave_on_exit,                     S,  0, false,                        STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.max_num_autosaves,         SLE_UINT8, S,  0,    16,        0,      255, 0, STR_NULL,                                       NULL),
@@ -2342,7 +2342,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/settings.cpp
  	 SDTC_BOOL(gui.bridge_pillars,                       S,  0,  true,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.auto_euro,                            S,  0,  true,                        STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.news_message_timeout,      SLE_UINT8, S,  0,     2,        1,      255, 0, STR_NULL,                                       NULL),
-@@ -1547,6 +1549,14 @@
+@@ -1548,6 +1550,14 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
  	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
@@ -2357,9 +2357,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/settings.cpp
  
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
-diff -r b3d363c24088 -r 55a457b8816c src/settings_gui.cpp
---- src/settings_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/settings_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/settings_gui.cpp
+--- src/settings_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/settings_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -1037,9 +1037,21 @@
  /** Interaction sub-page */
  static SettingsPage _settings_ui_interaction_page = {_settings_ui_interaction, lengthof(_settings_ui_interaction)};
@@ -2390,9 +2390,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r b3d363c24088 -r 55a457b8816c src/settings_type.h
---- src/settings_type.h	Thu Mar 12 18:42:25 2009 +0000
-+++ src/settings_type.h	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/settings_type.h
+--- src/settings_type.h	Sun Mar 15 21:49:37 2009 +0000
++++ src/settings_type.h	Fri Mar 20 18:33:34 2009 +0100
 @@ -90,6 +90,16 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
@@ -2410,9 +2410,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/settings_type.h
  
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
-diff -r b3d363c24088 -r 55a457b8816c src/signs_gui.cpp
---- src/signs_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/signs_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/signs_gui.cpp
+--- src/signs_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/signs_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -20,12 +20,25 @@
  
  #include "table/strings.h"
@@ -2749,9 +2749,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/signs_gui.cpp
  {  WWT_RESIZEBOX,   RESIZE_LRTB,  COLOUR_GREY,   346,   357,   126,   137, 0x0,                   STR_RESIZE_BUTTON},
  {   WIDGETS_END},
  };
-diff -r b3d363c24088 -r 55a457b8816c src/smallmap_gui.cpp
---- src/smallmap_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/smallmap_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/smallmap_gui.cpp
+--- src/smallmap_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/smallmap_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -20,6 +20,8 @@
  #include "vehicle_base.h"
  #include "sound_func.h"
@@ -2777,21 +2777,21 @@ diff -r b3d363c24088 -r 55a457b8816c src/smallmap_gui.cpp
 +void ShowBigBrotherWindow(ClientID client)
 +{
 +	if (BringWindowToFrontById(WC_BIG_BROTHER_WINDOW, client) != NULL) return;
-+
++	
 +	const NetworkClientInfo *ci = NetworkFindClientInfoFromClientID(client);
 +	if (ci == NULL || !IsValidCompanyID(ci->client_playas)) return;
-+
++	
 +	Window *w = new ExtraViewportWindow(&_extra_view_port_desc, client, ci->last_build_coordinate);
 +	w->window_class = WC_BIG_BROTHER_WINDOW;
 +	w->widget[1].data = STR_BIG_BROTHER_CLIENT_NAME;
 +}
 +
- bool ScrollMainWindowTo(int x, int y, bool instant)
- {
- 	bool res = ScrollWindowTo(x, y, FindWindowById(WC_MAIN_WINDOW, 0), instant);
-diff -r b3d363c24088 -r 55a457b8816c src/spritecache.cpp
---- src/spritecache.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/spritecache.cpp	Thu Mar 12 21:49:03 2009 +0100
+ /**
+  * Scrolls the main window to given coordinates.
+  * @param x x coordinate
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/spritecache.cpp
+--- src/spritecache.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/spritecache.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -16,8 +16,8 @@
  
  #include "table/sprites.h"
@@ -2803,10 +2803,10 @@ diff -r b3d363c24088 -r 55a457b8816c src/spritecache.cpp
  
  typedef SimpleTinyEnumT<SpriteType, byte> SpriteTypeByte;
  
-diff -r b3d363c24088 -r 55a457b8816c src/strgen/strgen.cpp
---- src/strgen/strgen.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/strgen/strgen.cpp	Thu Mar 12 21:49:03 2009 +0100
-@@ -503,6 +503,7 @@
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/strgen/strgen.cpp
+--- src/strgen/strgen.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/strgen/strgen.cpp	Fri Mar 20 18:33:34 2009 +0100
+@@ -504,6 +504,7 @@
  	{"COMPANY",  EmitSingleChar, SCC_COMPANY_NAME,  1, 0},
  	{"COMPANYNUM", EmitSingleChar, SCC_COMPANY_NUM, 1, 0},
  	{"PRESIDENTNAME", EmitSingleChar, SCC_PRESIDENT_NAME, 1, 0},
@@ -2814,9 +2814,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/strgen/strgen.cpp
  
  	// 0x9D is used for the pseudo command SETCASE
  	// 0x9E is used for case switching
-diff -r b3d363c24088 -r 55a457b8816c src/strings.cpp
---- src/strings.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/strings.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/strings.cpp
+--- src/strings.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/strings.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -30,6 +30,8 @@
  #include "video/video_driver.hpp"
  #include "engine_base.h"
@@ -2840,9 +2840,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/strings.cpp
  			case SCC_SETCASE: { // {SETCASE}
  				/* This is a pseudo command, it's outputted when someone does {STRING.ack}
  				 * The modifier is added to all subsequent GetStringWithArgs that accept the modifier. */
-diff -r b3d363c24088 -r 55a457b8816c src/table/control_codes.h
---- src/table/control_codes.h	Thu Mar 12 18:42:25 2009 +0000
-+++ src/table/control_codes.h	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/table/control_codes.h
+--- src/table/control_codes.h	Sun Mar 15 21:49:37 2009 +0000
++++ src/table/control_codes.h	Fri Mar 20 18:33:34 2009 +0100
 @@ -35,6 +35,7 @@
  	SCC_COMPANY_NAME,
  	SCC_COMPANY_NUM,
@@ -2851,9 +2851,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/table/control_codes.h
  	SCC_ENGINE_NAME,
  
  	SCC_CURRENCY_COMPACT,
-diff -r b3d363c24088 -r 55a457b8816c src/toolbar_gui.cpp
---- src/toolbar_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/toolbar_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/toolbar_gui.cpp
+--- src/toolbar_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/toolbar_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -1090,6 +1090,7 @@
  			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
  			case WKC_CTRL  | 'G': MenuClickWorldScreenshot(); break;
@@ -2862,10 +2862,10 @@ diff -r b3d363c24088 -r 55a457b8816c src/toolbar_gui.cpp
  			case 'A': if (CanBuildVehicleInfrastructure(VEH_TRAIN)) ShowBuildRailToolbar(_last_built_railtype, 4); break; // Invoke Autorail
  			case 'L': ShowTerraformToolbar(); break;
  			case 'M': ShowSmallMap(); break;
-diff -r b3d363c24088 -r 55a457b8816c src/town_cmd.cpp
---- src/town_cmd.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/town_cmd.cpp	Thu Mar 12 21:49:03 2009 +0100
-@@ -2432,7 +2432,7 @@
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/town_cmd.cpp
+--- src/town_cmd.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/town_cmd.cpp	Fri Mar 20 18:33:34 2009 +0100
+@@ -2434,7 +2434,7 @@
  	return cost;
  }
  
@@ -2874,9 +2874,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/town_cmd.cpp
  {
  	/* Increase company ratings if they're low */
  	const Company *c;
-diff -r b3d363c24088 -r 55a457b8816c src/town_gui.cpp
---- src/town_gui.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/town_gui.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/town_gui.cpp
+--- src/town_gui.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/town_gui.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -93,6 +93,25 @@
  
  	virtual void OnPaint()
@@ -2916,10 +2916,10 @@ diff -r b3d363c24088 -r 55a457b8816c src/town_gui.cpp
  				y += 10;
  			}
  		}
-diff -r b3d363c24088 -r 55a457b8816c src/vehicle.cpp
---- src/vehicle.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/vehicle.cpp	Thu Mar 12 21:49:03 2009 +0100
-@@ -221,7 +221,7 @@
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/vehicle.cpp
+--- src/vehicle.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/vehicle.cpp	Fri Mar 20 18:33:34 2009 +0100
+@@ -224,7 +224,7 @@
  
  /* Size of the hash, 6 = 64 x 64, 7 = 128 x 128. Larger sizes will (in theory) reduce hash
   * lookup times at the expense of memory usage. */
@@ -2928,9 +2928,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/vehicle.cpp
  const int HASH_SIZE = 1 << HASH_BITS;
  const int HASH_MASK = HASH_SIZE - 1;
  const int TOTAL_HASH_SIZE = 1 << (HASH_BITS * 2);
-diff -r b3d363c24088 -r 55a457b8816c src/viewport.cpp
---- src/viewport.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/viewport.cpp	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/viewport.cpp
+--- src/viewport.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/viewport.cpp	Fri Mar 20 18:33:34 2009 +0100
 @@ -43,6 +43,8 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -2949,10 +2949,10 @@ diff -r b3d363c24088 -r 55a457b8816c src/viewport.cpp
  		if ((bottom - top) > (right - left)) {
  			int t = (top + bottom) >> 1;
  			ViewportDrawChk(vp, left, top, right, t);
-diff -r b3d363c24088 -r 55a457b8816c src/window.cpp
---- src/window.cpp	Thu Mar 12 18:42:25 2009 +0000
-+++ src/window.cpp	Thu Mar 12 21:49:03 2009 +0100
-@@ -1250,7 +1250,6 @@
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/window.cpp
+--- src/window.cpp	Sun Mar 15 21:49:37 2009 +0000
++++ src/window.cpp	Fri Mar 20 18:33:34 2009 +0100
+@@ -1267,7 +1267,6 @@
  static bool HandleDragDrop()
  {
  	if (_special_mouse_mode != WSM_DRAGDROP) return true;
@@ -2960,7 +2960,7 @@ diff -r b3d363c24088 -r 55a457b8816c src/window.cpp
  
  	Window *w = GetCallbackWnd();
  
-@@ -1259,7 +1258,13 @@
+@@ -1276,7 +1275,13 @@
  		Point pt;
  		pt.x = _cursor.pos.x - w->left;
  		pt.y = _cursor.pos.y - w->top;
@@ -2975,10 +2975,10 @@ diff -r b3d363c24088 -r 55a457b8816c src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r b3d363c24088 -r 55a457b8816c src/window_gui.h
---- src/window_gui.h	Thu Mar 12 18:42:25 2009 +0000
-+++ src/window_gui.h	Thu Mar 12 21:49:03 2009 +0100
-@@ -443,6 +443,13 @@
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/window_gui.h
+--- src/window_gui.h	Sun Mar 15 21:49:37 2009 +0000
++++ src/window_gui.h	Fri Mar 20 18:33:34 2009 +0100
+@@ -447,6 +447,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  
  	/**
@@ -2992,9 +2992,9 @@ diff -r b3d363c24088 -r 55a457b8816c src/window_gui.h
  	 * Handle the request for (viewport) scrolling.
  	 * @param delta the amount the viewport must be scrolled.
  	 */
-diff -r b3d363c24088 -r 55a457b8816c src/window_type.h
---- src/window_type.h	Thu Mar 12 18:42:25 2009 +0000
-+++ src/window_type.h	Thu Mar 12 21:49:03 2009 +0100
+diff -r ca45cfe5bd79 -r 5fd0be17772e src/window_type.h
+--- src/window_type.h	Sun Mar 15 21:49:37 2009 +0000
++++ src/window_type.h	Fri Mar 20 18:33:34 2009 +0100
 @@ -79,6 +79,7 @@
  	WC_PERFORMANCE_DETAIL,
  	WC_CONSOLE,

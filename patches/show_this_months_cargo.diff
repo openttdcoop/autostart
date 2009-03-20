@@ -1,6 +1,6 @@
-diff -r c731704096bb src/economy.cpp
---- src/economy.cpp	Fri Feb 27 20:54:23 2009 +0100
-+++ src/economy.cpp	Fri Feb 27 20:55:23 2009 +0100
+diff -r 3fdd4f5fb6c6 src/economy.cpp
+--- src/economy.cpp	Fri Mar 20 18:21:22 2009 +0100
++++ src/economy.cpp	Fri Mar 20 18:33:10 2009 +0100
 @@ -1427,6 +1427,8 @@
  		}
  	}
@@ -10,9 +10,9 @@ diff -r c731704096bb src/economy.cpp
  	TriggerIndustry(i, INDUSTRY_TRIGGER_RECEIVED_CARGO);
  	StartStopIndustryTileAnimation(i, IAT_INDUSTRY_RECEIVED_CARGO);
  }
-diff -r c731704096bb src/industry_cmd.cpp
---- src/industry_cmd.cpp	Fri Feb 27 20:54:23 2009 +0100
-+++ src/industry_cmd.cpp	Fri Feb 27 20:55:23 2009 +0100
+diff -r 3fdd4f5fb6c6 src/industry_cmd.cpp
+--- src/industry_cmd.cpp	Fri Mar 20 18:21:22 2009 +0100
++++ src/industry_cmd.cpp	Fri Mar 20 18:33:10 2009 +0100
 @@ -456,6 +456,8 @@
  		}
  	}
@@ -22,9 +22,9 @@ diff -r c731704096bb src/industry_cmd.cpp
  	if (moved_cargo && !StartStopIndustryTileAnimation(i, IAT_INDUSTRY_DISTRIBUTES_CARGO)) {
  		uint newgfx = GetIndustryTileSpec(GetIndustryGfx(tile))->anim_production;
  
-diff -r c731704096bb src/industry_gui.cpp
---- src/industry_gui.cpp	Fri Feb 27 20:54:23 2009 +0100
-+++ src/industry_gui.cpp	Fri Feb 27 20:55:23 2009 +0100
+diff -r 3fdd4f5fb6c6 src/industry_gui.cpp
+--- src/industry_gui.cpp	Fri Mar 20 18:21:22 2009 +0100
++++ src/industry_gui.cpp	Fri Mar 20 18:33:10 2009 +0100
 @@ -539,6 +539,43 @@
  			y += 10;
  		}
@@ -69,10 +69,10 @@ diff -r c731704096bb src/industry_gui.cpp
  		/* Get the extra message for the GUI */
  		if (HasBit(ind->callback_flags, CBM_IND_WINDOW_MORE_TEXT)) {
  			uint16 callback_res = GetIndustryCallback(CBID_INDUSTRY_WINDOW_MORE_TEXT, 0, 0, i, i->type, i->xy);
-diff -r c731704096bb src/lang/english.txt
---- src/lang/english.txt	Fri Feb 27 20:54:23 2009 +0100
-+++ src/lang/english.txt	Fri Feb 27 20:55:23 2009 +0100
-@@ -1976,8 +1976,12 @@
+diff -r 3fdd4f5fb6c6 src/lang/english.txt
+--- src/lang/english.txt	Fri Mar 20 18:21:22 2009 +0100
++++ src/lang/english.txt	Fri Mar 20 18:33:10 2009 +0100
+@@ -1979,8 +1979,12 @@
  STR_4828_PRODUCES                                               :{BLACK}Produces: {YELLOW}{STRING}{STRING}, {STRING}{STRING}
  ############ range for produces ends
  

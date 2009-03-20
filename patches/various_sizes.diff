@@ -1,6 +1,6 @@
-diff -r a9a52bd21122 src/mixer.cpp
---- src/mixer.cpp	Fri Feb 27 20:55:24 2009 +0100
-+++ src/mixer.cpp	Fri Feb 27 20:55:51 2009 +0100
+diff -r b9d673266332 src/mixer.cpp
+--- src/mixer.cpp	Fri Mar 20 18:21:26 2009 +0100
++++ src/mixer.cpp	Fri Mar 20 18:33:06 2009 +0100
 @@ -25,7 +25,7 @@
  	uint flags;
  };
@@ -10,9 +10,9 @@ diff -r a9a52bd21122 src/mixer.cpp
  static uint32 _play_rate;
  
  /**
-diff -r a9a52bd21122 src/spritecache.cpp
---- src/spritecache.cpp	Fri Feb 27 20:55:24 2009 +0100
-+++ src/spritecache.cpp	Fri Feb 27 20:55:51 2009 +0100
+diff -r b9d673266332 src/spritecache.cpp
+--- src/spritecache.cpp	Fri Mar 20 18:21:26 2009 +0100
++++ src/spritecache.cpp	Fri Mar 20 18:33:06 2009 +0100
 @@ -16,8 +16,8 @@
  
  #include "table/sprites.h"
@@ -24,10 +24,10 @@ diff -r a9a52bd21122 src/spritecache.cpp
  
  typedef SimpleTinyEnumT<SpriteType, byte> SpriteTypeByte;
  
-diff -r a9a52bd21122 src/vehicle.cpp
---- src/vehicle.cpp	Fri Feb 27 20:55:24 2009 +0100
-+++ src/vehicle.cpp	Fri Feb 27 20:55:51 2009 +0100
-@@ -240,7 +240,7 @@
+diff -r b9d673266332 src/vehicle.cpp
+--- src/vehicle.cpp	Fri Mar 20 18:21:26 2009 +0100
++++ src/vehicle.cpp	Fri Mar 20 18:33:06 2009 +0100
+@@ -224,7 +224,7 @@
  
  /* Size of the hash, 6 = 64 x 64, 7 = 128 x 128. Larger sizes will (in theory) reduce hash
   * lookup times at the expense of memory usage. */
@@ -36,9 +36,9 @@ diff -r a9a52bd21122 src/vehicle.cpp
  const int HASH_SIZE = 1 << HASH_BITS;
  const int HASH_MASK = HASH_SIZE - 1;
  const int TOTAL_HASH_SIZE = 1 << (HASH_BITS * 2);
-diff -r a9a52bd21122 src/viewport.cpp
---- src/viewport.cpp	Fri Feb 27 20:55:24 2009 +0100
-+++ src/viewport.cpp	Fri Feb 27 20:55:51 2009 +0100
+diff -r b9d673266332 src/viewport.cpp
+--- src/viewport.cpp	Fri Mar 20 18:21:26 2009 +0100
++++ src/viewport.cpp	Fri Mar 20 18:33:06 2009 +0100
 @@ -43,6 +43,8 @@
  #include "table/sprites.h"
  #include "table/strings.h"

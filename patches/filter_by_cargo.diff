@@ -1,6 +1,6 @@
-diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
---- src/build_vehicle_gui.cpp	Thu Mar 12 21:33:52 2009 +0100
-+++ src/build_vehicle_gui.cpp	Thu Mar 12 21:48:55 2009 +0100
+diff -r f790601418d9 src/build_vehicle_gui.cpp
+--- src/build_vehicle_gui.cpp	Fri Mar 20 18:21:27 2009 +0100
++++ src/build_vehicle_gui.cpp	Fri Mar 20 18:32:53 2009 +0100
 @@ -31,6 +31,7 @@
  	BUILD_VEHICLE_WIDGET_CAPTION,
  	BUILD_VEHICLE_WIDGET_SORT_ASSENDING_DESCENDING,
@@ -41,7 +41,7 @@ diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
  
  static bool _internal_sort_order; // descending/ascending
  static byte _last_sort_criteria[]    = {0, 0, 0, 0};
-@@ -687,6 +692,12 @@
+@@ -690,6 +695,12 @@
  		AirportFTAClass::Flags flags;
  		RoadTypes roadtypes;
  	} filter;
@@ -54,7 +54,7 @@ diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
  	bool descending_sort_order;
  	byte sort_criteria;
  	bool regenerate_list;
-@@ -713,6 +724,26 @@
+@@ -716,6 +727,26 @@
  		this->sel_engine      = INVALID_ENGINE;
  		this->regenerate_list = false;
  
@@ -81,7 +81,7 @@ diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
  		this->sort_criteria         = _last_sort_criteria[type];
  		this->descending_sort_order = _last_sort_order[type];
  
-@@ -817,6 +848,8 @@
+@@ -820,6 +851,8 @@
  			if (this->filter.railtype != RAILTYPE_END && !HasPowerOnRail(rvi->railtype, this->filter.railtype)) continue;
  			if (!IsEngineBuildable(eid, VEH_TRAIN, _local_company)) continue;
  
@@ -90,7 +90,7 @@ diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  
  			if (rvi->railveh_type != RAILVEH_WAGON) {
-@@ -852,8 +885,11 @@
+@@ -855,8 +888,11 @@
  		const Engine *e;
  		FOR_ALL_ENGINES_OF_TYPE(e, VEH_ROAD) {
  			EngineID eid = e->index;
@@ -102,7 +102,7 @@ diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  
  			if (eid == this->sel_engine) sel_id = eid;
-@@ -870,7 +906,10 @@
+@@ -873,7 +909,10 @@
  		const Engine *e;
  		FOR_ALL_ENGINES_OF_TYPE(e, VEH_SHIP) {
  			EngineID eid = e->index;
@@ -113,7 +113,7 @@ diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  
  			if (eid == this->sel_engine) sel_id = eid;
-@@ -894,10 +933,13 @@
+@@ -897,10 +936,13 @@
  		const Engine *e;
  		FOR_ALL_ENGINES_OF_TYPE(e, VEH_AIRCRAFT) {
  			EngineID eid = e->index;
@@ -127,7 +127,7 @@ diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
  			*this->eng_list.Append() = eid;
  			if (eid == this->sel_engine) sel_id = eid;
  		}
-@@ -949,27 +991,45 @@
+@@ -952,27 +994,45 @@
  				ShowDropDownMenu(this, _sort_listing[this->vehicle_type], this->sort_criteria, BUILD_VEHICLE_WIDGET_SORT_DROPDOWN, 0, 0);
  				break;
  
@@ -174,7 +174,7 @@ diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
  				break;
  			}
  
-@@ -1021,6 +1081,18 @@
+@@ -1024,6 +1084,18 @@
  		/* Set text of sort by dropdown */
  		this->widget[BUILD_VEHICLE_WIDGET_SORT_DROPDOWN].data = _sort_listing[this->vehicle_type][this->sort_criteria];
  
@@ -193,7 +193,7 @@ diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
  		this->DrawWidgets();
  
  		DrawEngineList(this->vehicle_type, this->widget[BUILD_VEHICLE_WIDGET_LIST].left + 2, this->widget[BUILD_VEHICLE_WIDGET_LIST].right, this->widget[BUILD_VEHICLE_WIDGET_LIST].top + 1, &this->eng_list, this->vscroll.pos, max, this->sel_engine, 0, DEFAULT_GROUP);
-@@ -1064,11 +1136,41 @@
+@@ -1067,11 +1139,41 @@
  
  	virtual void OnDropdownSelect(int widget, int index)
  	{
@@ -240,12 +240,12 @@ diff -r e24c995c9ab1 src/build_vehicle_gui.cpp
  		this->SetDirty();
  	}
  
-@@ -1085,7 +1187,7 @@
+@@ -1088,7 +1190,7 @@
  };
  
- static const WindowDesc _build_vehicle_desc = {
+ static const WindowDesc _build_vehicle_desc(
 -	WDP_AUTO, WDP_AUTO, 240, 174, 240, 256,
 +	WDP_AUTO, WDP_AUTO, 294, 174, 294, 256,
  	WC_BUILD_VEHICLE, WC_NONE,
  	WDF_STD_TOOLTIPS | WDF_STD_BTN | WDF_DEF_WIDGET | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE | WDF_CONSTRUCTION,
- 	_build_vehicle_widgets,
+ 	_build_vehicle_widgets

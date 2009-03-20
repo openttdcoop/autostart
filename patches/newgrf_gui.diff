@@ -1,7 +1,7 @@
-diff -r 3466e53185d5 src/lang/english.txt
---- src/lang/english.txt	Fri Feb 27 20:52:01 2009 +0100
-+++ src/lang/english.txt	Fri Feb 27 20:52:28 2009 +0100
-@@ -3102,6 +3102,7 @@
+diff -r d15aa3ab7234 src/lang/english.txt
+--- src/lang/english.txt	Thu Mar 19 19:02:25 2009 +0100
++++ src/lang/english.txt	Fri Mar 20 18:33:22 2009 +0100
+@@ -3106,6 +3106,7 @@
  STR_NEWGRF_TOGGLE_PALETTE_TIP                                   :{BLACK}Toggle the palette of the selected NewGRF.{}Do this when the graphics from this NewGRF look pink in-game
  STR_NEWGRF_SET_PARAMETERS                                       :{BLACK}Set parameters
  STR_NEWGRF_FILENAME                                             :{BLACK}Filename: {SILVER}{RAW_STRING}
@@ -9,7 +9,7 @@ diff -r 3466e53185d5 src/lang/english.txt
  STR_NEWGRF_PALETTE                                              :{BLACK}Palette: {SILVER}{RAW_STRING}
  STR_NEWGRF_GRF_ID                                               :{BLACK}GRF ID: {SILVER}{RAW_STRING}
  STR_NEWGRF_MD5SUM                                               :{BLACK}MD5sum: {SILVER}{RAW_STRING}
-@@ -3137,19 +3138,23 @@
+@@ -3141,19 +3142,23 @@
  STR_NEWGRF_ADD_TIP                                              :{BLACK}Add a NewGRF file to the list
  STR_NEWGRF_REMOVE                                               :{BLACK}Remove
  STR_NEWGRF_REMOVE_TIP                                           :{BLACK}Remove the selected NewGRF file from the list
@@ -37,9 +37,9 @@ diff -r 3466e53185d5 src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-diff -r 3466e53185d5 src/newgrf_gui.cpp
---- src/newgrf_gui.cpp	Fri Feb 27 20:52:01 2009 +0100
-+++ src/newgrf_gui.cpp	Fri Feb 27 20:52:28 2009 +0100
+diff -r d15aa3ab7234 src/newgrf_gui.cpp
+--- src/newgrf_gui.cpp	Thu Mar 19 19:02:25 2009 +0100
++++ src/newgrf_gui.cpp	Fri Mar 20 18:33:22 2009 +0100
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -209,12 +209,12 @@ diff -r 3466e53185d5 src/newgrf_gui.cpp
 -};
 -
 -/* Window definition for the add a newgrf window */
--static const WindowDesc _newgrf_add_dlg_desc = {
+-static const WindowDesc _newgrf_add_dlg_desc(
 -	WDP_CENTER, WDP_CENTER, 307, 237, 307, 337,
 -	WC_SAVELOAD, WC_NONE,
 -	WDF_STD_TOOLTIPS | WDF_DEF_WIDGET | WDF_STD_BTN | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE,
--	_newgrf_add_dlg_widgets,
--};
+-	_newgrf_add_dlg_widgets
+-);
 -
  static GRFPresetList _grf_preset_list;
  
@@ -924,12 +924,12 @@ diff -r 3466e53185d5 src/newgrf_gui.cpp
 -};
 -
 -/* Window definition of the manage newgrfs window */
--static const WindowDesc _newgrf_desc = {
+-static const WindowDesc _newgrf_desc(
 -	WDP_CENTER, WDP_CENTER, 300, 263, 300, 263,
 -	WC_GAME_OPTIONS, WC_NONE,
 -	WDF_STD_TOOLTIPS | WDF_STD_BTN | WDF_DEF_WIDGET | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE,
--	_newgrf_widgets,
--};
+-	_newgrf_widgets
+-);
 -
  /** Callback function for the newgrf 'apply changes' confirmation window
   * @param w Window which is calling this callback
@@ -996,12 +996,12 @@ diff -r 3466e53185d5 src/newgrf_gui.cpp
 +{   WIDGETS_END },
 +};
  
-+static const WindowDesc _newgrf_desc = {
++static const WindowDesc _newgrf_desc(
 +	WDP_CENTER, WDP_CENTER, 600, 262, 600, 262,
 +	WC_GAME_OPTIONS, WC_NONE,
 +	WDF_STD_TOOLTIPS | WDF_DEF_WIDGET | WDF_STD_BTN | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE,
-+	_newgrf_widgets,
-+};
++	_newgrf_widgets
++);
  
  /** Setup the NewGRF gui
   * @param editable allow the user to make changes to the grfconfig in the window
@@ -1013,10 +1013,10 @@ diff -r 3466e53185d5 src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r 3466e53185d5 src/window.cpp
---- src/window.cpp	Fri Feb 27 20:52:01 2009 +0100
-+++ src/window.cpp	Fri Feb 27 20:52:28 2009 +0100
-@@ -1250,7 +1250,6 @@
+diff -r d15aa3ab7234 src/window.cpp
+--- src/window.cpp	Thu Mar 19 19:02:25 2009 +0100
++++ src/window.cpp	Fri Mar 20 18:33:22 2009 +0100
+@@ -1267,7 +1267,6 @@
  static bool HandleDragDrop()
  {
  	if (_special_mouse_mode != WSM_DRAGDROP) return true;
@@ -1024,7 +1024,7 @@ diff -r 3466e53185d5 src/window.cpp
  
  	Window *w = GetCallbackWnd();
  
-@@ -1259,7 +1258,13 @@
+@@ -1276,7 +1275,13 @@
  		Point pt;
  		pt.x = _cursor.pos.x - w->left;
  		pt.y = _cursor.pos.y - w->top;
@@ -1039,10 +1039,10 @@ diff -r 3466e53185d5 src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r 3466e53185d5 src/window_gui.h
---- src/window_gui.h	Fri Feb 27 20:52:01 2009 +0100
-+++ src/window_gui.h	Fri Feb 27 20:52:28 2009 +0100
-@@ -443,6 +443,13 @@
+diff -r d15aa3ab7234 src/window_gui.h
+--- src/window_gui.h	Thu Mar 19 19:02:25 2009 +0100
++++ src/window_gui.h	Fri Mar 20 18:33:22 2009 +0100
+@@ -447,6 +447,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  
  	/**

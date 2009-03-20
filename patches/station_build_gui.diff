@@ -1,7 +1,7 @@
-diff -r b9992f8592e3 src/lang/english.txt
---- src/lang/english.txt	Fri Feb 27 20:53:43 2009 +0100
-+++ src/lang/english.txt	Fri Feb 27 20:54:23 2009 +0100
-@@ -1082,6 +1082,9 @@
+diff -r cb4516453717 src/lang/english.txt
+--- src/lang/english.txt	Fri Mar 20 17:24:27 2009 +0100
++++ src/lang/english.txt	Fri Mar 20 18:33:13 2009 +0100
+@@ -1084,6 +1084,9 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :All
  
@@ -11,9 +11,9 @@ diff -r b9992f8592e3 src/lang/english.txt
  STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
  STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
  STR_CONFIG_SETTING_TOWN_LAYOUT_BETTER_ROADS                     :better roads
-diff -r b9992f8592e3 src/rail_gui.cpp
---- src/rail_gui.cpp	Fri Feb 27 20:53:43 2009 +0100
-+++ src/rail_gui.cpp	Fri Feb 27 20:54:23 2009 +0100
+diff -r cb4516453717 src/rail_gui.cpp
+--- src/rail_gui.cpp	Fri Mar 20 17:24:27 2009 +0100
++++ src/rail_gui.cpp	Fri Mar 20 18:33:13 2009 +0100
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -369,19 +369,19 @@ diff -r b9992f8592e3 src/rail_gui.cpp
 +};
 +
  /** High level window description of the default station-build window */
- static const WindowDesc _station_builder_desc = {
+ static const WindowDesc _station_builder_desc(
  	WDP_AUTO, WDP_AUTO, 148, 200, 148, 200,
 @@ -1349,13 +1598,24 @@
- 	_newstation_builder_widgets,
- };
+ 	_newstation_builder_widgets
+ );
  
 +/** High level window description of the newGRF station-build window */
-+static const WindowDesc _imp_newstation_builder_desc = {
++static const WindowDesc _imp_newstation_builder_desc(
 +	WDP_AUTO, WDP_AUTO, 304, 290, 304, 290,
 +	WC_BUILD_STATION, WC_BUILD_TOOLBAR,
 +	WDF_STD_TOOLTIPS | WDF_STD_BTN | WDF_DEF_WIDGET,
-+	_imp_newstation_builder_widgets,
-+};
++	_imp_newstation_builder_widgets
++);
 +
  /** Open station build window */
  static void ShowStationBuilder(Window *parent)
@@ -397,10 +397,10 @@ diff -r b9992f8592e3 src/rail_gui.cpp
  	}
  }
  
-diff -r b9992f8592e3 src/settings.cpp
---- src/settings.cpp	Fri Feb 27 20:53:43 2009 +0100
-+++ src/settings.cpp	Fri Feb 27 20:54:23 2009 +0100
-@@ -1539,6 +1539,8 @@
+diff -r cb4516453717 src/settings.cpp
+--- src/settings.cpp	Fri Mar 20 17:24:27 2009 +0100
++++ src/settings.cpp	Fri Mar 20 18:33:13 2009 +0100
+@@ -1548,6 +1548,8 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
  	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
@@ -409,9 +409,9 @@ diff -r b9992f8592e3 src/settings.cpp
  
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
-diff -r b9992f8592e3 src/settings_gui.cpp
---- src/settings_gui.cpp	Fri Feb 27 20:53:43 2009 +0100
-+++ src/settings_gui.cpp	Fri Feb 27 20:54:23 2009 +0100
+diff -r cb4516453717 src/settings_gui.cpp
+--- src/settings_gui.cpp	Fri Mar 20 17:24:27 2009 +0100
++++ src/settings_gui.cpp	Fri Mar 20 18:33:13 2009 +0100
 @@ -1051,6 +1051,7 @@
  	SettingEntry("gui.always_build_infrastructure"),
  	SettingEntry("gui.persistent_buildingtools"),
@@ -420,9 +420,9 @@ diff -r b9992f8592e3 src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r b9992f8592e3 src/settings_type.h
---- src/settings_type.h	Fri Feb 27 20:53:43 2009 +0100
-+++ src/settings_type.h	Fri Feb 27 20:54:23 2009 +0100
+diff -r cb4516453717 src/settings_type.h
+--- src/settings_type.h	Fri Mar 20 17:24:27 2009 +0100
++++ src/settings_type.h	Fri Mar 20 18:33:13 2009 +0100
 @@ -90,6 +90,7 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
