@@ -1,7 +1,7 @@
-diff -r d15aa3ab7234 src/lang/english.txt
---- src/lang/english.txt	Thu Mar 19 19:02:25 2009 +0100
-+++ src/lang/english.txt	Fri Mar 20 18:33:22 2009 +0100
-@@ -3106,6 +3106,7 @@
+diff -r c60f6f7bbf4a src/lang/english.txt
+--- src/lang/english.txt	Sat Apr 04 03:45:02 2009 +0000
++++ src/lang/english.txt	Sat Apr 04 08:25:01 2009 +0200
+@@ -3105,6 +3105,7 @@
  STR_NEWGRF_TOGGLE_PALETTE_TIP                                   :{BLACK}Toggle the palette of the selected NewGRF.{}Do this when the graphics from this NewGRF look pink in-game
  STR_NEWGRF_SET_PARAMETERS                                       :{BLACK}Set parameters
  STR_NEWGRF_FILENAME                                             :{BLACK}Filename: {SILVER}{RAW_STRING}
@@ -9,7 +9,7 @@ diff -r d15aa3ab7234 src/lang/english.txt
  STR_NEWGRF_PALETTE                                              :{BLACK}Palette: {SILVER}{RAW_STRING}
  STR_NEWGRF_GRF_ID                                               :{BLACK}GRF ID: {SILVER}{RAW_STRING}
  STR_NEWGRF_MD5SUM                                               :{BLACK}MD5sum: {SILVER}{RAW_STRING}
-@@ -3141,19 +3142,23 @@
+@@ -3140,19 +3141,23 @@
  STR_NEWGRF_ADD_TIP                                              :{BLACK}Add a NewGRF file to the list
  STR_NEWGRF_REMOVE                                               :{BLACK}Remove
  STR_NEWGRF_REMOVE_TIP                                           :{BLACK}Remove the selected NewGRF file from the list
@@ -37,9 +37,9 @@ diff -r d15aa3ab7234 src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-diff -r d15aa3ab7234 src/newgrf_gui.cpp
---- src/newgrf_gui.cpp	Thu Mar 19 19:02:25 2009 +0100
-+++ src/newgrf_gui.cpp	Fri Mar 20 18:33:22 2009 +0100
+diff -r c60f6f7bbf4a src/newgrf_gui.cpp
+--- src/newgrf_gui.cpp	Sat Apr 04 03:45:02 2009 +0000
++++ src/newgrf_gui.cpp	Sat Apr 04 08:25:01 2009 +0200
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -62,9 +62,9 @@ diff -r d15aa3ab7234 src/newgrf_gui.cpp
  	/* Draw filename or not if it is not known (GRF sent over internet) */
  	if (c->filename != NULL) {
 -		SetDParamStr(0, c->filename);
--		y += DrawStringMultiLine(x, y, STR_NEWGRF_FILENAME, w, bottom - y);
+-		y = DrawStringMultiLine(x, x + w, y, bottom, STR_NEWGRF_FILENAME);
 +		SetDParamStr(0, (show_filenames) ? c->name : c->filename);
-+		y += DrawStringMultiLine(x, y,  (show_filenames) ? STR_NEWGRF_NAME : STR_NEWGRF_FILENAME, w, bottom - y);
++		y = DrawStringMultiLine(x, x + w, y, bottom, (show_filenames) ? STR_NEWGRF_NAME : STR_NEWGRF_FILENAME);
  	}
  
  	/* Prepare and draw GRF ID */
@@ -126,7 +126,7 @@ diff -r d15aa3ab7234 src/newgrf_gui.cpp
 -
 -				/* Draw selection background */
 -				if (h) GfxFillRect(3, y, this->width - 15, y + 9, 156);
--				DoDrawStringTruncated(text, 4, y, h ? TC_WHITE : TC_ORANGE, this->width - 18);
+-				DrawString(4, this->width - 22, y, text, h ? TC_WHITE : TC_ORANGE);
 -				y += 10;
 -			}
 -		}
@@ -376,7 +376,7 @@ diff -r d15aa3ab7234 src/newgrf_gui.cpp
  
  		this->DrawWidgets();
  
-+		DrawStringCentered((this->widget[SNGRFS_AVAILABLE_GRF_CAPTION].right - this->widget[SNGRFS_AVAILABLE_GRF_CAPTION].left) / 2, 34, STR_NEWGRF_ADD_CAPTION, TC_WHITE);
++		DrawString(this->widget[SNGRFS_AVAILABLE_GRF_CAPTION].left, this->widget[SNGRFS_AVAILABLE_GRF_CAPTION].right, 34, STR_NEWGRF_ADD_CAPTION, TC_WHITE,SA_CENTER);
 +		GfxFillRect(this->widget[SNGRFS_AVAILABLE_GRF_LIST].left + 1, this->widget[SNGRFS_AVAILABLE_GRF_LIST].top + 1, this->widget[SNGRFS_AVAILABLE_GRF_LIST].right, this->widget[SNGRFS_AVAILABLE_GRF_LIST].bottom, 0xD7);
 +
 +		n = 0;
@@ -391,7 +391,7 @@ diff -r d15aa3ab7234 src/newgrf_gui.cpp
 +
 +				/* Draw selection background */
 +				if (h) GfxFillRect(3, y, this->widget[SNGRFS_AVAILABLE_GRF_LIST].right - 4, y + 9, 156);
-+				DoDrawStringTruncated(text, 4, y, h ? TC_WHITE : TC_ORANGE, this->widget[SNGRFS_AVAILABLE_GRF_LIST].right - 7);
++				DrawString(4, this->widget[SNGRFS_AVAILABLE_GRF_LIST].right - 7, y, text, h ? TC_WHITE : TC_ORANGE);
 +				y += 10;
 +			}
 +			n++;
@@ -416,15 +416,15 @@ diff -r d15aa3ab7234 src/newgrf_gui.cpp
  
 -				DrawSprite(SPR_SQUARE, pal, 5, y + 2);
 -				if (c->error != NULL) DrawSprite(SPR_WARNING_SIGN, 0, 20, y + 2);
-+				DrawSprite(SPR_SQUARE, pal, this->widget[SNGRFS_FILE_LIST].left + 9, y + 1);
-+				if (c->error != NULL) DrawSprite(SPR_WARNING_SIGN, 0, this->widget[SNGRFS_FILE_LIST].left + 21, y + 1);
++				DrawSprite(SPR_SQUARE, pal, this->widget[SNGRFS_FILE_LIST].left + 9, y + 2);
++				if (c->error != NULL) DrawSprite(SPR_WARNING_SIGN, 0, this->widget[SNGRFS_FILE_LIST].left + 21, y + 2);
  				txtoffset = c->error != NULL ? 35 : 25;
--				DoDrawStringTruncated(text, txtoffset, y + 3, this->sel == c ? TC_WHITE : TC_BLACK, this->width - txtoffset - 10);
+-				DrawString(txtoffset, this->widget[SNGRFS_FILE_LIST].right - 2, y + 3, text, this->sel == c ? TC_WHITE : TC_BLACK);
 -				y += 14;
-+				DoDrawStringTruncated(text,
-+						this->widget[SNGRFS_FILE_LIST].left + txtoffset, y + 2,
-+						this->sel_r == c ? TC_WHITE : TC_BLACK,
-+						this->widget[SNGRFS_FILE_LIST].right - this->widget[SNGRFS_FILE_LIST].left - txtoffset);
++				DrawString(this->widget[SNGRFS_FILE_LIST].left + txtoffset,
++						this->widget[SNGRFS_FILE_LIST].right - 2 - txtoffset , y + 2,
++						text,
++						this->sel_r == c ? TC_WHITE : TC_BLACK);
 +				y += 13;
  			}
  		}
@@ -753,7 +753,7 @@ diff -r d15aa3ab7234 src/newgrf_gui.cpp
  				/* parse_intlist returns -1 on error */
 @@ -686,80 +733,123 @@
  
- 	virtual void OnResize(Point new_size, Point delta)
+ 	virtual void OnResize(Point delta)
  	{
 -		if (delta.x != 0) {
 -			ResizeButtons(this, SNGRFS_ADD, SNGRFS_MOVE_DOWN);
@@ -823,10 +823,10 @@ diff -r d15aa3ab7234 src/newgrf_gui.cpp
 +
 +		int list_bottom;
 +
-+		if (this->height < 224) {
-+			list_bottom = 111;
++		if (this->height < 221) {
++			list_bottom = 104;
 +		} else {
-+			list_bottom = this->height - 113;
++			list_bottom = this->height - 106;
  		}
  
 -		this->vscroll.cap += delta.y / 14;
@@ -863,7 +863,7 @@ diff -r d15aa3ab7234 src/newgrf_gui.cpp
 -				this->SetupNewGRFWindow();
 -				break;
 +		const GRFConfig *c;
-+		uint8 n;
++		uint16 n;
  
 -			case 1:
 -				/* Search the list for items that are now found and mark them as such. */
@@ -969,7 +969,7 @@ diff -r d15aa3ab7234 src/newgrf_gui.cpp
 +{      WWT_PANEL, RESIZE_RIGHT,  COLOUR_MAUVE,   0, 291,  30,  45, STR_NULL,                    STR_NULL },                        // SNGRFS_AVAILABLE_GRF_CAPTION
 +{      WWT_PANEL,    RESIZE_RB,  COLOUR_MAUVE,   0, 279,  46, 137, STR_NULL,                    STR_NULL },                        // SNGRFS_EMPTY_GRF_LIST
 +{      WWT_INSET,    RESIZE_RB,  COLOUR_MAUVE,   2, 277,  46, 137, STR_NULL,                    STR_NULL },                        // SNGRFS_AVAILABLE_GRF_LIST
-+{  WWT_SCROLLBAR,   RESIZE_LRB,  COLOUR_MAUVE, 280, 291,  46, 137, STR_NULL,                    STR_NULL },                        // SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR
++{  WWT_SCROLLBAR,   RESIZE_LRB,  COLOUR_MAUVE, 280, 291,  46, 137, STR_NULL,                    STR_0190_SCROLL_BAR_SCROLLS_LIST },// SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR
 +/* NewGRF file info */
 +{      WWT_PANEL,   RESIZE_RTB,  COLOUR_MAUVE,   0, 599, 138, 237, STR_NULL,                    STR_NULL },                        // SNGRFS_NEWGRF_INFO
 +/* NewGRF file list buttons */
@@ -1013,10 +1013,10 @@ diff -r d15aa3ab7234 src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r d15aa3ab7234 src/window.cpp
---- src/window.cpp	Thu Mar 19 19:02:25 2009 +0100
-+++ src/window.cpp	Fri Mar 20 18:33:22 2009 +0100
-@@ -1267,7 +1267,6 @@
+diff -r c60f6f7bbf4a src/window.cpp
+--- src/window.cpp	Sat Apr 04 03:45:02 2009 +0000
++++ src/window.cpp	Sat Apr 04 08:25:01 2009 +0200
+@@ -1304,7 +1304,6 @@
  static bool HandleDragDrop()
  {
  	if (_special_mouse_mode != WSM_DRAGDROP) return true;
@@ -1024,7 +1024,7 @@ diff -r d15aa3ab7234 src/window.cpp
  
  	Window *w = GetCallbackWnd();
  
-@@ -1276,7 +1275,13 @@
+@@ -1313,7 +1312,13 @@
  		Point pt;
  		pt.x = _cursor.pos.x - w->left;
  		pt.y = _cursor.pos.y - w->top;
@@ -1039,10 +1039,10 @@ diff -r d15aa3ab7234 src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r d15aa3ab7234 src/window_gui.h
---- src/window_gui.h	Thu Mar 19 19:02:25 2009 +0100
-+++ src/window_gui.h	Fri Mar 20 18:33:22 2009 +0100
-@@ -447,6 +447,13 @@
+diff -r c60f6f7bbf4a src/window_gui.h
+--- src/window_gui.h	Sat Apr 04 03:45:02 2009 +0000
++++ src/window_gui.h	Sat Apr 04 08:25:01 2009 +0200
+@@ -455,6 +455,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  
  	/**
