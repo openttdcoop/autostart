@@ -1,6 +1,6 @@
-diff -r 344ebe2d208c -r 69e8f3c0a77a config.lib
+diff -r 344ebe2d208c -r 6feada079752 config.lib
 --- config.lib	Fri Apr 03 12:39:52 2009 +0000
-+++ config.lib	Sat Apr 04 08:25:58 2009 +0200
++++ config.lib	Sat Apr 04 09:18:54 2009 +0200
 @@ -868,7 +868,7 @@
  			log 1 "WARNING: in most cases it is not safe for network use"
  			log 1 "WARNING: USE WITH CAUTION!"
@@ -10,9 +10,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a config.lib
  		elif [ -f "$ROOT_DIR/version" ]; then
  			revision="`cat $ROOT_DIR/version`"
  
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/economy.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/economy.cpp
 --- src/economy.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/economy.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/economy.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -1427,6 +1427,8 @@
  		}
  	}
@@ -22,9 +22,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/economy.cpp
  	TriggerIndustry(i, INDUSTRY_TRIGGER_RECEIVED_CARGO);
  	StartStopIndustryTileAnimation(i, IAT_INDUSTRY_RECEIVED_CARGO);
  }
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/industry_cmd.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/industry_cmd.cpp
 --- src/industry_cmd.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/industry_cmd.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/industry_cmd.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -456,6 +456,8 @@
  		}
  	}
@@ -34,9 +34,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/industry_cmd.cpp
  	if (moved_cargo && !StartStopIndustryTileAnimation(i, IAT_INDUSTRY_DISTRIBUTES_CARGO)) {
  		uint newgfx = GetIndustryTileSpec(GetIndustryGfx(tile))->anim_production;
  
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/industry_gui.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/industry_gui.cpp
 --- src/industry_gui.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/industry_gui.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/industry_gui.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -557,6 +557,43 @@
  			y += 10;
  		}
@@ -81,9 +81,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/industry_gui.cpp
  		/* Get the extra message for the GUI */
  		if (HasBit(ind->callback_flags, CBM_IND_WINDOW_MORE_TEXT)) {
  			uint16 callback_res = GetIndustryCallback(CBID_INDUSTRY_WINDOW_MORE_TEXT, 0, 0, i, i->type, i->xy);
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/lang/english.txt
+diff -r 344ebe2d208c -r 6feada079752 src/lang/english.txt
 --- src/lang/english.txt	Fri Apr 03 12:39:52 2009 +0000
-+++ src/lang/english.txt	Sat Apr 04 08:25:58 2009 +0200
++++ src/lang/english.txt	Sat Apr 04 09:18:54 2009 +0200
 @@ -1083,6 +1083,7 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
@@ -106,7 +106,15 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/lang/english.txt
  STR_482C_CENTER_THE_MAIN_VIEW_ON                                :{BLACK}Centre the main view on industry location
  STR_482D_NEW_UNDER_CONSTRUCTION                                 :{BLACK}{BIGFONT}New {STRING} under construction near {TOWN}!
  STR_482E_NEW_BEING_PLANTED_NEAR                                 :{BLACK}{BIGFONT}New {STRING} being planted near {TOWN}!
-@@ -3104,6 +3109,7 @@
+@@ -2239,6 +2244,7 @@
+ STR_704B_GENERATE_RANDOM_NEW_FACE                               :{BLACK}Generate random new face
+ STR_704C_KEY                                                    :{BLACK}Key
+ STR_704D_SHOW_KEY_TO_GRAPHS                                     :{BLACK}Show key to graphs
++STR_SHOW_DETAILED_PERFORMANCE_RATINGS                           :{BLACK}Show detailed performance ratings
+ STR_704E_KEY_TO_COMPANY_GRAPHS                                  :{WHITE}Key to company graphs
+ STR_704F_CLICK_HERE_TO_TOGGLE_COMPANY                           :{BLACK}Click here to toggle company's entry on graph on/off
+ STR_7050_UNITS_OF_CARGO_DELIVERED                               :{WHITE}Units of cargo delivered
+@@ -3104,6 +3110,7 @@
  STR_NEWGRF_TOGGLE_PALETTE_TIP                                   :{BLACK}Toggle the palette of the selected NewGRF.{}Do this when the graphics from this NewGRF look pink in-game
  STR_NEWGRF_SET_PARAMETERS                                       :{BLACK}Set parameters
  STR_NEWGRF_FILENAME                                             :{BLACK}Filename: {SILVER}{RAW_STRING}
@@ -114,7 +122,7 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/lang/english.txt
  STR_NEWGRF_PALETTE                                              :{BLACK}Palette: {SILVER}{RAW_STRING}
  STR_NEWGRF_GRF_ID                                               :{BLACK}GRF ID: {SILVER}{RAW_STRING}
  STR_NEWGRF_MD5SUM                                               :{BLACK}MD5sum: {SILVER}{RAW_STRING}
-@@ -3139,19 +3145,23 @@
+@@ -3139,19 +3146,23 @@
  STR_NEWGRF_ADD_TIP                                              :{BLACK}Add a NewGRF file to the list
  STR_NEWGRF_REMOVE                                               :{BLACK}Remove
  STR_NEWGRF_REMOVE_TIP                                           :{BLACK}Remove the selected NewGRF file from the list
@@ -142,9 +150,23 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/main_gui.cpp
+@@ -3475,6 +3486,13 @@
+ 
+ ########
+ 
++#### GUI list filter 
++STR_FILTER                                                      :{BLACK}Filter
++STR_FILTER_OSKTITLE                                             :{BLACK}Enter a filter string
++STR_FILTER_MATCH_CASE                                           :{BLACK}Match case
++STR_FILTER_CLEAR                                                :{BLACK}Clear filter
++########
++
+ STR_FUND_NEW_INDUSTRY                                           :{BLACK}Fund
+ STR_PROSPECT_NEW_INDUSTRY                                       :{BLACK}Prospect
+ STR_BUILD_NEW_INDUSTRY                                          :{BLACK}Build
+diff -r 344ebe2d208c -r 6feada079752 src/main_gui.cpp
 --- src/main_gui.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/main_gui.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/main_gui.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -26,6 +26,7 @@
  #include "toolbar_gui.h"
  #include "statusbar_gui.h"
@@ -164,9 +186,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/main_gui.cpp
  
  #ifdef ENABLE_NETWORK
  			case WKC_RETURN: case 'T': // smart chat; send to team if any, otherwise to all
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/mixer.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/mixer.cpp
 --- src/mixer.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/mixer.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/mixer.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -25,7 +25,7 @@
  	uint flags;
  };
@@ -176,9 +198,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/mixer.cpp
  static uint32 _play_rate;
  
  /**
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/network/network_client.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/network/network_client.cpp
 --- src/network/network_client.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/network/network_client.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/network/network_client.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -514,9 +514,14 @@
  			_password_game_seed = p->Recv_uint32();
  			p->Recv_string(_password_server_unique_id, sizeof(_password_server_unique_id));
@@ -196,9 +218,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/network/network_client.cpp
  			return NETWORK_RECV_STATUS_OKAY;
  
  		default: return NETWORK_RECV_STATUS_MALFORMED_PACKET;
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/network/network_internal.h
+diff -r 344ebe2d208c -r 6feada079752 src/network/network_internal.h
 --- src/network/network_internal.h	Fri Apr 03 12:39:52 2009 +0000
-+++ src/network/network_internal.h	Sat Apr 04 08:25:58 2009 +0200
++++ src/network/network_internal.h	Sat Apr 04 09:18:54 2009 +0200
 @@ -123,6 +123,9 @@
  
  void NetworkTCPQueryServer(NetworkAddress address);
@@ -209,9 +231,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/network/network_internal.h
  void NetworkAddServer(const char *b);
  void NetworkRebuildHostList();
  void UpdateNetworkGameWindow(bool unselect);
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/newgrf_gui.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/newgrf_gui.cpp
 --- src/newgrf_gui.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/newgrf_gui.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/newgrf_gui.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -1185,9 +1207,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/openttd.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/openttd.cpp
 --- src/openttd.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/openttd.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/openttd.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -157,6 +157,8 @@
  		"  -G seed             = Set random seed\n"
  #if defined(ENABLE_NETWORK)
@@ -1230,9 +1252,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/openttd.cpp
  #endif /* ENABLE_NETWORK */
  		case 'r': ParseResolution(&resolution, mgo.opt); break;
  		case 't': startyear = atoi(mgo.opt); break;
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/rail_gui.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/rail_gui.cpp
 --- src/rail_gui.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/rail_gui.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/rail_gui.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -1631,9 +1653,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/rail_gui.cpp
  	}
  }
  
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/settings_gui.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/settings_gui.cpp
 --- src/settings_gui.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/settings_gui.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/settings_gui.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -1143,6 +1143,7 @@
  	SettingEntry("gui.always_build_infrastructure"),
  	SettingEntry("gui.persistent_buildingtools"),
@@ -1642,9 +1664,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/settings_type.h
+diff -r 344ebe2d208c -r 6feada079752 src/settings_type.h
 --- src/settings_type.h	Fri Apr 03 12:39:52 2009 +0000
-+++ src/settings_type.h	Sat Apr 04 08:25:58 2009 +0200
++++ src/settings_type.h	Sat Apr 04 09:18:54 2009 +0200
 @@ -90,6 +90,7 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
@@ -1653,9 +1675,357 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/settings_type.h
  
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/spritecache.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/signs_gui.cpp
+--- src/signs_gui.cpp	Fri Apr 03 12:39:52 2009 +0000
++++ src/signs_gui.cpp	Sat Apr 04 09:18:54 2009 +0200
+@@ -20,12 +20,25 @@
+ 
+ #include "table/strings.h"
+ 
++struct FilterInfo {
++	const char *string;
++	bool case_sensitive;
++};
++
+ struct SignList {
+-	typedef GUIList<const Sign *> GUISignList;
++	typedef GUIList<const Sign *, FilterInfo> GUISignList;
+ 
+ 	static const Sign *last_sign;
+ 	GUISignList signs;
+ 
++	char filter_string[MAX_LENGTH_SIGN_NAME_BYTES];
++	bool match_case;
++
++	SignList(){
++		memset(filter_string, '\0', sizeof(this->filter_string));
++		this->match_case = false;
++	}
++
+ 	void BuildSignsList()
+ 	{
+ 		if (!this->signs.NeedRebuild()) return;
+@@ -37,6 +50,7 @@
+ 		const Sign *si;
+ 		FOR_ALL_SIGNS(si) *this->signs.Append() = si;
+ 
++		this->FilterSignList();
+ 		this->signs.Compact();
+ 		this->signs.RebuildDone();
+ 	}
+@@ -66,6 +80,23 @@
+ 		/* Reset the name sorter sort cache */
+ 		this->last_sign = NULL;
+ 	}
++
++	/** Filter sign list by sign name (case sensitive setting in FilterInfo) */
++	static bool CDECL SignNameFilter(const Sign * const *a, FilterInfo filter_info)
++	{
++		/* Get sign string */
++		char buf1[64];
++		SetDParam(0, (*a)->index);
++		GetString(buf1, STR_SIGN_NAME, lastof(buf1));
++
++		return (filter_info.case_sensitive ? strstr(buf1, filter_info.string) : strcasestr(buf1, filter_info.string)) != NULL;
++	}
++
++	void FilterSignList()
++	{
++		FilterInfo filter_info = {this->filter_string, this->match_case};
++		this->signs.Filter(&SignNameFilter, filter_info);
++	}
+ };
+ 
+ const Sign *SignList::last_sign = NULL;
+@@ -77,22 +108,118 @@
+ 	SLW_STICKY,
+ 	SLW_LIST,
+ 	SLW_SCROLLBAR,
++	SLW_FILTER_TEXT,
++	SLW_FILTER_MATCH_CASE_BTN,
++	SLW_FILTER_CLEAR_BTN,
+ 	SLW_RESIZE,
+ };
+ 
+-struct SignListWindow : Window, SignList {
+-	SignListWindow(const WindowDesc *desc, WindowNumber window_number) : Window(desc, window_number)
++struct SignListWindow : QueryStringBaseWindow, SignList {
++private:
++	int selected_sign;
++
++public:
++	SignListWindow(const WindowDesc *desc, WindowNumber window_number) : QueryStringBaseWindow(MAX_LENGTH_SIGN_NAME_BYTES, desc)
+ 	{
+-		this->vscroll.cap = 12;
++		this->vscroll.cap = 11;
+ 		this->resize.step_height = 10;
+ 		this->resize.height = this->height - 10 * 7; // minimum if 5 in the list
+ 
++		this->InitializeFilterTextWidget();
++		this->SetFilterString("");
++		this->selected_sign = -1;
++ 
+ 		this->signs.ForceRebuild();
+ 		this->signs.NeedResort();
+ 
+ 		this->FindWindowPlacementAndResize(desc);
+ 	}
+ 
++	void InitializeFilterTextWidget()
++	{
++		this->afilter = CS_ALPHANUMERAL;
++		this->LowerWidget(SLW_FILTER_TEXT);
++
++		/* Display an empty string in the edit box */
++		GetString(this->edit_str_buf, STR_EMPTY, lastof(this->edit_str_buf));
++
++		this->edit_str_buf[lengthof(this->edit_str_buf) - 1] = '\0';
++
++		InitializeTextBuffer(&this->text, this->edit_str_buf, MAX_LENGTH_SIGN_NAME_BYTES, 255); // Allow MAX_LENGTH_SIGN_NAME_BYTES characters (including \0)
++
++		this->InvalidateWidget(SLW_FILTER_TEXT);
++	}
++
++	void SetFilterString(const char* new_filter_string)
++	{
++		/* clear this->filter_string */
++		memset(this->filter_string, '\0', sizeof(this->filter_string));
++
++		/* check if there is a new filter string */ 
++		if (new_filter_string != 0 && strlen(new_filter_string) != 0) {
++			/* Copy new filter string */
++			strncpy(this->filter_string, new_filter_string, strlen(new_filter_string));
++			this->filter_string[strlen(new_filter_string)] = '\0';
++
++			this->signs.SetFilterState(true);
++		}
++		else
++			this->signs.SetFilterState(false);
++
++		this->UpdateList();
++	}
++
++	void UpdateList()
++	{
++		/* Rebuild list of signs that are displayed. */
++		this->signs.ForceRebuild();
++
++		/* Re-paint widgets that need to be repainted */
++		this->InvalidateWidget(SLW_LIST);
++		this->InvalidateWidget(SLW_SCROLLBAR);
++		this->InvalidateWidget(SLW_CAPTION);
++	}
++
++	void SelectNextSign()
++	{
++		this->selected_sign++;
++		if (this->selected_sign != -1 && (unsigned int) this->selected_sign >= this->signs.Length()) {
++			this->selected_sign = this->signs.Length () - 1;
++		}
++
++		/* Scroll down a half page if moving below last line  */
++		if (this->selected_sign >= this->vscroll.cap + this->vscroll.pos)
++		{
++			int pos = Clamp(this->vscroll.pos + this->vscroll.cap/2 + 1,  0, this->vscroll.count - this->vscroll.cap);
++			this->vscroll.pos = pos;
++			//this->SetDirty();
++			this->InvalidateWidget(SLW_SCROLLBAR);
++		}
++
++		this->InvalidateWidget(SLW_LIST);
++	}
++
++	void SelectPreviousSign()
++	{
++		this->selected_sign--;
++		if (this->selected_sign < 0) {
++			this->selected_sign = 0;
++		} else if ((unsigned int) this->selected_sign >= this->signs.Length()) {
++			this->selected_sign = this->signs.Length () - 1;
++		}
++
++		/* Scroll up a half page if moving above first line  */
++		if (this->selected_sign < this->vscroll.pos)
++		{
++			int pos = Clamp(this->vscroll.pos - this->vscroll.cap/2 - 1,  0, this->vscroll.count - this->vscroll.cap);
++			this->vscroll.pos = pos;
++			//this->SetDirty();
++			this->InvalidateWidget(SLW_SCROLLBAR);
++		}
++		
++		this->InvalidateWidget(SLW_LIST);
++ 	}
++
+ 	virtual void OnPaint()
+ 	{
+ 		BuildSignsList();
+@@ -102,6 +229,7 @@
+ 
+ 		SetDParam(0, this->vscroll.count);
+ 		this->DrawWidgets();
++		this->DrawEditBox(SLW_FILTER_TEXT);
+ 
+ 		/* No signs? */
+ 		int y = this->widget[SLW_LIST].top + 2; // offset from top of widget
+@@ -118,24 +246,119 @@
+ 
+ 			SetDParam(0, si->index);
+ 			DrawString(this->widget[SLW_LIST].left + 22, this->widget[SLW_LIST].right, y, STR_SIGN_NAME, TC_YELLOW);
++			if (this->selected_sign == i)
++				DrawString(this->widget[SLW_LIST].left + 22, this->widget[SLW_LIST].right, y, STR_SIGN_NAME, TC_BLUE);
++			else
++				DrawString(this->widget[SLW_LIST].left + 22, this->widget[SLW_LIST].right, y, STR_SIGN_NAME, TC_YELLOW);
+ 			y += 10;
+ 		}
+ 	}
+ 
+ 	virtual void OnClick(Point pt, int widget)
+ 	{
+-		if (widget == SLW_LIST) {
+-			uint32 id_v = (pt.y - this->widget[SLW_LIST].top - 1) / 10;
++		switch (widget) {
++			case SLW_LIST:
++			{ // <- needed or the compiler will complain
++				uint32 id_v = (pt.y - this->widget[SLW_LIST].top - 1) / 10;
+ 
+-			if (id_v >= this->vscroll.cap) return;
+-			id_v += this->vscroll.pos;
+-			if (id_v >= this->vscroll.count) return;
++				if (id_v >= this->vscroll.cap) return;
++				id_v += this->vscroll.pos;
++				if (id_v >= this->vscroll.count) return;
+ 
+-			const Sign *si = this->signs[id_v];
+-			ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++				const Sign *si = this->signs[id_v];
++				ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++				break;
++			}
++
++			case SLW_FILTER_CLEAR_BTN:
++				this->InitializeFilterTextWidget();
++				this->SetFilterString(0);
++				this->selected_sign = -1;
++				break;
++
++			case SLW_FILTER_MATCH_CASE_BTN:
++				this->match_case = !this->match_case;
++				if (this->match_case) {
++					this->LowerWidget(SLW_FILTER_MATCH_CASE_BTN);
++				} else {
++					this->RaiseWidget(SLW_FILTER_MATCH_CASE_BTN);
++				}
++				this->UpdateList();
++				break;
+ 		}
+ 	}
+ 
++	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
++	{
++		EventState state = ES_NOT_HANDLED;
++		switch (this->HandleEditBoxKey(SLW_FILTER_TEXT, key, keycode, state)) {
++			case HEBR_EDITING:
++				break;
++
++			case HEBR_CONFIRM: // Enter pressed -> goto first sign in list
++			{
++				uint n_signs = this->signs.Length();
++				if (n_signs >= 1) {
++					/* highlight first sign if selected_sign is == -1 or if a sign below the end of list is selected */
++					uint sign_id = this->selected_sign == -1 || (uint)this->selected_sign >= n_signs? 0 : this->selected_sign;
++					if (n_signs > sign_id) {
++						const Sign* si = this->signs[sign_id];
++						ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++					}
++				}
++				return state;
++			}
++
++			case HEBR_CANCEL: // ESC pressed, clear filter
++				this->InitializeFilterTextWidget(); // Empty the text in the EditBox widget
++				this->SetFilterString(0);           // Use empty text as filter text (= view all signs)
++				this->focused_widget = 0;           // Unfocus the text box
++				this->selected_sign = -1;           // Deselect sign in sign list
++				return state;
++
++			case HEBR_NOT_FOCUSED: // The filter text box is not globaly focused
++				if (keycode == 'F') { // Hotkey to enable filter box
++					this->SetFocusedWidget(SLW_FILTER_TEXT);
++					SetFocusedWindow(this); // The user has asked to give focus to the text box, so make sure this window is focused.
++					state = ES_HANDLED;
++				}
++				break;
++
++			default:
++				NOT_REACHED();
++		}
++
++		if (state == ES_HANDLED) OnOSKInput(SLW_FILTER_TEXT);
++
++		// Selection of signs using arrow up/down keys
++		if (this->focused_widget == this->widget + SLW_FILTER_TEXT)
++		{
++			switch (keycode) {
++				case WKC_UP:
++					this->SelectPreviousSign();
++					state = ES_HANDLED;
++					break;
++
++				case WKC_DOWN:
++					this->SelectNextSign();
++					state = ES_HANDLED;
++			}
++		}
++
++		return state;
++	}
++
++	virtual void OnOSKInput(int wid)
++	{
++		this->SetFilterString(this->text.buf);
++		this->UpdateList();
++	}
++
++	virtual void OnMouseLoop()
++	{
++		this->HandleEditBox(SLW_FILTER_TEXT);
++ 	}
++
+ 	virtual void OnResize(Point delta)
+ 	{
+ 		this->vscroll.cap += delta.y / 10;
+@@ -143,7 +366,10 @@
+ 
+ 	virtual void OnInvalidateData(int data)
+ 	{
+-		if (data == 0) {
++		/* data == 0: new or deleted sign
++		 * data == 1: sign is renamed
++		 */
++		if (data == 0 || strlen(this->filter_string) != 0) {
+ 			this->signs.ForceRebuild();
+ 		} else {
+ 			this->signs.ForceResort();
+@@ -153,10 +379,13 @@
+ 
+ static const Widget _sign_list_widget[] = {
+ {   WWT_CLOSEBOX,   RESIZE_NONE,  COLOUR_GREY,     0,    10,     0,    13, STR_00C5,              STR_018B_CLOSE_WINDOW},
+-{    WWT_CAPTION,  RESIZE_RIGHT,  COLOUR_GREY,    11,   345,     0,    13, STR_SIGN_LIST_CAPTION, STR_018C_WINDOW_TITLE_DRAG_THIS},
++{    WWT_CAPTION,  RESIZE_RIGHT,  COLOUR_GREY,    11,   345,     0,    13, STR_SIGN_LIST_CAPTION, STR_018C_WINDOW_TITLE_DRAG_THIS},   // SLW_CAPTION
+ {  WWT_STICKYBOX,     RESIZE_LR,  COLOUR_GREY,   346,   357,     0,    13, 0x0,                   STR_STICKY_BUTTON},
+-{      WWT_PANEL,     RESIZE_RB,  COLOUR_GREY,     0,   345,    14,   137, 0x0,                   STR_NULL},
+-{  WWT_SCROLLBAR,    RESIZE_LRB,  COLOUR_GREY,   346,   357,    14,   125, 0x0,                   STR_0190_SCROLL_BAR_SCROLLS_LIST},
++{      WWT_PANEL,     RESIZE_RB,  COLOUR_GREY,     0,   345,    14,   125, 0x0,                   STR_NULL},                          // SLW_LIST
++{  WWT_SCROLLBAR,    RESIZE_LRB,  COLOUR_GREY,   346,   357,    14,   125, 0x0,                   STR_0190_SCROLL_BAR_SCROLLS_LIST},  // SLW_SCROLLBAR
++{    WWT_EDITBOX,    RESIZE_RTB,  COLOUR_GREY,     0,   165,   126,   137, STR_FILTER_OSKTITLE,   STR_NULL},                          // SLW_FILTER_TEXT
++{ WWT_PUSHTXTBTN,    RESIZE_LRTB, COLOUR_GREY,     166, 255,   126,   137, STR_FILTER_MATCH_CASE, STR_NULL},                          // SLW_FILTER_MATCH_CASE_BTN
++{    WWT_TEXTBTN,    RESIZE_LRTB, COLOUR_GREY,     256, 345,   126,   137, STR_FILTER_CLEAR,      STR_NULL},                          // SLW_FILTER_CLEAR_BTN
+ {  WWT_RESIZEBOX,   RESIZE_LRTB,  COLOUR_GREY,   346,   357,   126,   137, 0x0,                   STR_RESIZE_BUTTON},
+ {   WIDGETS_END},
+ };
+diff -r 344ebe2d208c -r 6feada079752 src/spritecache.cpp
 --- src/spritecache.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/spritecache.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/spritecache.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -16,8 +16,8 @@
  
  #include "table/sprites.h"
@@ -1667,9 +2037,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/spritecache.cpp
  
  typedef SimpleTinyEnumT<SpriteType, byte> SpriteTypeByte;
  
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/table/settings.h
+diff -r 344ebe2d208c -r 6feada079752 src/table/settings.h
 --- src/table/settings.h	Fri Apr 03 12:39:52 2009 +0000
-+++ src/table/settings.h	Sat Apr 04 08:25:58 2009 +0200
++++ src/table/settings.h	Sat Apr 04 09:18:54 2009 +0200
 @@ -552,6 +552,7 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
@@ -1678,9 +2048,20 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/table/settings.h
  
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/town_cmd.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/toolbar_gui.cpp
+--- src/toolbar_gui.cpp	Fri Apr 03 12:39:52 2009 +0000
++++ src/toolbar_gui.cpp	Sat Apr 04 09:18:54 2009 +0200
+@@ -1090,6 +1090,7 @@
+ 			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
+ 			case WKC_CTRL  | 'G': MenuClickWorldScreenshot(); break;
+ 			case WKC_CTRL | WKC_ALT | 'C': if (!_networking) ShowCheatWindow(); break;
++			case WKC_CTRL | 'L': ShowSignList(); break;
+ 			case 'A': if (CanBuildVehicleInfrastructure(VEH_TRAIN)) ShowBuildRailToolbar(_last_built_railtype, 4); break; // Invoke Autorail
+ 			case 'L': ShowTerraformToolbar(); break;
+ 			case 'M': ShowSmallMap(); break;
+diff -r 344ebe2d208c -r 6feada079752 src/town_cmd.cpp
 --- src/town_cmd.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/town_cmd.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/town_cmd.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -2452,7 +2452,7 @@
  	return cost;
  }
@@ -1690,9 +2071,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/town_cmd.cpp
  {
  	/* Increase company ratings if they're low */
  	const Company *c;
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/town_gui.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/town_gui.cpp
 --- src/town_gui.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/town_gui.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/town_gui.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -93,6 +93,25 @@
  
  	virtual void OnPaint()
@@ -1732,9 +2113,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/town_gui.cpp
  				y += 10;
  			}
  		}
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/vehicle.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/vehicle.cpp
 --- src/vehicle.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/vehicle.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/vehicle.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -224,7 +224,7 @@
  
  /* Size of the hash, 6 = 64 x 64, 7 = 128 x 128. Larger sizes will (in theory) reduce hash
@@ -1744,9 +2125,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/vehicle.cpp
  const int HASH_SIZE = 1 << HASH_BITS;
  const int HASH_MASK = HASH_SIZE - 1;
  const int TOTAL_HASH_SIZE = 1 << (HASH_BITS * 2);
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/viewport.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/viewport.cpp
 --- src/viewport.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/viewport.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/viewport.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -43,6 +43,8 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -1765,9 +2146,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/viewport.cpp
  		if ((bottom - top) > (right - left)) {
  			int t = (top + bottom) >> 1;
  			ViewportDrawChk(vp, left, top, right, t);
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/window.cpp
+diff -r 344ebe2d208c -r 6feada079752 src/window.cpp
 --- src/window.cpp	Fri Apr 03 12:39:52 2009 +0000
-+++ src/window.cpp	Sat Apr 04 08:25:58 2009 +0200
++++ src/window.cpp	Sat Apr 04 09:18:54 2009 +0200
 @@ -1304,7 +1304,6 @@
  static bool HandleDragDrop()
  {
@@ -1791,9 +2172,9 @@ diff -r 344ebe2d208c -r 69e8f3c0a77a src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r 344ebe2d208c -r 69e8f3c0a77a src/window_gui.h
+diff -r 344ebe2d208c -r 6feada079752 src/window_gui.h
 --- src/window_gui.h	Fri Apr 03 12:39:52 2009 +0000
-+++ src/window_gui.h	Sat Apr 04 08:25:58 2009 +0200
++++ src/window_gui.h	Sat Apr 04 09:18:54 2009 +0200
 @@ -455,6 +455,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  

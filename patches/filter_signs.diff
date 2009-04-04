@@ -1,7 +1,15 @@
-diff -r 941d22975314 src/lang/english.txt
---- src/lang/english.txt	Fri Feb 27 21:01:31 2009 +0100
-+++ src/lang/english.txt	Fri Feb 27 21:07:12 2009 +0100
-@@ -3500,6 +3500,13 @@
+diff -r ea4d6358e258 src/lang/english.txt
+--- src/lang/english.txt	Fri Apr 03 11:02:41 2009 +0000
++++ src/lang/english.txt	Sat Apr 04 09:18:07 2009 +0200
+@@ -2239,6 +2239,7 @@
+ STR_704B_GENERATE_RANDOM_NEW_FACE                               :{BLACK}Generate random new face
+ STR_704C_KEY                                                    :{BLACK}Key
+ STR_704D_SHOW_KEY_TO_GRAPHS                                     :{BLACK}Show key to graphs
++STR_SHOW_DETAILED_PERFORMANCE_RATINGS                           :{BLACK}Show detailed performance ratings
+ STR_704E_KEY_TO_COMPANY_GRAPHS                                  :{WHITE}Key to company graphs
+ STR_704F_CLICK_HERE_TO_TOGGLE_COMPANY                           :{BLACK}Click here to toggle company's entry on graph on/off
+ STR_7050_UNITS_OF_CARGO_DELIVERED                               :{WHITE}Units of cargo delivered
+@@ -3475,6 +3476,13 @@
  
  ########
  
@@ -15,9 +23,9 @@ diff -r 941d22975314 src/lang/english.txt
  STR_FUND_NEW_INDUSTRY                                           :{BLACK}Fund
  STR_PROSPECT_NEW_INDUSTRY                                       :{BLACK}Prospect
  STR_BUILD_NEW_INDUSTRY                                          :{BLACK}Build
-diff -r 941d22975314 src/signs_gui.cpp
---- src/signs_gui.cpp	Fri Feb 27 21:01:31 2009 +0100
-+++ src/signs_gui.cpp	Fri Feb 27 21:07:12 2009 +0100
+diff -r ea4d6358e258 src/signs_gui.cpp
+--- src/signs_gui.cpp	Fri Apr 03 11:02:41 2009 +0000
++++ src/signs_gui.cpp	Sat Apr 04 09:18:07 2009 +0200
 @@ -20,12 +20,25 @@
  
  #include "table/strings.h"
@@ -53,7 +61,7 @@ diff -r 941d22975314 src/signs_gui.cpp
  		this->signs.Compact();
  		this->signs.RebuildDone();
  	}
-@@ -66,23 +80,137 @@
+@@ -66,6 +80,23 @@
  		/* Reset the name sorter sort cache */
  		this->last_sign = NULL;
  	}
@@ -77,19 +85,18 @@ diff -r 941d22975314 src/signs_gui.cpp
  };
  
  const Sign *SignList::last_sign = NULL;
+@@ -77,22 +108,118 @@
+ 	SLW_STICKY,
+ 	SLW_LIST,
+ 	SLW_SCROLLBAR,
++	SLW_FILTER_TEXT,
++	SLW_FILTER_MATCH_CASE_BTN,
++	SLW_FILTER_CLEAR_BTN,
+ 	SLW_RESIZE,
+ };
  
 -struct SignListWindow : Window, SignList {
 -	SignListWindow(const WindowDesc *desc, WindowNumber window_number) : Window(desc, window_number)
-+/** Enum referring to the widgets of the sign list window */
-+enum SignListWidgets {
-+	SIGN_LIST_WIDGET_CAPTION = 1,
-+	SIGN_LIST_WIDGET_LIST = 3,
-+	SIGN_LIST_WIDGET_SCROLLBAR,
-+	SIGN_LIST_WIDGET_FILTER_TEXT,
-+	SIGN_LIST_WIDGET_FILTER_MATCH_CASE_BTN,
-+	SIGN_LIST_WIDGET_FILTER_CLEAR_BTN,
-+};
-+
 +struct SignListWindow : QueryStringBaseWindow, SignList {
 +private:
 +	int selected_sign;
@@ -105,7 +112,7 @@ diff -r 941d22975314 src/signs_gui.cpp
 +		this->InitializeFilterTextWidget();
 +		this->SetFilterString("");
 +		this->selected_sign = -1;
-+
++ 
  		this->signs.ForceRebuild();
  		this->signs.NeedResort();
  
@@ -115,7 +122,7 @@ diff -r 941d22975314 src/signs_gui.cpp
 +	void InitializeFilterTextWidget()
 +	{
 +		this->afilter = CS_ALPHANUMERAL;
-+		this->LowerWidget(SIGN_LIST_WIDGET_FILTER_TEXT);
++		this->LowerWidget(SLW_FILTER_TEXT);
 +
 +		/* Display an empty string in the edit box */
 +		GetString(this->edit_str_buf, STR_EMPTY, lastof(this->edit_str_buf));
@@ -124,7 +131,7 @@ diff -r 941d22975314 src/signs_gui.cpp
 +
 +		InitializeTextBuffer(&this->text, this->edit_str_buf, MAX_LENGTH_SIGN_NAME_BYTES, 255); // Allow MAX_LENGTH_SIGN_NAME_BYTES characters (including \0)
 +
-+		this->InvalidateWidget(SIGN_LIST_WIDGET_FILTER_TEXT);
++		this->InvalidateWidget(SLW_FILTER_TEXT);
 +	}
 +
 +	void SetFilterString(const char* new_filter_string)
@@ -152,9 +159,9 @@ diff -r 941d22975314 src/signs_gui.cpp
 +		this->signs.ForceRebuild();
 +
 +		/* Re-paint widgets that need to be repainted */
-+		this->InvalidateWidget(SIGN_LIST_WIDGET_LIST);
-+		this->InvalidateWidget(SIGN_LIST_WIDGET_SCROLLBAR);
-+		this->InvalidateWidget(SIGN_LIST_WIDGET_CAPTION);
++		this->InvalidateWidget(SLW_LIST);
++		this->InvalidateWidget(SLW_SCROLLBAR);
++		this->InvalidateWidget(SLW_CAPTION);
 +	}
 +
 +	void SelectNextSign()
@@ -169,8 +176,11 @@ diff -r 941d22975314 src/signs_gui.cpp
 +		{
 +			int pos = Clamp(this->vscroll.pos + this->vscroll.cap/2 + 1,  0, this->vscroll.count - this->vscroll.cap);
 +			this->vscroll.pos = pos;
-+			this->SetDirty();
++			//this->SetDirty();
++			this->InvalidateWidget(SLW_SCROLLBAR);
 +		}
++
++		this->InvalidateWidget(SLW_LIST);
 +	}
 +
 +	void SelectPreviousSign()
@@ -187,42 +197,44 @@ diff -r 941d22975314 src/signs_gui.cpp
 +		{
 +			int pos = Clamp(this->vscroll.pos - this->vscroll.cap/2 - 1,  0, this->vscroll.count - this->vscroll.cap);
 +			this->vscroll.pos = pos;
-+			this->SetDirty();
++			//this->SetDirty();
++			this->InvalidateWidget(SLW_SCROLLBAR);
 +		}
-+	}
++		
++		this->InvalidateWidget(SLW_LIST);
++ 	}
 +
  	virtual void OnPaint()
  	{
  		BuildSignsList();
-@@ -92,6 +220,7 @@
+@@ -102,6 +229,7 @@
  
  		SetDParam(0, this->vscroll.count);
  		this->DrawWidgets();
-+		this->DrawEditBox(SIGN_LIST_WIDGET_FILTER_TEXT);
++		this->DrawEditBox(SLW_FILTER_TEXT);
  
  		/* No signs? */
- 		int y = 16; // offset from top of widget
-@@ -107,25 +236,114 @@
- 			if (si->owner != OWNER_NONE) DrawCompanyIcon(si->owner, 4, y + 1);
+ 		int y = this->widget[SLW_LIST].top + 2; // offset from top of widget
+@@ -118,24 +246,119 @@
  
  			SetDParam(0, si->index);
--			DrawString(22, y, STR_SIGN_NAME, TC_YELLOW);
+ 			DrawString(this->widget[SLW_LIST].left + 22, this->widget[SLW_LIST].right, y, STR_SIGN_NAME, TC_YELLOW);
 +			if (this->selected_sign == i)
-+				DrawString(22, y, STR_SIGN_NAME, TC_BLUE);
++				DrawString(this->widget[SLW_LIST].left + 22, this->widget[SLW_LIST].right, y, STR_SIGN_NAME, TC_BLUE);
 +			else
-+				DrawString(22, y, STR_SIGN_NAME, TC_YELLOW);
++				DrawString(this->widget[SLW_LIST].left + 22, this->widget[SLW_LIST].right, y, STR_SIGN_NAME, TC_YELLOW);
  			y += 10;
  		}
  	}
  
  	virtual void OnClick(Point pt, int widget)
  	{
--		if (widget == 3) {
--			uint32 id_v = (pt.y - 15) / 10;
+-		if (widget == SLW_LIST) {
+-			uint32 id_v = (pt.y - this->widget[SLW_LIST].top - 1) / 10;
 +		switch (widget) {
-+			case SIGN_LIST_WIDGET_LIST:
++			case SLW_LIST:
 +			{ // <- needed or the compiler will complain
-+				uint32 id_v = (pt.y - 15) / 10;
++				uint32 id_v = (pt.y - this->widget[SLW_LIST].top - 1) / 10;
  
 -			if (id_v >= this->vscroll.cap) return;
 -			id_v += this->vscroll.pos;
@@ -238,29 +250,28 @@ diff -r 941d22975314 src/signs_gui.cpp
 +				break;
 +			}
 +
-+			case SIGN_LIST_WIDGET_FILTER_CLEAR_BTN:
++			case SLW_FILTER_CLEAR_BTN:
 +				this->InitializeFilterTextWidget();
 +				this->SetFilterString(0);
 +				this->selected_sign = -1;
 +				break;
 +
-+			case SIGN_LIST_WIDGET_FILTER_MATCH_CASE_BTN:
++			case SLW_FILTER_MATCH_CASE_BTN:
 +				this->match_case = !this->match_case;
 +				if (this->match_case) {
-+					this->LowerWidget(SIGN_LIST_WIDGET_FILTER_MATCH_CASE_BTN);
++					this->LowerWidget(SLW_FILTER_MATCH_CASE_BTN);
 +				} else {
-+					this->RaiseWidget(SIGN_LIST_WIDGET_FILTER_MATCH_CASE_BTN);
++					this->RaiseWidget(SLW_FILTER_MATCH_CASE_BTN);
 +				}
 +				this->UpdateList();
 +				break;
-+
  		}
  	}
  
 +	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
 +	{
 +		EventState state = ES_NOT_HANDLED;
-+		switch (this->HandleEditBoxKey(SIGN_LIST_WIDGET_FILTER_TEXT, key, keycode, state)) {
++		switch (this->HandleEditBoxKey(SLW_FILTER_TEXT, key, keycode, state)) {
 +			case HEBR_EDITING:
 +				break;
 +
@@ -280,14 +291,14 @@ diff -r 941d22975314 src/signs_gui.cpp
 +
 +			case HEBR_CANCEL: // ESC pressed, clear filter
 +				this->InitializeFilterTextWidget(); // Empty the text in the EditBox widget
-+				this->SetFilterString(0);             // Use empty text as filter text (= view all signs)
++				this->SetFilterString(0);           // Use empty text as filter text (= view all signs)
 +				this->focused_widget = 0;           // Unfocus the text box
 +				this->selected_sign = -1;           // Deselect sign in sign list
 +				return state;
 +
 +			case HEBR_NOT_FOCUSED: // The filter text box is not globaly focused
 +				if (keycode == 'F') { // Hotkey to enable filter box
-+					this->SetFocusedWidget(SIGN_LIST_WIDGET_FILTER_TEXT);
++					this->SetFocusedWidget(SLW_FILTER_TEXT);
 +					SetFocusedWindow(this); // The user has asked to give focus to the text box, so make sure this window is focused.
 +					state = ES_HANDLED;
 +				}
@@ -297,16 +308,22 @@ diff -r 941d22975314 src/signs_gui.cpp
 +				NOT_REACHED();
 +		}
 +
-+		switch (keycode) {
-+			case WKC_UP:
-+				this->SelectPreviousSign();
-+				break;
++		if (state == ES_HANDLED) OnOSKInput(SLW_FILTER_TEXT);
 +
-+			case WKC_DOWN:
-+				this->SelectNextSign();
++		// Selection of signs using arrow up/down keys
++		if (this->focused_widget == this->widget + SLW_FILTER_TEXT)
++		{
++			switch (keycode) {
++				case WKC_UP:
++					this->SelectPreviousSign();
++					state = ES_HANDLED;
++					break;
++
++				case WKC_DOWN:
++					this->SelectNextSign();
++					state = ES_HANDLED;
++			}
 +		}
-+
-+		if (state == ES_HANDLED) OnOSKInput(SIGN_LIST_WIDGET_FILTER_TEXT);
 +
 +		return state;
 +	}
@@ -319,13 +336,13 @@ diff -r 941d22975314 src/signs_gui.cpp
 +
 +	virtual void OnMouseLoop()
 +	{
-+		this->HandleEditBox(SIGN_LIST_WIDGET_FILTER_TEXT);
-+	}
++		this->HandleEditBox(SLW_FILTER_TEXT);
++ 	}
 +
- 	virtual void OnResize(Point new_size, Point delta)
+ 	virtual void OnResize(Point delta)
  	{
  		this->vscroll.cap += delta.y / 10;
-@@ -133,7 +351,10 @@
+@@ -143,7 +366,10 @@
  
  	virtual void OnInvalidateData(int data)
  	{
@@ -337,27 +354,27 @@ diff -r 941d22975314 src/signs_gui.cpp
  			this->signs.ForceRebuild();
  		} else {
  			this->signs.ForceResort();
-@@ -143,10 +364,13 @@
+@@ -153,10 +379,13 @@
  
  static const Widget _sign_list_widget[] = {
  {   WWT_CLOSEBOX,   RESIZE_NONE,  COLOUR_GREY,     0,    10,     0,    13, STR_00C5,              STR_018B_CLOSE_WINDOW},
 -{    WWT_CAPTION,  RESIZE_RIGHT,  COLOUR_GREY,    11,   345,     0,    13, STR_SIGN_LIST_CAPTION, STR_018C_WINDOW_TITLE_DRAG_THIS},
-+{    WWT_CAPTION,  RESIZE_RIGHT,  COLOUR_GREY,    11,   345,     0,    13, STR_SIGN_LIST_CAPTION, STR_018C_WINDOW_TITLE_DRAG_THIS},   // SIGN_LIST_WIDGET_CAPTION
++{    WWT_CAPTION,  RESIZE_RIGHT,  COLOUR_GREY,    11,   345,     0,    13, STR_SIGN_LIST_CAPTION, STR_018C_WINDOW_TITLE_DRAG_THIS},   // SLW_CAPTION
  {  WWT_STICKYBOX,     RESIZE_LR,  COLOUR_GREY,   346,   357,     0,    13, 0x0,                   STR_STICKY_BUTTON},
 -{      WWT_PANEL,     RESIZE_RB,  COLOUR_GREY,     0,   345,    14,   137, 0x0,                   STR_NULL},
 -{  WWT_SCROLLBAR,    RESIZE_LRB,  COLOUR_GREY,   346,   357,    14,   125, 0x0,                   STR_0190_SCROLL_BAR_SCROLLS_LIST},
-+{      WWT_PANEL,     RESIZE_RB,  COLOUR_GREY,     0,   345,    14,   125, 0x0,                   STR_NULL},                          // SIGN_LIST_WIDGET_LIST
-+{  WWT_SCROLLBAR,    RESIZE_LRB,  COLOUR_GREY,   346,   357,    14,   125, 0x0,                   STR_0190_SCROLL_BAR_SCROLLS_LIST},  // SIGN_LIST_WIDGET_SCROLLBAR
-+{    WWT_EDITBOX,    RESIZE_RTB,  COLOUR_GREY,     0,   165,   126,   137, STR_FILTER_OSKTITLE,   STR_NULL},                          // SIGN_LIST_WIDGET_FILTER_TEXT
-+{ WWT_PUSHTXTBTN,    RESIZE_LRTB, COLOUR_GREY,     166, 255,   126,   137, STR_FILTER_MATCH_CASE, STR_NULL},                          // SIGN_LIST_WIDGET_FILTER_MATCH_CASE_BTN
-+{    WWT_TEXTBTN,    RESIZE_LRTB, COLOUR_GREY,     256, 345,   126,   137, STR_FILTER_CLEAR,      STR_NULL},                          // SIGN_LIST_WIDGET_FILTER_CLEAR_BTN
++{      WWT_PANEL,     RESIZE_RB,  COLOUR_GREY,     0,   345,    14,   125, 0x0,                   STR_NULL},                          // SLW_LIST
++{  WWT_SCROLLBAR,    RESIZE_LRB,  COLOUR_GREY,   346,   357,    14,   125, 0x0,                   STR_0190_SCROLL_BAR_SCROLLS_LIST},  // SLW_SCROLLBAR
++{    WWT_EDITBOX,    RESIZE_RTB,  COLOUR_GREY,     0,   165,   126,   137, STR_FILTER_OSKTITLE,   STR_NULL},                          // SLW_FILTER_TEXT
++{ WWT_PUSHTXTBTN,    RESIZE_LRTB, COLOUR_GREY,     166, 255,   126,   137, STR_FILTER_MATCH_CASE, STR_NULL},                          // SLW_FILTER_MATCH_CASE_BTN
++{    WWT_TEXTBTN,    RESIZE_LRTB, COLOUR_GREY,     256, 345,   126,   137, STR_FILTER_CLEAR,      STR_NULL},                          // SLW_FILTER_CLEAR_BTN
  {  WWT_RESIZEBOX,   RESIZE_LRTB,  COLOUR_GREY,   346,   357,   126,   137, 0x0,                   STR_RESIZE_BUTTON},
  {   WIDGETS_END},
  };
-diff -r 941d22975314 src/toolbar_gui.cpp
---- src/toolbar_gui.cpp	Fri Feb 27 21:01:31 2009 +0100
-+++ src/toolbar_gui.cpp	Fri Feb 27 21:07:12 2009 +0100
-@@ -1093,6 +1093,7 @@
+diff -r ea4d6358e258 src/toolbar_gui.cpp
+--- src/toolbar_gui.cpp	Fri Apr 03 11:02:41 2009 +0000
++++ src/toolbar_gui.cpp	Sat Apr 04 09:18:07 2009 +0200
+@@ -1090,6 +1090,7 @@
  			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
  			case WKC_CTRL  | 'G': MenuClickWorldScreenshot(); break;
  			case WKC_CTRL | WKC_ALT | 'C': if (!_networking) ShowCheatWindow(); break;
