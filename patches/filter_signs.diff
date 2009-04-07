@@ -1,15 +1,7 @@
-diff -r ea4d6358e258 src/lang/english.txt
---- src/lang/english.txt	Fri Apr 03 11:02:41 2009 +0000
-+++ src/lang/english.txt	Sat Apr 04 09:18:07 2009 +0200
-@@ -2239,6 +2239,7 @@
- STR_704B_GENERATE_RANDOM_NEW_FACE                               :{BLACK}Generate random new face
- STR_704C_KEY                                                    :{BLACK}Key
- STR_704D_SHOW_KEY_TO_GRAPHS                                     :{BLACK}Show key to graphs
-+STR_SHOW_DETAILED_PERFORMANCE_RATINGS                           :{BLACK}Show detailed performance ratings
- STR_704E_KEY_TO_COMPANY_GRAPHS                                  :{WHITE}Key to company graphs
- STR_704F_CLICK_HERE_TO_TOGGLE_COMPANY                           :{BLACK}Click here to toggle company's entry on graph on/off
- STR_7050_UNITS_OF_CARGO_DELIVERED                               :{WHITE}Units of cargo delivered
-@@ -3475,6 +3476,13 @@
+diff -r f0a9277f1bb6 src/lang/english.txt
+--- src/lang/english.txt	Tue Apr 07 20:15:39 2009 +0200
++++ src/lang/english.txt	Tue Apr 07 20:18:39 2009 +0200
+@@ -3488,6 +3488,13 @@
  
  ########
  
@@ -23,9 +15,9 @@ diff -r ea4d6358e258 src/lang/english.txt
  STR_FUND_NEW_INDUSTRY                                           :{BLACK}Fund
  STR_PROSPECT_NEW_INDUSTRY                                       :{BLACK}Prospect
  STR_BUILD_NEW_INDUSTRY                                          :{BLACK}Build
-diff -r ea4d6358e258 src/signs_gui.cpp
---- src/signs_gui.cpp	Fri Apr 03 11:02:41 2009 +0000
-+++ src/signs_gui.cpp	Sat Apr 04 09:18:07 2009 +0200
+diff -r f0a9277f1bb6 src/signs_gui.cpp
+--- src/signs_gui.cpp	Tue Apr 07 20:15:39 2009 +0200
++++ src/signs_gui.cpp	Tue Apr 07 20:18:39 2009 +0200
 @@ -20,12 +20,25 @@
  
  #include "table/strings.h"
@@ -371,9 +363,9 @@ diff -r ea4d6358e258 src/signs_gui.cpp
  {  WWT_RESIZEBOX,   RESIZE_LRTB,  COLOUR_GREY,   346,   357,   126,   137, 0x0,                   STR_RESIZE_BUTTON},
  {   WIDGETS_END},
  };
-diff -r ea4d6358e258 src/toolbar_gui.cpp
---- src/toolbar_gui.cpp	Fri Apr 03 11:02:41 2009 +0000
-+++ src/toolbar_gui.cpp	Sat Apr 04 09:18:07 2009 +0200
+diff -r f0a9277f1bb6 src/toolbar_gui.cpp
+--- src/toolbar_gui.cpp	Tue Apr 07 20:15:39 2009 +0200
++++ src/toolbar_gui.cpp	Tue Apr 07 20:18:39 2009 +0200
 @@ -1090,6 +1090,7 @@
  			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
  			case WKC_CTRL  | 'G': MenuClickWorldScreenshot(); break;
