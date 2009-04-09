@@ -1,6 +1,6 @@
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 config.lib
---- config.lib	Tue Apr 07 14:28:32 2009 +0000
-+++ config.lib	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 config.lib
+--- config.lib	Thu Apr 09 01:22:45 2009 +0000
++++ config.lib	Thu Apr 09 19:46:57 2009 +0200
 @@ -868,7 +868,7 @@
  			log 1 "WARNING: in most cases it is not safe for network use"
  			log 1 "WARNING: USE WITH CAUTION!"
@@ -10,9 +10,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 config.lib
  		elif [ -f "$ROOT_DIR/version" ]; then
  			revision="`cat $ROOT_DIR/version`"
  
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 projects/openttd_vs80.vcproj
---- projects/openttd_vs80.vcproj	Tue Apr 07 14:28:32 2009 +0000
-+++ projects/openttd_vs80.vcproj	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 projects/openttd_vs80.vcproj
+--- projects/openttd_vs80.vcproj	Thu Apr 09 01:22:45 2009 +0000
++++ projects/openttd_vs80.vcproj	Thu Apr 09 19:46:57 2009 +0200
 @@ -740,6 +740,10 @@
  				>
  			</File>
@@ -35,9 +35,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 projects/openttd_vs80.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 projects/openttd_vs90.vcproj
---- projects/openttd_vs90.vcproj	Tue Apr 07 14:28:32 2009 +0000
-+++ projects/openttd_vs90.vcproj	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 projects/openttd_vs90.vcproj
+--- projects/openttd_vs90.vcproj	Thu Apr 09 01:22:45 2009 +0000
++++ projects/openttd_vs90.vcproj	Thu Apr 09 19:46:57 2009 +0200
 @@ -737,6 +737,10 @@
  				>
  			</File>
@@ -60,9 +60,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 projects/openttd_vs90.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 source.list
---- source.list	Tue Apr 07 14:28:32 2009 +0000
-+++ source.list	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 source.list
+--- source.list	Thu Apr 09 01:22:45 2009 +0000
++++ source.list	Thu Apr 09 19:46:57 2009 +0200
 @@ -95,6 +95,7 @@
  	thread_none.cpp
  #end
@@ -79,9 +79,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 source.list
  timetable.h
  toolbar_gui.h
  town.h
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/command.cpp
---- src/command.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/command.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/command.cpp
+--- src/command.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/command.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -20,6 +20,7 @@
  #include "company_func.h"
  #include "company_base.h"
@@ -99,9 +99,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/command.cpp
  	/* update last build coordinate of company. */
  	if (tile != 0 && IsValidCompanyID(_current_company)) {
  		GetCompany(_current_company)->last_build_coordinate = tile;
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/date.cpp
---- src/date.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/date.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/date.cpp
+--- src/date.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/date.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -15,6 +15,7 @@
  #include "vehicle_base.h"
  #include "debug.h"
@@ -118,9 +118,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/date.cpp
  	}
  
  	/* check if we entered a new month? */
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/economy.cpp
---- src/economy.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/economy.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/economy.cpp
+--- src/economy.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/economy.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -1427,6 +1427,8 @@
  		}
  	}
@@ -130,9 +130,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/economy.cpp
  	TriggerIndustry(i, INDUSTRY_TRIGGER_RECEIVED_CARGO);
  	StartStopIndustryTileAnimation(i, IAT_INDUSTRY_RECEIVED_CARGO);
  }
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/industry_cmd.cpp
---- src/industry_cmd.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/industry_cmd.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/industry_cmd.cpp
+--- src/industry_cmd.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/industry_cmd.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -456,6 +456,8 @@
  		}
  	}
@@ -142,9 +142,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/industry_cmd.cpp
  	if (moved_cargo && !StartStopIndustryTileAnimation(i, IAT_INDUSTRY_DISTRIBUTES_CARGO)) {
  		uint newgfx = GetIndustryTileSpec(GetIndustryGfx(tile))->anim_production;
  
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/industry_gui.cpp
---- src/industry_gui.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/industry_gui.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/industry_gui.cpp
+--- src/industry_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/industry_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -557,6 +557,43 @@
  			y += 10;
  		}
@@ -189,9 +189,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/industry_gui.cpp
  		/* Get the extra message for the GUI */
  		if (HasBit(ind->callback_flags, CBM_IND_WINDOW_MORE_TEXT)) {
  			uint16 callback_res = GetIndustryCallback(CBID_INDUSTRY_WINDOW_MORE_TEXT, 0, 0, i, i->type, i->xy);
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/lang/english.txt
---- src/lang/english.txt	Tue Apr 07 14:28:32 2009 +0000
-+++ src/lang/english.txt	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/lang/english.txt
+--- src/lang/english.txt	Thu Apr 09 01:22:45 2009 +0000
++++ src/lang/english.txt	Thu Apr 09 19:46:57 2009 +0200
 @@ -1084,6 +1084,37 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
@@ -294,9 +294,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/lang/english.txt
  STR_FUND_NEW_INDUSTRY                                           :{BLACK}Fund
  STR_PROSPECT_NEW_INDUSTRY                                       :{BLACK}Prospect
  STR_BUILD_NEW_INDUSTRY                                          :{BLACK}Build
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/main_gui.cpp
---- src/main_gui.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/main_gui.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/main_gui.cpp
+--- src/main_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/main_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -26,6 +26,7 @@
  #include "toolbar_gui.h"
  #include "statusbar_gui.h"
@@ -316,9 +316,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/main_gui.cpp
  
  #ifdef ENABLE_NETWORK
  			case WKC_RETURN: case 'T': // smart chat; send to team if any, otherwise to all
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/mixer.cpp
---- src/mixer.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/mixer.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/mixer.cpp
+--- src/mixer.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/mixer.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -25,7 +25,7 @@
  	uint flags;
  };
@@ -328,29 +328,31 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/mixer.cpp
  static uint32 _play_rate;
  
  /**
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/network/network_client.cpp
---- src/network/network_client.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/network/network_client.cpp	Tue Apr 07 20:49:07 2009 +0200
-@@ -514,9 +514,14 @@
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/network/network_client.cpp
+--- src/network/network_client.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/network/network_client.cpp	Thu Apr 09 19:46:57 2009 +0200
+@@ -514,9 +514,15 @@
  			_password_game_seed = p->Recv_uint32();
  			p->Recv_string(_password_server_unique_id, sizeof(_password_server_unique_id));
- 			if (MY_CLIENT->has_quit) return NETWORK_RECV_STATUS_MALFORMED_PACKET;
+ 			if (MY_CLIENT->HasClientQuit()) return NETWORK_RECV_STATUS_MALFORMED_PACKET;
 -
-+			if (_company_pw != NULL) _login_pw = _company_pw;
- 		case NETWORK_GAME_PASSWORD:
+-		case NETWORK_GAME_PASSWORD:
 -			ShowNetworkNeedPassword(type);
-+			if (_login_pw == NULL) {
-+			    ShowNetworkNeedPassword(type);
-+			} else {
-+			    SEND_COMMAND(PACKET_CLIENT_PASSWORD)(type, _login_pw);
-+			    _login_pw = NULL;
-+			}
++	
++			if (_company_pw != NULL) _login_pw = _company_pw;
++			case NETWORK_GAME_PASSWORD:
++				if (_login_pw == NULL) {
++					ShowNetworkNeedPassword(type);
++				} else {
++					SEND_COMMAND(PACKET_CLIENT_PASSWORD)(type, _login_pw);
++					_login_pw = NULL;
++				}
  			return NETWORK_RECV_STATUS_OKAY;
  
  		default: return NETWORK_RECV_STATUS_MALFORMED_PACKET;
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/network/network_internal.h
---- src/network/network_internal.h	Tue Apr 07 14:28:32 2009 +0000
-+++ src/network/network_internal.h	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/network/network_internal.h
+--- src/network/network_internal.h	Thu Apr 09 01:22:45 2009 +0000
++++ src/network/network_internal.h	Thu Apr 09 19:46:57 2009 +0200
 @@ -123,6 +123,9 @@
  
  void NetworkTCPQueryServer(NetworkAddress address);
@@ -361,9 +363,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/network/network_internal.h
  void NetworkAddServer(const char *b);
  void NetworkRebuildHostList();
  void UpdateNetworkGameWindow(bool unselect);
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/newgrf_gui.cpp
---- src/newgrf_gui.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/newgrf_gui.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/newgrf_gui.cpp
+--- src/newgrf_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/newgrf_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -1337,9 +1339,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/openttd.cpp
---- src/openttd.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/openttd.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/openttd.cpp
+--- src/openttd.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/openttd.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -157,6 +157,8 @@
  		"  -G seed             = Set random seed\n"
  #if defined(ENABLE_NETWORK)
@@ -1382,9 +1384,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/openttd.cpp
  #endif /* ENABLE_NETWORK */
  		case 'r': ParseResolution(&resolution, mgo.opt); break;
  		case 't': startyear = atoi(mgo.opt); break;
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/rail_gui.cpp
---- src/rail_gui.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/rail_gui.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/rail_gui.cpp
+--- src/rail_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/rail_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -1783,9 +1785,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/rail_gui.cpp
  	}
  }
  
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/screenshot.cpp
---- src/screenshot.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/screenshot.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/screenshot.cpp
+--- src/screenshot.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/screenshot.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -16,6 +16,9 @@
  #include "map_func.h"
  #include "saveload/saveload.h"
@@ -1906,9 +1908,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/screenshot.cpp
  		default: return false;
  	}
  }
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/screenshot.h
---- src/screenshot.h	Tue Apr 07 14:28:32 2009 +0000
-+++ src/screenshot.h	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/screenshot.h
+--- src/screenshot.h	Thu Apr 09 01:22:45 2009 +0000
++++ src/screenshot.h	Thu Apr 09 19:46:57 2009 +0200
 @@ -13,10 +13,12 @@
  enum ScreenshotType {
  	SC_NONE,
@@ -1924,9 +1926,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/screenshot.h
  void SetScreenshotType(ScreenshotType t);
  bool IsScreenshotRequested();
  
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/settings_gui.cpp
---- src/settings_gui.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/settings_gui.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/settings_gui.cpp
+--- src/settings_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/settings_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -1129,9 +1129,24 @@
  /** Interaction sub-page */
  static SettingsPage _settings_ui_interaction_page = {_settings_ui_interaction, lengthof(_settings_ui_interaction)};
@@ -1960,9 +1962,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/settings_type.h
---- src/settings_type.h	Tue Apr 07 14:28:32 2009 +0000
-+++ src/settings_type.h	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/settings_type.h
+--- src/settings_type.h	Thu Apr 09 01:22:45 2009 +0000
++++ src/settings_type.h	Thu Apr 09 19:46:57 2009 +0200
 @@ -90,6 +90,20 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
@@ -1984,9 +1986,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/settings_type.h
  
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/signs_gui.cpp
---- src/signs_gui.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/signs_gui.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/signs_gui.cpp
+--- src/signs_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/signs_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -20,12 +20,25 @@
  
  #include "table/strings.h"
@@ -2332,9 +2334,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/signs_gui.cpp
  {  WWT_RESIZEBOX,   RESIZE_LRTB,  COLOUR_GREY,   346,   357,   126,   137, 0x0,                   STR_RESIZE_BUTTON},
  {   WIDGETS_END},
  };
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/spritecache.cpp
---- src/spritecache.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/spritecache.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/spritecache.cpp
+--- src/spritecache.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/spritecache.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -16,8 +16,8 @@
  
  #include "table/sprites.h"
@@ -2346,9 +2348,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/spritecache.cpp
  
  typedef SimpleTinyEnumT<SpriteType, byte> SpriteTypeByte;
  
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/table/settings.h
---- src/table/settings.h	Tue Apr 07 14:28:32 2009 +0000
-+++ src/table/settings.h	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/table/settings.h
+--- src/table/settings.h	Thu Apr 09 01:22:45 2009 +0000
++++ src/table/settings.h	Thu Apr 09 19:46:57 2009 +0200
 @@ -552,6 +552,20 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
@@ -2370,9 +2372,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/table/settings.h
  
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/timelapse.cpp
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/timelapse.cpp
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.cpp	Tue Apr 07 20:49:07 2009 +0200
++++ src/timelapse.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -0,0 +1,131 @@
 +/* $Id */
 +
@@ -2505,9 +2507,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/timelapse.cpp
 +		}
 +	}
 +}
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/timelapse.h
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/timelapse.h
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.h	Tue Apr 07 20:49:07 2009 +0200
++++ src/timelapse.h	Thu Apr 09 19:46:57 2009 +0200
 @@ -0,0 +1,33 @@
 +/* $Id */
 +
@@ -2542,9 +2544,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/timelapse.h
 +void TimelapseCommandCheck();
 +
 +#endif /* TIMELAPSE_H */
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/toolbar_gui.cpp
---- src/toolbar_gui.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/toolbar_gui.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/toolbar_gui.cpp
+--- src/toolbar_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/toolbar_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -1090,6 +1090,7 @@
  			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
  			case WKC_CTRL  | 'G': MenuClickWorldScreenshot(); break;
@@ -2553,9 +2555,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/toolbar_gui.cpp
  			case 'A': if (CanBuildVehicleInfrastructure(VEH_TRAIN)) ShowBuildRailToolbar(_last_built_railtype, 4); break; // Invoke Autorail
  			case 'L': ShowTerraformToolbar(); break;
  			case 'M': ShowSmallMap(); break;
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/town_cmd.cpp
---- src/town_cmd.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/town_cmd.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/town_cmd.cpp
+--- src/town_cmd.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/town_cmd.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -2452,7 +2452,7 @@
  	return cost;
  }
@@ -2565,9 +2567,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/town_cmd.cpp
  {
  	/* Increase company ratings if they're low */
  	const Company *c;
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/town_gui.cpp
---- src/town_gui.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/town_gui.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/town_gui.cpp
+--- src/town_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/town_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -93,6 +93,25 @@
  
  	virtual void OnPaint()
@@ -2607,9 +2609,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/town_gui.cpp
  				y += 10;
  			}
  		}
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/vehicle.cpp
---- src/vehicle.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/vehicle.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/vehicle.cpp
+--- src/vehicle.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/vehicle.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -224,7 +224,7 @@
  
  /* Size of the hash, 6 = 64 x 64, 7 = 128 x 128. Larger sizes will (in theory) reduce hash
@@ -2619,9 +2621,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/vehicle.cpp
  const int HASH_SIZE = 1 << HASH_BITS;
  const int HASH_MASK = HASH_SIZE - 1;
  const int TOTAL_HASH_SIZE = 1 << (HASH_BITS * 2);
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/viewport.cpp
---- src/viewport.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/viewport.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/viewport.cpp
+--- src/viewport.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/viewport.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -43,6 +43,8 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -2640,9 +2642,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/viewport.cpp
  		if ((bottom - top) > (right - left)) {
  			int t = (top + bottom) >> 1;
  			ViewportDrawChk(vp, left, top, right, t);
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/window.cpp
---- src/window.cpp	Tue Apr 07 14:28:32 2009 +0000
-+++ src/window.cpp	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/window.cpp
+--- src/window.cpp	Thu Apr 09 01:22:45 2009 +0000
++++ src/window.cpp	Thu Apr 09 19:46:57 2009 +0200
 @@ -1304,7 +1304,6 @@
  static bool HandleDragDrop()
  {
@@ -2666,9 +2668,9 @@ diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r b4a2a9d6a99c -r 1ca2298b96e9 src/window_gui.h
---- src/window_gui.h	Tue Apr 07 14:28:32 2009 +0000
-+++ src/window_gui.h	Tue Apr 07 20:49:07 2009 +0200
+diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/window_gui.h
+--- src/window_gui.h	Thu Apr 09 01:22:45 2009 +0000
++++ src/window_gui.h	Thu Apr 09 19:46:57 2009 +0200
 @@ -455,6 +455,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  
