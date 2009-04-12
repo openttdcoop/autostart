@@ -1,7 +1,7 @@
-diff -r ecfbfa484e1b src/lang/english.txt
---- src/lang/english.txt	Tue Mar 31 17:46:18 2009 +0000
-+++ src/lang/english.txt	Sat Apr 04 08:16:12 2009 +0200
-@@ -1083,6 +1083,7 @@
+diff -r 0ecf7a26b47d src/lang/english.txt
+--- src/lang/english.txt	Sat Apr 11 09:07:32 2009 +0200
++++ src/lang/english.txt	Sat Apr 11 09:08:13 2009 +0200
+@@ -1084,6 +1084,7 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :All
@@ -9,9 +9,9 @@ diff -r ecfbfa484e1b src/lang/english.txt
  
  STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
  STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
-diff -r ecfbfa484e1b src/rail_gui.cpp
---- src/rail_gui.cpp	Tue Mar 31 17:46:18 2009 +0000
-+++ src/rail_gui.cpp	Sat Apr 04 08:16:12 2009 +0200
+diff -r 0ecf7a26b47d src/rail_gui.cpp
+--- src/rail_gui.cpp	Sat Apr 11 09:07:32 2009 +0200
++++ src/rail_gui.cpp	Sat Apr 11 09:08:13 2009 +0200
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -410,9 +410,9 @@ diff -r ecfbfa484e1b src/rail_gui.cpp
  	}
  }
  
-diff -r ecfbfa484e1b src/settings_gui.cpp
---- src/settings_gui.cpp	Tue Mar 31 17:46:18 2009 +0000
-+++ src/settings_gui.cpp	Sat Apr 04 08:16:12 2009 +0200
+diff -r 0ecf7a26b47d src/settings_gui.cpp
+--- src/settings_gui.cpp	Sat Apr 11 09:07:32 2009 +0200
++++ src/settings_gui.cpp	Sat Apr 11 09:08:13 2009 +0200
 @@ -1143,6 +1143,7 @@
  	SettingEntry("gui.always_build_infrastructure"),
  	SettingEntry("gui.persistent_buildingtools"),
@@ -421,9 +421,9 @@ diff -r ecfbfa484e1b src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r ecfbfa484e1b src/settings_type.h
---- src/settings_type.h	Tue Mar 31 17:46:18 2009 +0000
-+++ src/settings_type.h	Sat Apr 04 08:16:12 2009 +0200
+diff -r 0ecf7a26b47d src/settings_type.h
+--- src/settings_type.h	Sat Apr 11 09:07:32 2009 +0200
++++ src/settings_type.h	Sat Apr 11 09:08:13 2009 +0200
 @@ -90,6 +90,7 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
@@ -432,9 +432,9 @@ diff -r ecfbfa484e1b src/settings_type.h
  
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
-diff -r ecfbfa484e1b src/table/settings.h
---- src/table/settings.h	Tue Mar 31 17:46:18 2009 +0000
-+++ src/table/settings.h	Sat Apr 04 08:16:12 2009 +0200
+diff -r 0ecf7a26b47d src/table/settings.h
+--- src/table/settings.h	Sat Apr 11 09:07:32 2009 +0200
++++ src/table/settings.h	Sat Apr 11 09:08:13 2009 +0200
 @@ -552,6 +552,7 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),

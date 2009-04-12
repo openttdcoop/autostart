@@ -1,6 +1,6 @@
-diff -r 246855e5c06d projects/openttd_vs80.vcproj
---- projects/openttd_vs80.vcproj	Sat Apr 04 14:30:23 2009 +0200
-+++ projects/openttd_vs80.vcproj	Sat Apr 04 14:36:22 2009 +0200
+diff -r a793d08dc898 projects/openttd_vs80.vcproj
+--- projects/openttd_vs80.vcproj	Sat Apr 11 09:50:42 2009 +0200
++++ projects/openttd_vs80.vcproj	Sun Apr 12 09:48:23 2009 +0200
 @@ -740,6 +740,10 @@
  				>
  			</File>
@@ -23,9 +23,9 @@ diff -r 246855e5c06d projects/openttd_vs80.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r 246855e5c06d projects/openttd_vs90.vcproj
---- projects/openttd_vs90.vcproj	Sat Apr 04 14:30:23 2009 +0200
-+++ projects/openttd_vs90.vcproj	Sat Apr 04 14:36:22 2009 +0200
+diff -r a793d08dc898 projects/openttd_vs90.vcproj
+--- projects/openttd_vs90.vcproj	Sat Apr 11 09:50:42 2009 +0200
++++ projects/openttd_vs90.vcproj	Sun Apr 12 09:48:23 2009 +0200
 @@ -737,6 +737,10 @@
  				>
  			</File>
@@ -48,9 +48,9 @@ diff -r 246855e5c06d projects/openttd_vs90.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r 246855e5c06d source.list
---- source.list	Sat Apr 04 14:30:23 2009 +0200
-+++ source.list	Sat Apr 04 14:36:22 2009 +0200
+diff -r a793d08dc898 source.list
+--- source.list	Sat Apr 11 09:50:42 2009 +0200
++++ source.list	Sun Apr 12 09:48:23 2009 +0200
 @@ -95,6 +95,7 @@
  	thread_none.cpp
  #end
@@ -67,9 +67,9 @@ diff -r 246855e5c06d source.list
  timetable.h
  toolbar_gui.h
  town.h
-diff -r 246855e5c06d src/command.cpp
---- src/command.cpp	Sat Apr 04 14:30:23 2009 +0200
-+++ src/command.cpp	Sat Apr 04 14:36:22 2009 +0200
+diff -r a793d08dc898 src/command.cpp
+--- src/command.cpp	Sat Apr 11 09:50:42 2009 +0200
++++ src/command.cpp	Sun Apr 12 09:48:23 2009 +0200
 @@ -20,6 +20,7 @@
  #include "company_func.h"
  #include "company_base.h"
@@ -87,9 +87,9 @@ diff -r 246855e5c06d src/command.cpp
  	/* update last build coordinate of company. */
  	if (tile != 0 && IsValidCompanyID(_current_company)) {
  		GetCompany(_current_company)->last_build_coordinate = tile;
-diff -r 246855e5c06d src/date.cpp
---- src/date.cpp	Sat Apr 04 14:30:23 2009 +0200
-+++ src/date.cpp	Sat Apr 04 14:36:22 2009 +0200
+diff -r a793d08dc898 src/date.cpp
+--- src/date.cpp	Sat Apr 11 09:50:42 2009 +0200
++++ src/date.cpp	Sun Apr 12 09:48:23 2009 +0200
 @@ -15,6 +15,7 @@
  #include "vehicle_base.h"
  #include "debug.h"
@@ -106,10 +106,10 @@ diff -r 246855e5c06d src/date.cpp
  	}
  
  	/* check if we entered a new month? */
-diff -r 246855e5c06d src/lang/english.txt
---- src/lang/english.txt	Sat Apr 04 14:30:23 2009 +0200
-+++ src/lang/english.txt	Sat Apr 04 14:36:22 2009 +0200
-@@ -1085,6 +1085,36 @@
+diff -r a793d08dc898 src/lang/english.txt
+--- src/lang/english.txt	Sat Apr 11 09:50:42 2009 +0200
++++ src/lang/english.txt	Sun Apr 12 09:48:23 2009 +0200
+@@ -1086,6 +1086,36 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :All
  STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI                          :{LTBLUE}Enable previews for station building: {ORANGE}{STRING1}
  
@@ -146,9 +146,9 @@ diff -r 246855e5c06d src/lang/english.txt
  STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
  STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
  STR_CONFIG_SETTING_TOWN_LAYOUT_BETTER_ROADS                     :better roads
-diff -r 246855e5c06d src/screenshot.cpp
---- src/screenshot.cpp	Sat Apr 04 14:30:23 2009 +0200
-+++ src/screenshot.cpp	Sat Apr 04 14:36:22 2009 +0200
+diff -r a793d08dc898 src/screenshot.cpp
+--- src/screenshot.cpp	Sat Apr 11 09:50:42 2009 +0200
++++ src/screenshot.cpp	Sun Apr 12 09:48:23 2009 +0200
 @@ -16,6 +16,9 @@
  #include "map_func.h"
  #include "saveload/saveload.h"
@@ -269,9 +269,9 @@ diff -r 246855e5c06d src/screenshot.cpp
  		default: return false;
  	}
  }
-diff -r 246855e5c06d src/screenshot.h
---- src/screenshot.h	Sat Apr 04 14:30:23 2009 +0200
-+++ src/screenshot.h	Sat Apr 04 14:36:22 2009 +0200
+diff -r a793d08dc898 src/screenshot.h
+--- src/screenshot.h	Sat Apr 11 09:50:42 2009 +0200
++++ src/screenshot.h	Sun Apr 12 09:48:23 2009 +0200
 @@ -13,10 +13,12 @@
  enum ScreenshotType {
  	SC_NONE,
@@ -287,9 +287,9 @@ diff -r 246855e5c06d src/screenshot.h
  void SetScreenshotType(ScreenshotType t);
  bool IsScreenshotRequested();
  
-diff -r 246855e5c06d src/settings_gui.cpp
---- src/settings_gui.cpp	Sat Apr 04 14:30:23 2009 +0200
-+++ src/settings_gui.cpp	Sat Apr 04 14:36:22 2009 +0200
+diff -r a793d08dc898 src/settings_gui.cpp
+--- src/settings_gui.cpp	Sat Apr 11 09:50:42 2009 +0200
++++ src/settings_gui.cpp	Sun Apr 12 09:48:23 2009 +0200
 @@ -1129,9 +1129,24 @@
  /** Interaction sub-page */
  static SettingsPage _settings_ui_interaction_page = {_settings_ui_interaction, lengthof(_settings_ui_interaction)};
@@ -315,9 +315,9 @@ diff -r 246855e5c06d src/settings_gui.cpp
  	SettingEntry("gui.show_finances"),
  	SettingEntry("gui.errmsg_duration"),
  	SettingEntry("gui.toolbar_pos"),
-diff -r 246855e5c06d src/settings_type.h
---- src/settings_type.h	Sat Apr 04 14:30:23 2009 +0200
-+++ src/settings_type.h	Sat Apr 04 14:36:22 2009 +0200
+diff -r a793d08dc898 src/settings_type.h
+--- src/settings_type.h	Sat Apr 11 09:50:42 2009 +0200
++++ src/settings_type.h	Sun Apr 12 09:48:23 2009 +0200
 @@ -92,6 +92,19 @@
  	uint8  expenses_layout;                  ///< layout of expenses window
  	bool   imp_newstations_gui;              ///< use the new newstations selection ui
@@ -338,9 +338,9 @@ diff -r 246855e5c06d src/settings_type.h
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
  #ifdef ENABLE_NETWORK
-diff -r 246855e5c06d src/table/settings.h
---- src/table/settings.h	Sat Apr 04 14:30:23 2009 +0200
-+++ src/table/settings.h	Sat Apr 04 14:36:22 2009 +0200
+diff -r a793d08dc898 src/table/settings.h
+--- src/table/settings.h	Sat Apr 11 09:50:42 2009 +0200
++++ src/table/settings.h	Sun Apr 12 09:48:23 2009 +0200
 @@ -554,6 +554,19 @@
  	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
  	 SDTC_BOOL(gui.imp_newstations_gui,                  S,  0, false,                        STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI,         RedrawScreen),
@@ -361,175 +361,3 @@ diff -r 246855e5c06d src/table/settings.h
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  #ifdef ENABLE_NETWORK
-diff -r 246855e5c06d src/timelapse.cpp
---- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.cpp	Sat Apr 04 14:36:22 2009 +0200
-@@ -0,0 +1,131 @@
-+/* $Id */
-+
-+/** @file timelapse.cpp Timelapse patch */
-+
-+#include "stdafx.h"
-+#include "openttd.h"
-+#include "functions.h"
-+#include "core/bitmath_func.hpp"
-+#include "settings_type.h"
-+#include "date_type.h"
-+#include "screenshot.h"
-+#include "signs_base.h"
-+#include "station_base.h"
-+#include "landscape.h"
-+#include "map_func.h"
-+#include "transparency.h"
-+#include "debug.h"
-+
-+uint32 _command_count_giant = 0;
-+uint32 _command_count_local = 0;
-+
-+extern Date _date;
-+
-+void DoGiantScreenshot()
-+{
-+	/* save the current transparency setting */
-+	uint8 transparency_backup = _transparency_opt;
-+	/* disable transparency for all unlocked transparency settings */
-+	_transparency_opt &= _transparency_lock;
-+	/* take a giant screenshot */
-+	SetScreenshotType(SC_TIMELAPSE);
-+	MakeScreenshot();
-+	/* reset transparency to the former state */
-+	_transparency_opt = transparency_backup;
-+}
-+
-+void DoLocalScreenshots()
-+{
-+	/* save the current transparency setting */
-+	uint8 transparency_backup = _transparency_opt;
-+	/* disable transparency for all unlocked transparency settings */
-+	_transparency_opt &= _transparency_lock;
-+
-+	/* iterate through signs and take local screenshots if appropriate */
-+	if (_settings_client.gui.auto_local_screen_types != 1) { // 1 == stations only
-+		const Sign *si;
-+		FOR_ALL_SIGNS(si) {
-+			if (si->name != NULL && *si->name == _settings_client.gui.auto_local_screen_prefix) {
-+				SetScreenshotType(SC_TIMELAPSE_LOCAL);
-+				const Point pt = RemapCoords2(si->x, si->y);
-+				MakeScreenshot(si->name, &pt);
-+			}
-+		}
-+	}
-+
-+	/* iterate through stations and take local screenshots if appropriate */
-+	if (_settings_client.gui.auto_local_screen_types != 0) { // 0 == signs only
-+		const Station *s;
-+		FOR_ALL_STATIONS(s) {
-+			if (s->name != NULL && *s->name == _settings_client.gui.auto_local_screen_prefix) {
-+				SetScreenshotType(SC_TIMELAPSE_LOCAL);
-+				const Point pt = RemapCoords2(TileX(s->xy) * TILE_SIZE, TileY(s->xy) * TILE_SIZE);
-+				MakeScreenshot(s->name, &pt);
-+			}
-+		}
-+	}
-+	/* reset transparency to the former state */
-+	_transparency_opt = transparency_backup;
-+}
-+
-+void CheckGiantScreenshot()
-+{
-+	switch (_settings_client.gui.auto_screenshot) {
-+		case 0: break; // off
-+		case 2: break; // number of commands
-+		case 1: // time interval
-+			if (_date % _settings_client.gui.auto_screenshot_interval == 0) DoGiantScreenshot();
-+			break;
-+		case 3: // time interval and number of commands
-+			if (_date % _settings_client.gui.auto_screenshot_interval != 0) break;
-+			if (_command_count_giant < _settings_client.gui.auto_screenshot_num_commands) break;
-+			_command_count_giant = 0;
-+			DoGiantScreenshot();
-+			break;
-+		default: NOT_REACHED();
-+	}
-+}
-+
-+void CheckLocalScreenshots()
-+{
-+	switch (_settings_client.gui.auto_local_screen) {
-+		case 0: break; // off
-+		case 2: break; // number of commands
-+		case 1: // time interval
-+			if (_date % _settings_client.gui.auto_local_screen_interval == 0) DoLocalScreenshots();
-+			break;
-+		case 3: // time interval and number of commands
-+			if (_date % _settings_client.gui.auto_local_screen_interval != 0) break;
-+			if (_command_count_local < _settings_client.gui.auto_local_screen_num_commands) break;
-+			_command_count_local = 0;
-+			DoLocalScreenshots();
-+			break;
-+		default: NOT_REACHED();
-+	}
-+}
-+
-+void TimelapseDailyCheck()
-+{
-+	DEBUG(misc, 1, "TimelapseDailyCheck()! _command_count_giant=%d, _command_count_local=%d)", _command_count_giant, _command_count_local);
-+
-+	CheckLocalScreenshots();
-+	CheckGiantScreenshot();
-+}
-+
-+void TimelapseCommandCheck()
-+{
-+	if ((_settings_client.gui.auto_screenshot & 0x02) != 0) {
-+		_command_count_giant++;
-+		if ((_settings_client.gui.auto_screenshot == 2) && (_command_count_giant >= _settings_client.gui.auto_screenshot_num_commands)) {
-+			_command_count_giant = 0;
-+			DoGiantScreenshot();
-+		}
-+	}
-+	if ((_settings_client.gui.auto_local_screen & 0x02) != 0) {
-+		_command_count_local++;
-+		if ((_settings_client.gui.auto_local_screen == 2) && (_command_count_local >= _settings_client.gui.auto_local_screen_num_commands)) {
-+			_command_count_local = 0;
-+			DoLocalScreenshots();
-+		}
-+	}
-+}
-diff -r 246855e5c06d src/timelapse.h
---- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.h	Sat Apr 04 14:36:22 2009 +0200
-@@ -0,0 +1,33 @@
-+/* $Id */
-+
-+/** @file timelapse.h Functions of the timelapse patch */
-+
-+#ifndef TIMELAPSE_H
-+#define TIMELAPSE_H
-+
-+void TimelapseDailyCheck();
-+void TimelapseCommandCheck();
-+
-+#endif /* TIMELAPSE_H */
-+/* $Id */
-+
-+/** @file timelapse.h Functions of the timelapse patch */
-+
-+#ifndef TIMELAPSE_H
-+#define TIMELAPSE_H
-+
-+void TimelapseDailyCheck();
-+void TimelapseCommandCheck();
-+
-+#endif /* TIMELAPSE_H */
-+/* $Id */
-+
-+/** @file timelapse.h Functions of the timelapse patch */
-+
-+#ifndef TIMELAPSE_H
-+#define TIMELAPSE_H
-+
-+void TimelapseDailyCheck();
-+void TimelapseCommandCheck();
-+
-+#endif /* TIMELAPSE_H */

@@ -1,6 +1,6 @@
-diff -r 9032b3f9e60b config.lib
---- config.lib	Thu Apr 09 01:22:45 2009 +0000
-+++ config.lib	Thu Apr 09 19:19:43 2009 +0200
+diff -r f9b5e16c4172 config.lib
+--- config.lib	Fri Apr 10 22:47:19 2009 +0000
++++ config.lib	Sat Apr 11 09:06:29 2009 +0200
 @@ -868,7 +868,7 @@
  			log 1 "WARNING: in most cases it is not safe for network use"
  			log 1 "WARNING: USE WITH CAUTION!"
@@ -10,9 +10,9 @@ diff -r 9032b3f9e60b config.lib
  		elif [ -f "$ROOT_DIR/version" ]; then
  			revision="`cat $ROOT_DIR/version`"
  
-diff -r 9032b3f9e60b src/network/network_client.cpp
---- src/network/network_client.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/network/network_client.cpp	Thu Apr 09 19:19:43 2009 +0200
+diff -r f9b5e16c4172 src/network/network_client.cpp
+--- src/network/network_client.cpp	Fri Apr 10 22:47:19 2009 +0000
++++ src/network/network_client.cpp	Sat Apr 11 09:06:29 2009 +0200
 @@ -514,9 +514,15 @@
  			_password_game_seed = p->Recv_uint32();
  			p->Recv_string(_password_server_unique_id, sizeof(_password_server_unique_id));
@@ -32,9 +32,9 @@ diff -r 9032b3f9e60b src/network/network_client.cpp
  			return NETWORK_RECV_STATUS_OKAY;
  
  		default: return NETWORK_RECV_STATUS_MALFORMED_PACKET;
-diff -r 9032b3f9e60b src/network/network_internal.h
---- src/network/network_internal.h	Thu Apr 09 01:22:45 2009 +0000
-+++ src/network/network_internal.h	Thu Apr 09 19:19:43 2009 +0200
+diff -r f9b5e16c4172 src/network/network_internal.h
+--- src/network/network_internal.h	Fri Apr 10 22:47:19 2009 +0000
++++ src/network/network_internal.h	Sat Apr 11 09:06:29 2009 +0200
 @@ -123,6 +123,9 @@
  
  void NetworkTCPQueryServer(NetworkAddress address);
@@ -42,12 +42,12 @@ diff -r 9032b3f9e60b src/network/network_internal.h
 +extern char *_login_pw;                      // login password from -p argument
 +extern char *_company_pw;                    // company password from -P argument
 +
+ void GetBindAddresses(NetworkAddressList *addresses, uint16 port);
  void NetworkAddServer(const char *b);
  void NetworkRebuildHostList();
- void UpdateNetworkGameWindow(bool unselect);
-diff -r 9032b3f9e60b src/openttd.cpp
---- src/openttd.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/openttd.cpp	Thu Apr 09 19:19:43 2009 +0200
+diff -r f9b5e16c4172 src/openttd.cpp
+--- src/openttd.cpp	Fri Apr 10 22:47:19 2009 +0000
++++ src/openttd.cpp	Sat Apr 11 09:06:29 2009 +0200
 @@ -157,6 +157,8 @@
  		"  -G seed             = Set random seed\n"
  #if defined(ENABLE_NETWORK)

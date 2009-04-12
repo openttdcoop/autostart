@@ -1,7 +1,7 @@
-diff -r a5d67fe1df9d src/lang/english.txt
---- src/lang/english.txt	Tue Apr 07 20:15:38 2009 +0200
-+++ src/lang/english.txt	Tue Apr 07 20:49:02 2009 +0200
-@@ -3111,6 +3111,7 @@
+diff -r d67c63e6bb86 src/lang/english.txt
+--- src/lang/english.txt	Sat Apr 11 09:06:29 2009 +0200
++++ src/lang/english.txt	Sat Apr 11 09:06:55 2009 +0200
+@@ -3106,6 +3106,7 @@
  STR_NEWGRF_TOGGLE_PALETTE_TIP                                   :{BLACK}Toggle the palette of the selected NewGRF.{}Do this when the graphics from this NewGRF look pink in-game
  STR_NEWGRF_SET_PARAMETERS                                       :{BLACK}Set parameters
  STR_NEWGRF_FILENAME                                             :{BLACK}Filename: {SILVER}{RAW_STRING}
@@ -9,7 +9,7 @@ diff -r a5d67fe1df9d src/lang/english.txt
  STR_NEWGRF_PALETTE                                              :{BLACK}Palette: {SILVER}{RAW_STRING}
  STR_NEWGRF_GRF_ID                                               :{BLACK}GRF ID: {SILVER}{RAW_STRING}
  STR_NEWGRF_MD5SUM                                               :{BLACK}MD5sum: {SILVER}{RAW_STRING}
-@@ -3146,19 +3147,23 @@
+@@ -3141,19 +3142,23 @@
  STR_NEWGRF_ADD_TIP                                              :{BLACK}Add a NewGRF file to the list
  STR_NEWGRF_REMOVE                                               :{BLACK}Remove
  STR_NEWGRF_REMOVE_TIP                                           :{BLACK}Remove the selected NewGRF file from the list
@@ -37,9 +37,9 @@ diff -r a5d67fe1df9d src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-diff -r a5d67fe1df9d src/newgrf_gui.cpp
---- src/newgrf_gui.cpp	Tue Apr 07 20:15:38 2009 +0200
-+++ src/newgrf_gui.cpp	Tue Apr 07 20:49:02 2009 +0200
+diff -r d67c63e6bb86 src/newgrf_gui.cpp
+--- src/newgrf_gui.cpp	Sat Apr 11 09:06:29 2009 +0200
++++ src/newgrf_gui.cpp	Sat Apr 11 09:06:55 2009 +0200
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -1013,9 +1013,9 @@ diff -r a5d67fe1df9d src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r a5d67fe1df9d src/window.cpp
---- src/window.cpp	Tue Apr 07 20:15:38 2009 +0200
-+++ src/window.cpp	Tue Apr 07 20:49:02 2009 +0200
+diff -r d67c63e6bb86 src/window.cpp
+--- src/window.cpp	Sat Apr 11 09:06:29 2009 +0200
++++ src/window.cpp	Sat Apr 11 09:06:55 2009 +0200
 @@ -1304,7 +1304,6 @@
  static bool HandleDragDrop()
  {
@@ -1039,9 +1039,9 @@ diff -r a5d67fe1df9d src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r a5d67fe1df9d src/window_gui.h
---- src/window_gui.h	Tue Apr 07 20:15:38 2009 +0200
-+++ src/window_gui.h	Tue Apr 07 20:49:02 2009 +0200
+diff -r d67c63e6bb86 src/window_gui.h
+--- src/window_gui.h	Sat Apr 11 09:06:29 2009 +0200
++++ src/window_gui.h	Sat Apr 11 09:06:55 2009 +0200
 @@ -455,6 +455,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  

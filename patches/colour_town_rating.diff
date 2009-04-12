@@ -1,0 +1,151 @@
+diff -r 3c0dd9782899 src/lang/english.txt
+--- src/lang/english.txt	Sun Apr 12 09:48:24 2009 +0200
++++ src/lang/english.txt	Sun Apr 12 18:09:47 2009 +0200
+@@ -966,6 +966,7 @@
+ STR_CONFIG_SETTING_AUTORENEW_MONEY                              :{LTBLUE}Autorenew minimum needed money for renew: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_ERRMSG_DURATION                              :{LTBLUE}Duration of error message: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :{LTBLUE}Show town population in the town name label: {ORANGE}{STRING1}
++STR_CONFIG_SETTING_RATING_IN_LABEL								:{LTBLUE}Show town rating in the town name label: {ORANGE}{STRING1}
+ 
+ STR_CONFIG_SETTING_LAND_GENERATOR                               :{LTBLUE}Land generator: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_LAND_GENERATOR_ORIGINAL                      :Original
+@@ -1700,8 +1701,8 @@
+ 
+ ##id 0x2000
+ STR_2000_TOWNS                                                  :{WHITE}Towns
+-STR_TOWN_LABEL_POP                                              :{WHITE}{TOWN} ({COMMA})
+-STR_TOWN_LABEL                                                  :{WHITE}{TOWN}
++STR_TOWN_LABEL_POP                                              :{TOWN} ({COMMA})
++STR_TOWN_LABEL                                                  :{TOWN}
+ STR_TOWN_LABEL_TINY_BLACK                                       :{TINYFONT}{BLACK}{TOWN}
+ STR_TOWN_LABEL_TINY_WHITE                                       :{TINYFONT}{WHITE}{TOWN}
+ STR_2002                                                        :{TINYFONT}{BLACK}{SIGN}
+diff -r 3c0dd9782899 src/settings_gui.cpp
+--- src/settings_gui.cpp	Sun Apr 12 09:48:24 2009 +0200
++++ src/settings_gui.cpp	Sun Apr 12 18:09:47 2009 +0200
+@@ -1098,6 +1098,7 @@
+ 	SettingEntry("gui.status_long_date"),
+ 	SettingEntry("gui.date_format_in_default_names"),
+ 	SettingEntry("gui.population_in_label"),
++	SettingEntry("gui.rating_in_label"),
+ 	SettingEntry("gui.measure_tooltip"),
+ 	SettingEntry("gui.loading_indicators"),
+ 	SettingEntry("gui.liveries"),
+diff -r 3c0dd9782899 src/settings_type.h
+--- src/settings_type.h	Sun Apr 12 09:48:24 2009 +0200
++++ src/settings_type.h	Sun Apr 12 18:09:47 2009 +0200
+@@ -64,6 +64,7 @@
+ 	uint8  date_format_in_default_names;     ///< should the default savegame/screenshot name use long dates (31th Dec 2008), short dates (31-12-2008) or ISO dates (2008-12-31)
+ 	byte   max_num_autosaves;                ///< controls how many autosavegames are made before the game starts to overwrite (names them 0 to max_num_autosaves - 1)
+ 	bool   population_in_label;              ///< show the population of a town in his label?
++	bool   rating_in_label;                  ///< show the rating of a town in its label
+ 	uint8  right_mouse_btn_emulation;        ///< should we emulate right mouse clicking?
+ 	uint8  scrollwheel_scrolling;            ///< scrolling using the scroll wheel?
+ 	uint8  scrollwheel_multiplier;           ///< how much 'wheel' per incoming event from the OS?
+diff -r 3c0dd9782899 src/table/settings.h
+--- src/table/settings.h	Sun Apr 12 09:48:24 2009 +0200
++++ src/table/settings.h	Sun Apr 12 18:09:47 2009 +0200
+@@ -515,6 +515,7 @@
+ 	  SDTC_VAR(gui.window_snap_radius,        SLE_UINT8, S, D0,    10,        1,       32, 0, STR_CONFIG_SETTING_SNAP_RADIUS,                 NULL),
+ 	  SDTC_VAR(gui.window_soft_limit,         SLE_UINT8, S, D0,    20,        5,      255, 1, STR_CONFIG_SETTING_SOFT_LIMIT,                  NULL),
+ 	 SDTC_BOOL(gui.population_in_label,                  S,  0,  true,                        STR_CONFIG_SETTING_POPULATION_IN_LABEL,         PopulationInLabelActive),
++	 SDTC_BOOL(gui.rating_in_label,                      S,  0,  true,                        STR_CONFIG_SETTING_RATING_IN_LABEL,             PopulationInLabelActive),
+ 	 SDTC_BOOL(gui.link_terraform_toolbar,               S,  0, false,                        STR_CONFIG_SETTING_LINK_TERRAFORM_TOOLBAR,      NULL),
+ 	  SDTC_VAR(gui.liveries,                  SLE_UINT8, S, MS,     2,        0,        2, 0, STR_CONFIG_SETTING_LIVERIES,                    RedrawScreen),
+ 	 SDTC_BOOL(gui.prefer_teamchat,                      S,  0, false,                        STR_CONFIG_SETTING_PREFER_TEAMCHAT,             NULL),
+diff -r 3c0dd9782899 src/town.h
+--- src/town.h	Sun Apr 12 09:48:24 2009 +0200
++++ src/town.h	Sun Apr 12 18:09:47 2009 +0200
+@@ -251,6 +251,7 @@
+ uint32 GetWorldPopulation();
+ 
+ void UpdateTownVirtCoord(Town *t);
++uint16 TownSignColour(Town *t);
+ void UpdateAllTownVirtCoords();
+ void InitializeTown();
+ void ShowTownViewWindow(TownID town);
+diff -r 3c0dd9782899 src/town_cmd.cpp
+--- src/town_cmd.cpp	Sun Apr 12 09:48:24 2009 +0200
++++ src/town_cmd.cpp	Sun Apr 12 18:09:47 2009 +0200
+@@ -316,6 +316,34 @@
+ }
+ 
+ /**
++ * Finds the required colour of the town sign based in the rating
++ * @param t Town that we need the colour for
++ */
++uint16 TownSignColour(Town *t)
++{
++	if((_game_mode == GM_EDITOR) || (!_settings_client.gui.rating_in_label) || (_current_company == COMPANY_SPECTATOR)) return TC_WHITE;
++
++	uint16 colour;
++
++	int r = t->ratings[_current_company];
++	
++	if(r <= RATING_VERYPOOR){
++		colour = TC_RED;
++	}
++	else if(r <= RATING_MEDIOCRE){
++		colour = TC_YELLOW;
++	}
++	else if(r <= RATING_VERYGOOD){
++		colour = TC_WHITE;
++	}
++	else{
++		colour = TC_GREEN;
++	}
++
++	return colour;
++}
++
++/**
+  * Resize the sign(label) of the town after changes in
+  * population (creation or growth or else)
+  * @param t Town to update
+@@ -2341,6 +2369,7 @@
+ 		 */
+ 		if (t->ratings[_current_company] > RATING_BRIBE_DOWN_TO) {
+ 			t->ratings[_current_company] = RATING_BRIBE_DOWN_TO;
++			UpdateTownVirtCoord(t);
+ 			InvalidateWindow(WC_TOWN_AUTHORITY, t->index);
+ 		}
+ 	} else {
+@@ -2690,6 +2719,7 @@
+ 	} else {
+ 		SetBit(t->have_ratings, _current_company);
+ 		t->ratings[_current_company] = rating;
++		UpdateTownVirtCoord(t);
+ 		InvalidateWindow(WC_TOWN_AUTHORITY, t->index);
+ 	}
+ }
+diff -r 3c0dd9782899 src/viewport.cpp
+--- src/viewport.cpp	Sun Apr 12 09:48:24 2009 +0200
++++ src/viewport.cpp	Sun Apr 12 18:09:47 2009 +0200
+@@ -1076,7 +1076,7 @@
+ 						left   < t->sign.left + t->sign.width_1) {
+ 					AddStringToDraw(t->sign.left + 1, t->sign.top + 1,
+ 						_settings_client.gui.population_in_label ? STR_TOWN_LABEL_POP : STR_TOWN_LABEL,
+-						t->index, t->population);
++						t->index, t->population, TownSignColour(t));
+ 				}
+ 			}
+ 			break;
+@@ -1092,7 +1092,7 @@
+ 						left   < t->sign.left + t->sign.width_1 * 2) {
+ 					AddStringToDraw(t->sign.left + 1, t->sign.top + 1,
+ 						_settings_client.gui.population_in_label ? STR_TOWN_LABEL_POP : STR_TOWN_LABEL,
+-						t->index, t->population);
++						t->index, t->population, TownSignColour(t));
+ 				}
+ 			}
+ 			break;
+@@ -1487,6 +1487,9 @@
+ 			/* Real colours need the IS_PALETTE_COLOUR flag
+ 			 * otherwise colours from _string_colourmap are assumed. */
+ 			colour = (TextColour)_colour_gradient[ss->colour][6] | IS_PALETTE_COLOUR;
++		} else if(ss->string != STR_2806 && ss->width == 0) {
++			/* Colours for town signs */
++			colour = (TextColour)ss->colour;
+ 		} else {
+ 			colour = TC_BLACK;
+ 		}

@@ -1,6 +1,6 @@
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 config.lib
---- config.lib	Thu Apr 09 01:22:45 2009 +0000
-+++ config.lib	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 config.lib
+--- config.lib	Sun Apr 12 15:17:27 2009 +0000
++++ config.lib	Sun Apr 12 18:10:09 2009 +0200
 @@ -868,7 +868,7 @@
  			log 1 "WARNING: in most cases it is not safe for network use"
  			log 1 "WARNING: USE WITH CAUTION!"
@@ -10,9 +10,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 config.lib
  		elif [ -f "$ROOT_DIR/version" ]; then
  			revision="`cat $ROOT_DIR/version`"
  
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 projects/openttd_vs80.vcproj
---- projects/openttd_vs80.vcproj	Thu Apr 09 01:22:45 2009 +0000
-+++ projects/openttd_vs80.vcproj	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 projects/openttd_vs80.vcproj
+--- projects/openttd_vs80.vcproj	Sun Apr 12 15:17:27 2009 +0000
++++ projects/openttd_vs80.vcproj	Sun Apr 12 18:10:09 2009 +0200
 @@ -740,6 +740,10 @@
  				>
  			</File>
@@ -35,9 +35,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 projects/openttd_vs80.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 projects/openttd_vs90.vcproj
---- projects/openttd_vs90.vcproj	Thu Apr 09 01:22:45 2009 +0000
-+++ projects/openttd_vs90.vcproj	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 projects/openttd_vs90.vcproj
+--- projects/openttd_vs90.vcproj	Sun Apr 12 15:17:27 2009 +0000
++++ projects/openttd_vs90.vcproj	Sun Apr 12 18:10:09 2009 +0200
 @@ -737,6 +737,10 @@
  				>
  			</File>
@@ -60,9 +60,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 projects/openttd_vs90.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 source.list
---- source.list	Thu Apr 09 01:22:45 2009 +0000
-+++ source.list	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 source.list
+--- source.list	Sun Apr 12 15:17:27 2009 +0000
++++ source.list	Sun Apr 12 18:10:09 2009 +0200
 @@ -95,6 +95,7 @@
  	thread_none.cpp
  #end
@@ -79,9 +79,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 source.list
  timetable.h
  toolbar_gui.h
  town.h
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/command.cpp
---- src/command.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/command.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/command.cpp
+--- src/command.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/command.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -20,6 +20,7 @@
  #include "company_func.h"
  #include "company_base.h"
@@ -99,9 +99,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/command.cpp
  	/* update last build coordinate of company. */
  	if (tile != 0 && IsValidCompanyID(_current_company)) {
  		GetCompany(_current_company)->last_build_coordinate = tile;
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/date.cpp
---- src/date.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/date.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/date.cpp
+--- src/date.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/date.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -15,6 +15,7 @@
  #include "vehicle_base.h"
  #include "debug.h"
@@ -118,9 +118,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/date.cpp
  	}
  
  	/* check if we entered a new month? */
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/economy.cpp
---- src/economy.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/economy.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/economy.cpp
+--- src/economy.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/economy.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -1427,6 +1427,8 @@
  		}
  	}
@@ -130,9 +130,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/economy.cpp
  	TriggerIndustry(i, INDUSTRY_TRIGGER_RECEIVED_CARGO);
  	StartStopIndustryTileAnimation(i, IAT_INDUSTRY_RECEIVED_CARGO);
  }
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/industry_cmd.cpp
---- src/industry_cmd.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/industry_cmd.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/industry_cmd.cpp
+--- src/industry_cmd.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/industry_cmd.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -456,6 +456,8 @@
  		}
  	}
@@ -142,9 +142,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/industry_cmd.cpp
  	if (moved_cargo && !StartStopIndustryTileAnimation(i, IAT_INDUSTRY_DISTRIBUTES_CARGO)) {
  		uint newgfx = GetIndustryTileSpec(GetIndustryGfx(tile))->anim_production;
  
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/industry_gui.cpp
---- src/industry_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/industry_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/industry_gui.cpp
+--- src/industry_gui.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/industry_gui.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -557,6 +557,43 @@
  			y += 10;
  		}
@@ -189,10 +189,118 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/industry_gui.cpp
  		/* Get the extra message for the GUI */
  		if (HasBit(ind->callback_flags, CBM_IND_WINDOW_MORE_TEXT)) {
  			uint16 callback_res = GetIndustryCallback(CBID_INDUSTRY_WINDOW_MORE_TEXT, 0, 0, i, i->type, i->xy);
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/lang/english.txt
---- src/lang/english.txt	Thu Apr 09 01:22:45 2009 +0000
-+++ src/lang/english.txt	Thu Apr 09 19:46:57 2009 +0200
-@@ -1084,6 +1084,37 @@
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/landscape.cpp
+--- src/landscape.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/landscape.cpp	Sun Apr 12 18:10:09 2009 +0200
+@@ -605,6 +605,23 @@
+ 	return _tile_type_procs[GetTileType(tile)]->clear_tile_proc(tile, flags);
+ }
+ 
++bool ClearSingleTile(TileIndex tile, DoCommandFlag flags, Money & money, CommandCost & cost)
++{
++	CommandCost ret = DoCommand(tile, 0, 0, flags & ~DC_EXEC, CMD_LANDSCAPE_CLEAR);
++ 	if (CmdFailed(ret)) return true;
++
++ 	if (flags & DC_EXEC) {
++ 		money -= ret.GetCost();
++		if (ret.GetCost() > 0 && money < 0) {
++ 			_additional_cash_required = ret.GetCost();
++ 			return false;
++ 		}
++ 		DoCommand(tile, 0, 0, flags, CMD_LANDSCAPE_CLEAR);
++ 	}
++ 	cost.AddCost(ret);
++ 	return true;
++}
++
+ /** Clear a big piece of landscape
+  * @param tile end tile of area dragging
+  * @param p1 start tile of area dragging
+@@ -615,45 +632,39 @@
+ {
+ 	if (p1 >= MapSize()) return CMD_ERROR;
+ 
+-	/* make sure sx,sy are smaller than ex,ey */
+-	int ex = TileX(tile);
+-	int ey = TileY(tile);
+-	int sx = TileX(p1);
+-	int sy = TileY(p1);
+-	if (ex < sx) Swap(ex, sx);
+-	if (ey < sy) Swap(ey, sy);
+-
+ 	Money money = GetAvailableMoneyForCommand();
+ 	CommandCost cost(EXPENSES_CONSTRUCTION);
+-	bool success = false;
+ 
+-	for (int x = sx; x <= ex; ++x) {
+-		for (int y = sy; y <= ey; ++y) {
+-			CommandCost ret = DoCommand(TileXY(x, y), 0, 0, flags & ~DC_EXEC, CMD_LANDSCAPE_CLEAR);
+-			if (CmdFailed(ret)) continue;
+-			success = true;
++	if (p2 & ORIENTATION_DIAG) {
++ 		for (DiagIterator iter(tile, p1); iter != TileIterator::end; ++iter) {
++ 			if (!ClearSingleTile(*iter, flags, money, cost)) return cost;
++ 		}
++ 	}
++ 	if (p2 & ORIENTATION_ORTH){
++ 		for (OrthIterator iter(tile, p1); iter != TileIterator::end; ++iter) {
++ 			if (!ClearSingleTile(*iter, flags, money, cost)) return cost;
++ 		}
++ 	}
+ 
+-			if (flags & DC_EXEC) {
+-				money -= ret.GetCost();
+-				if (ret.GetCost() > 0 && money < 0) {
+-					_additional_cash_required = ret.GetCost();
+-					return cost;
+-				}
+-				DoCommand(TileXY(x, y), 0, 0, flags, CMD_LANDSCAPE_CLEAR);
++ 	/* draw explosion animation... */
++	/* big explosion in 2 corners, or small explosion
++	 * for single tiles
++	 */
++	CreateEffectVehicleAbove(TileX(tile) * TILE_SIZE + TILE_SIZE
++		/ 2, TileY(tile) * TILE_SIZE + TILE_SIZE / 2,
++		2, tile == p1 ?
++		EV_EXPLOSION_SMALL :
++		EV_EXPLOSION_LARGE
++	 );
+ 
+-				/* draw explosion animation... */
+-				if ((x == sx || x == ex) && (y == sy || y == ey)) {
+-					/* big explosion in each corner, or small explosion for single tiles */
+-					CreateEffectVehicleAbove(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 2,
+-						sy == ey && sx == ex ? EV_EXPLOSION_SMALL : EV_EXPLOSION_LARGE
+-					);
+-				}
+-			}
+-			cost.AddCost(ret);
+-		}
+-	}
++ 	if (tile != p1) {
++ 		CreateEffectVehicleAbove(TileX(p1) * TILE_SIZE + TILE_SIZE
++			/ 2, TileY(p1) * TILE_SIZE + TILE_SIZE / 2, 2,
++			EV_EXPLOSION_LARGE
++ 		);
++ 	}
+ 
+-	return (success) ? cost : CMD_ERROR;
++ 	return (cost.GetCost() == 0) ? CMD_ERROR : cost;
+ }
+ 
+ 
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/lang/english.txt
+--- src/lang/english.txt	Sun Apr 12 15:17:27 2009 +0000
++++ src/lang/english.txt	Sun Apr 12 18:10:09 2009 +0200
+@@ -970,6 +970,7 @@
+ STR_CONFIG_SETTING_AUTORENEW_MONEY                              :{LTBLUE}Autorenew minimum needed money for renew: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_ERRMSG_DURATION                              :{LTBLUE}Duration of error message: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :{LTBLUE}Show town population in the town name label: {ORANGE}{STRING1}
++STR_CONFIG_SETTING_RATING_IN_LABEL								:{LTBLUE}Show town rating in the town name label: {ORANGE}{STRING1}
+ 
+ STR_CONFIG_SETTING_LAND_GENERATOR                               :{LTBLUE}Land generator: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_LAND_GENERATOR_ORIGINAL                      :Original
+@@ -1088,6 +1089,37 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :All
@@ -230,7 +338,18 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/lang/english.txt
  
  STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
  STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
-@@ -1975,8 +2006,12 @@
+@@ -1673,8 +1705,8 @@
+ 
+ ##id 0x2000
+ STR_2000_TOWNS                                                  :{WHITE}Towns
+-STR_TOWN_LABEL_POP                                              :{WHITE}{TOWN} ({COMMA})
+-STR_TOWN_LABEL                                                  :{WHITE}{TOWN}
++STR_TOWN_LABEL_POP                                              :{TOWN} ({COMMA})
++STR_TOWN_LABEL                                                  :{TOWN}
+ STR_TOWN_LABEL_TINY_BLACK                                       :{TINYFONT}{BLACK}{TOWN}
+ STR_TOWN_LABEL_TINY_WHITE                                       :{TINYFONT}{WHITE}{TOWN}
+ STR_2002                                                        :{TINYFONT}{BLACK}{SIGN}
+@@ -1979,8 +2011,12 @@
  STR_4828_PRODUCES                                               :{BLACK}Produces: {YELLOW}{STRING}{STRING}, {STRING}{STRING}
  ############ range for produces ends
  
@@ -244,7 +363,7 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/lang/english.txt
  STR_482C_CENTER_THE_MAIN_VIEW_ON                                :{BLACK}Centre the main view on industry location
  STR_482D_NEW_UNDER_CONSTRUCTION                                 :{BLACK}{BIGFONT}New {STRING} under construction near {TOWN}!
  STR_482E_NEW_BEING_PLANTED_NEAR                                 :{BLACK}{BIGFONT}New {STRING} being planted near {TOWN}!
-@@ -3106,6 +3141,7 @@
+@@ -3113,6 +3149,7 @@
  STR_NEWGRF_TOGGLE_PALETTE_TIP                                   :{BLACK}Toggle the palette of the selected NewGRF.{}Do this when the graphics from this NewGRF look pink in-game
  STR_NEWGRF_SET_PARAMETERS                                       :{BLACK}Set parameters
  STR_NEWGRF_FILENAME                                             :{BLACK}Filename: {SILVER}{RAW_STRING}
@@ -252,7 +371,7 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/lang/english.txt
  STR_NEWGRF_PALETTE                                              :{BLACK}Palette: {SILVER}{RAW_STRING}
  STR_NEWGRF_GRF_ID                                               :{BLACK}GRF ID: {SILVER}{RAW_STRING}
  STR_NEWGRF_MD5SUM                                               :{BLACK}MD5sum: {SILVER}{RAW_STRING}
-@@ -3141,19 +3177,23 @@
+@@ -3148,19 +3185,23 @@
  STR_NEWGRF_ADD_TIP                                              :{BLACK}Add a NewGRF file to the list
  STR_NEWGRF_REMOVE                                               :{BLACK}Remove
  STR_NEWGRF_REMOVE_TIP                                           :{BLACK}Remove the selected NewGRF file from the list
@@ -280,7 +399,7 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-@@ -3478,6 +3518,13 @@
+@@ -3485,6 +3526,13 @@
  
  ########
  
@@ -294,9 +413,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/lang/english.txt
  STR_FUND_NEW_INDUSTRY                                           :{BLACK}Fund
  STR_PROSPECT_NEW_INDUSTRY                                       :{BLACK}Prospect
  STR_BUILD_NEW_INDUSTRY                                          :{BLACK}Build
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/main_gui.cpp
---- src/main_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/main_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/main_gui.cpp
+--- src/main_gui.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/main_gui.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -26,6 +26,7 @@
  #include "toolbar_gui.h"
  #include "statusbar_gui.h"
@@ -316,9 +435,289 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/main_gui.cpp
  
  #ifdef ENABLE_NETWORK
  			case WKC_RETURN: case 'T': // smart chat; send to team if any, otherwise to all
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/mixer.cpp
---- src/mixer.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/mixer.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/map.cpp
+--- src/map.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/map.cpp	Sun Apr 12 18:10:09 2009 +0200
+@@ -327,3 +327,65 @@
+ 	*tile = INVALID_TILE;
+ 	return false;
+ }
++
++const InvalidIterator TileIterator::end = InvalidIterator();
++
++OrthIterator::OrthIterator(TileIndex corner1, TileIndex corner2)
++{
++	/* coordinates of end and start points */
++	x_max = TileX(corner2);
++	y_max = TileY(corner2);
++	uint x_min = TileX(corner1);
++	uint y_min = TileY(corner1);
++	Init(x_min, y_min);
++}
++
++void OrthIterator::Init(uint x_min, uint y_min)
++{
++	/* make sure x_min, y_min are smaller than x_max, y_max
++	 */
++	if (x_max < x_min) Swap(x_max, x_min);
++	if (y_max < y_min) Swap(y_max, y_min);
++
++	current = TileXY(x_min, y_min);
++	w = x_max - x_min + 1;
++}
++
++OrthIterator::OrthIterator(TileIndex corner, int width, int height)
++{
++	uint x_min = TileX(corner);
++	uint y_min = TileY(corner);
++	x_max = x_min + width;
++	y_max = y_min + height;
++	Init(x_min, y_min);
++}
++
++DiagIterator::DiagIterator(TileIndex corner1, TileIndex corner2)
++{
++	int dist_x = TileX(corner1) - TileX(corner2);
++	int dist_y = TileY(corner1) - TileY(corner2);
++	a_max = dist_x + dist_y;
++	b_max = dist_y - dist_x;
++	base = corner2;
++	/* Unfortunately we can't find a new base and make all a and b positive because
++	 * the new base might be a "flattened" corner where there actually is no single
++	 * tile. If we try anyway the result is either inaccurate ("one off" half of the
++	 * time) or the code gets much more complex;
++	 *
++	 * We also need to increment here to have equality as marker for the end of a row or
++	 * column. Like that it's shorter than having another if/else in operator++
++	 */
++	if (a_max > 0) {
++		a_max++;
++	} else {
++		a_max--;
++	}
++	if (b_max > 0) {
++		b_max++;
++	} else {
++		b_max--;
++	}
++	b_cur = 0;
++	a_cur = 0;
++	if (OutsideMap()) operator++();
++}
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/map_func.h
+--- src/map_func.h	Sun Apr 12 15:17:27 2009 +0000
++++ src/map_func.h	Sun Apr 12 18:10:09 2009 +0200
+@@ -333,6 +333,186 @@
+ 			} while (++var, --w_cur != 0);                       \
+ 		} while (var += TileDiffXY(0, 1) - (w), --h_cur != 0); \
+ 	}
++
++/* a common base class for tile iterators could be done as follows. On the downside
++ * we'd need virtual methods which degrades performance.
++ */
++class InvalidIterator;
++class TileIterator {
++public:
++	static const InvalidIterator end;
++	virtual TileIterator & operator++() = 0;
++	virtual TileIndex operator*() const = 0;
++};
++
++
++class InvalidIterator : public TileIterator {
++	TileIterator & operator++() {return *this;}
++	TileIndex operator*() const {return INVALID_TILE;}
++};
++
++/**
++ * an iterator that lists all the tiles in an orthogonally arranged rectangle.
++ * Use operator++ to advance it and operator* to get the current tile.
++ */
++class OrthIterator : public TileIterator {
++public:
++
++	OrthIterator(TileIndex corner1, TileIndex corner2);
++
++	OrthIterator(TileIndex corner, int width, int height);
++
++	inline OrthIterator & operator++()
++	{
++		++current;
++		if(TileX(current) > x_max) {
++			current += TileDiffXY(0, 1) - (w);
++			if (TileY(current) > y_max) {
++				current = INVALID_TILE;
++			}
++		}
++		return *this;
++	}
++
++	inline TileIndex operator*() const {return current;}
++
++	/**
++	 * compare two iterators.
++	 * They are equal iff all their members are.
++	 */
++	inline bool operator==(const OrthIterator & other) const
++	{
++		return current == other.current && x_max == other.x_max &&
++			y_max == other.y_max && w == other.w;
++	}
++
++	inline bool operator!=(const OrthIterator & other) const
++	{
++		return !operator==(other);
++	}
++
++private:
++	void Init(uint x_min, uint y_min);
++	TileIndex current;
++	uint x_max, y_max;
++	uint w;
++
++	friend bool operator==(const OrthIterator & it1, const InvalidIterator & it2);
++};
++
++inline bool operator==(const OrthIterator & it1, const InvalidIterator & it2)
++{
++	return it1.current == INVALID_TILE;
++}
++
++inline bool operator==(const InvalidIterator & it1, const OrthIterator & it2)
++{
++	return it2 == it1;
++}
++
++inline bool operator!=(const OrthIterator & it1, const InvalidIterator & it2)
++{
++	return !(it1 == it2);
++}
++
++inline bool operator!=(const InvalidIterator & it1, const OrthIterator & it2)
++{
++	return !(it2 == it1);
++}
++
++
++/**
++ * an iterator that lists all the tiles in an diagonally arranged rectangle.
++ * Use operator++ to advance it and operator* to get the current tile.
++ */
++class DiagIterator : public TileIterator {
++public:
++	/* a and b are coordinates in a rotated coordinate system.
++	 * base, a_max and b_max form a rectangle in a diagonal coordinate system.
++	 * a_max counts the number of diagonals in one direction, b_max in the other.
++	 * However with this method you only count half the squares. Compare with a
++	 * check board with alternating black and white squares. You only count one
++	 * color. That is why we count double the amount of rows and columns and
++	 * divide by 2 when translating the coordinates back.
++	 */
++
++	DiagIterator(TileIndex corner1, TileIndex corner2);
++
++	inline TileIterator & operator++()
++	{
++		do {
++			if (a_max > 0) {
++				++a_cur;
++			} else {
++				--a_cur;
++			}
++			if(a_cur == a_max) {
++				a_cur = 0;
++				if (b_max > 0) {
++					++b_cur;
++				} else {
++					--b_cur;
++				}
++			}
++		} while (OutsideMap() && b_max != b_cur);
++		return *this;
++	}
++
++	inline TileIndex operator*() const
++	{
++		return base + TileDiffXY((a_cur - b_cur) / 2, (b_cur + a_cur) / 2);
++	}
++
++	/**
++	 * compare two iterators.
++	 * They are equal iff all their members are.
++	 */
++	inline bool operator==(const DiagIterator & other) const
++	{
++		return base == other.base && b_cur == other.b_cur &&
++			b_max == other.b_max && a_cur == other.a_cur && a_max == other.a_max;
++	}
++
++	inline bool operator!=(const DiagIterator & other) const
++	{
++		return !operator==(other);
++	}
++
++private:
++	inline bool OutsideMap() const
++	{
++		TileIndex tile = base + TileDiffXY((a_cur - b_cur) / 2, (b_cur + a_cur) / 2);
++		return TileX(tile) >= MapSizeX() || TileY(tile) >= MapSizeY();
++	}
++
++	TileIndex base;
++	int a_cur, b_cur;
++	int a_max, b_max;
++
++	friend bool operator==(const DiagIterator & it1, const InvalidIterator & it2);
++};
++
++inline bool operator==(const DiagIterator & it1, const InvalidIterator & it2)
++{
++	return it1.b_cur == it1.b_max;
++}
++
++inline bool operator==(const InvalidIterator & it1, const DiagIterator & it2)
++{
++	return it2 == it1;
++}
++
++inline bool operator!=(const DiagIterator & it1, const InvalidIterator & it2)
++{
++	return !(it1 == it2);
++}
++
++inline bool operator!=(const InvalidIterator & it1, const DiagIterator & it2)
++{
++	return !(it2 == it1);
++}
++
++
+ /**
+  * Convert a DiagDirection to a TileIndexDiff
+  *
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/map_type.h
+--- src/map_type.h	Sun Apr 12 15:17:27 2009 +0000
++++ src/map_type.h	Sun Apr 12 18:10:09 2009 +0200
+@@ -62,4 +62,17 @@
+  */
+ #define STRAIGHT_TRACK_LENGTH 7071/10000
+ 
++/**
++ * argument for CmdLevelLand describing what to do
++ */
++typedef enum {
++	LEVEL_LOWER	= 0x1,
++	LEVEL_RAISE	= 0x2,
++} LevelMode;
++
++typedef enum {
++	ORIENTATION_DIAG = 0x4,
++	ORIENTATION_ORTH = 0x8,
++} Orientation;
++
+ #endif /* MAP_TYPE_H */
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/mixer.cpp
+--- src/mixer.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/mixer.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -25,7 +25,7 @@
  	uint flags;
  };
@@ -328,9 +727,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/mixer.cpp
  static uint32 _play_rate;
  
  /**
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/network/network_client.cpp
---- src/network/network_client.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/network/network_client.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/network/network_client.cpp
+--- src/network/network_client.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/network/network_client.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -514,9 +514,15 @@
  			_password_game_seed = p->Recv_uint32();
  			p->Recv_string(_password_server_unique_id, sizeof(_password_server_unique_id));
@@ -350,9 +749,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/network/network_client.cpp
  			return NETWORK_RECV_STATUS_OKAY;
  
  		default: return NETWORK_RECV_STATUS_MALFORMED_PACKET;
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/network/network_internal.h
---- src/network/network_internal.h	Thu Apr 09 01:22:45 2009 +0000
-+++ src/network/network_internal.h	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/network/network_internal.h
+--- src/network/network_internal.h	Sun Apr 12 15:17:27 2009 +0000
++++ src/network/network_internal.h	Sun Apr 12 18:10:09 2009 +0200
 @@ -123,6 +123,9 @@
  
  void NetworkTCPQueryServer(NetworkAddress address);
@@ -360,12 +759,12 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/network/network_internal.h
 +extern char *_login_pw;                      // login password from -p argument
 +extern char *_company_pw;                    // company password from -P argument
 +
+ void GetBindAddresses(NetworkAddressList *addresses, uint16 port);
  void NetworkAddServer(const char *b);
  void NetworkRebuildHostList();
- void UpdateNetworkGameWindow(bool unselect);
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/newgrf_gui.cpp
---- src/newgrf_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/newgrf_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/newgrf_gui.cpp
+--- src/newgrf_gui.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/newgrf_gui.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -1339,9 +1738,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/openttd.cpp
---- src/openttd.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/openttd.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/openttd.cpp
+--- src/openttd.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/openttd.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -157,6 +157,8 @@
  		"  -G seed             = Set random seed\n"
  #if defined(ENABLE_NETWORK)
@@ -1384,9 +1783,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/openttd.cpp
  #endif /* ENABLE_NETWORK */
  		case 'r': ParseResolution(&resolution, mgo.opt); break;
  		case 't': startyear = atoi(mgo.opt); break;
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/rail_gui.cpp
---- src/rail_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/rail_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/rail_gui.cpp
+--- src/rail_gui.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/rail_gui.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -1785,9 +2184,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/rail_gui.cpp
  	}
  }
  
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/screenshot.cpp
---- src/screenshot.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/screenshot.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/screenshot.cpp
+--- src/screenshot.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/screenshot.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -16,6 +16,9 @@
  #include "map_func.h"
  #include "saveload/saveload.h"
@@ -1908,9 +2307,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/screenshot.cpp
  		default: return false;
  	}
  }
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/screenshot.h
---- src/screenshot.h	Thu Apr 09 01:22:45 2009 +0000
-+++ src/screenshot.h	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/screenshot.h
+--- src/screenshot.h	Sun Apr 12 15:17:27 2009 +0000
++++ src/screenshot.h	Sun Apr 12 18:10:09 2009 +0200
 @@ -13,10 +13,12 @@
  enum ScreenshotType {
  	SC_NONE,
@@ -1926,10 +2325,18 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/screenshot.h
  void SetScreenshotType(ScreenshotType t);
  bool IsScreenshotRequested();
  
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/settings_gui.cpp
---- src/settings_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/settings_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
-@@ -1129,9 +1129,24 @@
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/settings_gui.cpp
+--- src/settings_gui.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/settings_gui.cpp	Sun Apr 12 18:10:09 2009 +0200
+@@ -1098,6 +1098,7 @@
+ 	SettingEntry("gui.status_long_date"),
+ 	SettingEntry("gui.date_format_in_default_names"),
+ 	SettingEntry("gui.population_in_label"),
++	SettingEntry("gui.rating_in_label"),
+ 	SettingEntry("gui.measure_tooltip"),
+ 	SettingEntry("gui.loading_indicators"),
+ 	SettingEntry("gui.liveries"),
+@@ -1129,9 +1130,24 @@
  /** Interaction sub-page */
  static SettingsPage _settings_ui_interaction_page = {_settings_ui_interaction, lengthof(_settings_ui_interaction)};
  
@@ -1954,7 +2361,7 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/settings_gui.cpp
  	SettingEntry("gui.show_finances"),
  	SettingEntry("gui.errmsg_duration"),
  	SettingEntry("gui.toolbar_pos"),
-@@ -1143,6 +1158,7 @@
+@@ -1143,6 +1159,7 @@
  	SettingEntry("gui.always_build_infrastructure"),
  	SettingEntry("gui.persistent_buildingtools"),
  	SettingEntry("gui.coloured_news_year"),
@@ -1962,10 +2369,18 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/settings_type.h
---- src/settings_type.h	Thu Apr 09 01:22:45 2009 +0000
-+++ src/settings_type.h	Thu Apr 09 19:46:57 2009 +0200
-@@ -90,6 +90,20 @@
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/settings_type.h
+--- src/settings_type.h	Sun Apr 12 15:17:27 2009 +0000
++++ src/settings_type.h	Sun Apr 12 18:10:09 2009 +0200
+@@ -65,6 +65,7 @@
+ 	uint8  date_format_in_default_names;     ///< should the default savegame/screenshot name use long dates (31th Dec 2008), short dates (31-12-2008) or ISO dates (2008-12-31)
+ 	byte   max_num_autosaves;                ///< controls how many autosavegames are made before the game starts to overwrite (names them 0 to max_num_autosaves - 1)
+ 	bool   population_in_label;              ///< show the population of a town in his label?
++	bool   rating_in_label;                  ///< show the rating of a town in its label
+ 	uint8  right_mouse_btn_emulation;        ///< should we emulate right mouse clicking?
+ 	uint8  scrollwheel_scrolling;            ///< scrolling using the scroll wheel?
+ 	uint8  scrollwheel_multiplier;           ///< how much 'wheel' per incoming event from the OS?
+@@ -91,6 +92,20 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
  	uint8  expenses_layout;                  ///< layout of expenses window
@@ -1986,9 +2401,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/settings_type.h
  
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/signs_gui.cpp
---- src/signs_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/signs_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/signs_gui.cpp
+--- src/signs_gui.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/signs_gui.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -20,12 +20,25 @@
  
  #include "table/strings.h"
@@ -2334,9 +2749,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/signs_gui.cpp
  {  WWT_RESIZEBOX,   RESIZE_LRTB,  COLOUR_GREY,   346,   357,   126,   137, 0x0,                   STR_RESIZE_BUTTON},
  {   WIDGETS_END},
  };
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/spritecache.cpp
---- src/spritecache.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/spritecache.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/spritecache.cpp
+--- src/spritecache.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/spritecache.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -16,8 +16,8 @@
  
  #include "table/sprites.h"
@@ -2348,10 +2763,18 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/spritecache.cpp
  
  typedef SimpleTinyEnumT<SpriteType, byte> SpriteTypeByte;
  
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/table/settings.h
---- src/table/settings.h	Thu Apr 09 01:22:45 2009 +0000
-+++ src/table/settings.h	Thu Apr 09 19:46:57 2009 +0200
-@@ -552,6 +552,20 @@
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/table/settings.h
+--- src/table/settings.h	Sun Apr 12 15:17:27 2009 +0000
++++ src/table/settings.h	Sun Apr 12 18:10:09 2009 +0200
+@@ -528,6 +528,7 @@
+ 	  SDTC_VAR(gui.window_snap_radius,        SLE_UINT8, S, D0,    10,        1,       32, 0, STR_CONFIG_SETTING_SNAP_RADIUS,                 NULL),
+ 	  SDTC_VAR(gui.window_soft_limit,         SLE_UINT8, S, D0,    20,        5,      255, 1, STR_CONFIG_SETTING_SOFT_LIMIT,                  NULL),
+ 	 SDTC_BOOL(gui.population_in_label,                  S,  0,  true,                        STR_CONFIG_SETTING_POPULATION_IN_LABEL,         PopulationInLabelActive),
++	 SDTC_BOOL(gui.rating_in_label,                      S,  0,  true,                        STR_CONFIG_SETTING_RATING_IN_LABEL,             PopulationInLabelActive),
+ 	 SDTC_BOOL(gui.link_terraform_toolbar,               S,  0, false,                        STR_CONFIG_SETTING_LINK_TERRAFORM_TOOLBAR,      NULL),
+ 	  SDTC_VAR(gui.liveries,                  SLE_UINT8, S, MS,     2,        0,        2, 0, STR_CONFIG_SETTING_LIVERIES,                    RedrawScreen),
+ 	 SDTC_BOOL(gui.prefer_teamchat,                      S,  0, false,                        STR_CONFIG_SETTING_PREFER_TEAMCHAT,             NULL),
+@@ -566,6 +567,20 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
  	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
@@ -2372,181 +2795,144 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/table/settings.h
  
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/timelapse.cpp
---- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.cpp	Thu Apr 09 19:46:57 2009 +0200
-@@ -0,0 +1,131 @@
-+/* $Id */
-+
-+/** @file timelapse.cpp Timelapse patch */
-+
-+#include "stdafx.h"
-+#include "openttd.h"
-+#include "functions.h"
-+#include "core/bitmath_func.hpp"
-+#include "settings_type.h"
-+#include "date_type.h"
-+#include "screenshot.h"
-+#include "signs_base.h"
-+#include "station_base.h"
-+#include "landscape.h"
-+#include "map_func.h"
-+#include "transparency.h"
-+#include "debug.h"
-+
-+uint32 _command_count_giant = 0;
-+uint32 _command_count_local = 0;
-+
-+extern Date _date;
-+
-+void DoGiantScreenshot()
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/terraform_cmd.cpp
+--- src/terraform_cmd.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/terraform_cmd.cpp	Sun Apr 12 18:10:09 2009 +0200
+@@ -346,12 +346,35 @@
+ 	return total_cost;
+ }
+ 
++bool LevelSingleTile(TileIndex tile2, uint h, DoCommandFlag flags, Money & money, CommandCost & cost)
 +{
-+	/* save the current transparency setting */
-+	uint8 transparency_backup = _transparency_opt;
-+	/* disable transparency for all unlocked transparency settings */
-+	_transparency_opt &= _transparency_lock;
-+	/* take a giant screenshot */
-+	SetScreenshotType(SC_TIMELAPSE);
-+	MakeScreenshot();
-+	/* reset transparency to the former state */
-+	_transparency_opt = transparency_backup;
-+}
++	uint curh = TileHeight(tile2);
++	while (curh != h) {
++		CommandCost ret = DoCommand(tile2, SLOPE_N, (curh > h) ? 0 : 1,
++			flags & ~DC_EXEC, CMD_TERRAFORM_LAND);
++		if (CmdFailed(ret)) break;
 +
-+void DoLocalScreenshots()
-+{
-+	/* save the current transparency setting */
-+	uint8 transparency_backup = _transparency_opt;
-+	/* disable transparency for all unlocked transparency settings */
-+	_transparency_opt &= _transparency_lock;
-+
-+	/* iterate through signs and take local screenshots if appropriate */
-+	if (_settings_client.gui.auto_local_screen_types != 1) { // 1 == stations only
-+		const Sign *si;
-+		FOR_ALL_SIGNS(si) {
-+			if (si->name != NULL && *si->name == _settings_client.gui.auto_local_screen_prefix) {
-+				SetScreenshotType(SC_TIMELAPSE_LOCAL);
-+				const Point pt = RemapCoords2(si->x, si->y);
-+				MakeScreenshot(si->name, &pt);
++		if (flags & DC_EXEC) {
++			money -= ret.GetCost();
++			if (money < 0) {
++				_additional_cash_required = ret.GetCost();
++				return false;
 +			}
++			DoCommand(tile2, SLOPE_N, (curh > h) ? 0 : 1, flags,
++				CMD_TERRAFORM_LAND);
++		}
++
++		cost.AddCost(ret);
++		curh += (curh > h) ? -1 : 1;
++	}
++	return true;
++}
+ 
+ /** Levels a selected (rectangle) area of land
+  * @param tile end tile of area-drag
+  * @param flags for this command type
+  * @param p1 start tile of area drag
+- * @param p2 height difference; eg raise (+1), lower (-1) or level (0)
++ * @param p2 see @LevelMode and @Orientation; flags for the mode of levelling (up, down, diagonal ...)
+  * @return  error or cost of terraforming
+  */
+ CommandCost CmdLevelLand(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char *text)
+@@ -364,46 +387,27 @@
+ 	uint oldh = TileHeight(p1);
+ 
+ 	/* compute new height */
+-	uint h = oldh + p2;
++	uint h = oldh;
++	if (p2 & LEVEL_RAISE) h++;
++	if (p2 & LEVEL_LOWER) h--;
+ 
+ 	/* Check range of destination height */
+ 	if (h > MAX_TILE_HEIGHT) return_cmd_error((oldh == 0) ? STR_1003_ALREADY_AT_SEA_LEVEL : STR_1004_TOO_HIGH);
+ 	if (p2 == 0) _error_message = STR_ALREADY_LEVELLED;
+ 
+-	/* make sure sx,sy are smaller than ex,ey */
+-	int ex = TileX(tile);
+-	int ey = TileY(tile);
+-	int sx = TileX(p1);
+-	int sy = TileY(p1);
+-	if (ex < sx) Swap(ex, sx);
+-	if (ey < sy) Swap(ey, sy);
+-	tile = TileXY(sx, sy);
+-
+-	int size_x = ex - sx + 1;
+-	int size_y = ey - sy + 1;
+-
+ 	Money money = GetAvailableMoneyForCommand();
+ 	CommandCost cost(EXPENSES_CONSTRUCTION);
+ 
+-	BEGIN_TILE_LOOP(tile2, size_x, size_y, tile) {
+-		uint curh = TileHeight(tile2);
+-		while (curh != h) {
+-			CommandCost ret = DoCommand(tile2, SLOPE_N, (curh > h) ? 0 : 1, flags & ~DC_EXEC, CMD_TERRAFORM_LAND);
+-			if (CmdFailed(ret)) break;
+-
+-			if (flags & DC_EXEC) {
+-				money -= ret.GetCost();
+-				if (money < 0) {
+-					_additional_cash_required = ret.GetCost();
+-					return cost;
+-				}
+-				DoCommand(tile2, SLOPE_N, (curh > h) ? 0 : 1, flags, CMD_TERRAFORM_LAND);
+-			}
+-
+-			cost.AddCost(ret);
+-			curh += (curh > h) ? -1 : 1;
++	if (p2 & ORIENTATION_DIAG) {
++		for (DiagIterator iter(tile, p1); iter != TileIterator::end; ++iter) {
++			if (!LevelSingleTile(*iter, h, flags, money, cost)) return cost;
+ 		}
+-	} END_TILE_LOOP(tile2, size_x, size_y, tile)
++	}
++	if (p2 & ORIENTATION_ORTH){
++		for (OrthIterator iter(tile, p1); iter != TileIterator::end; ++iter) {
++			if (!LevelSingleTile(*iter, h, flags, money, cost)) return cost;
 +		}
 +	}
-+
-+	/* iterate through stations and take local screenshots if appropriate */
-+	if (_settings_client.gui.auto_local_screen_types != 0) { // 0 == signs only
-+		const Station *s;
-+		FOR_ALL_STATIONS(s) {
-+			if (s->name != NULL && *s->name == _settings_client.gui.auto_local_screen_prefix) {
-+				SetScreenshotType(SC_TIMELAPSE_LOCAL);
-+				const Point pt = RemapCoords2(TileX(s->xy) * TILE_SIZE, TileY(s->xy) * TILE_SIZE);
-+				MakeScreenshot(s->name, &pt);
-+			}
-+		}
-+	}
-+	/* reset transparency to the former state */
-+	_transparency_opt = transparency_backup;
-+}
-+
-+void CheckGiantScreenshot()
-+{
-+	switch (_settings_client.gui.auto_screenshot) {
-+		case 0: break; // off
-+		case 2: break; // number of commands
-+		case 1: // time interval
-+			if (_date % _settings_client.gui.auto_screenshot_interval == 0) DoGiantScreenshot();
-+			break;
-+		case 3: // time interval and number of commands
-+			if (_date % _settings_client.gui.auto_screenshot_interval != 0) break;
-+			if (_command_count_giant < _settings_client.gui.auto_screenshot_num_commands) break;
-+			_command_count_giant = 0;
-+			DoGiantScreenshot();
-+			break;
-+		default: NOT_REACHED();
-+	}
-+}
-+
-+void CheckLocalScreenshots()
-+{
-+	switch (_settings_client.gui.auto_local_screen) {
-+		case 0: break; // off
-+		case 2: break; // number of commands
-+		case 1: // time interval
-+			if (_date % _settings_client.gui.auto_local_screen_interval == 0) DoLocalScreenshots();
-+			break;
-+		case 3: // time interval and number of commands
-+			if (_date % _settings_client.gui.auto_local_screen_interval != 0) break;
-+			if (_command_count_local < _settings_client.gui.auto_local_screen_num_commands) break;
-+			_command_count_local = 0;
-+			DoLocalScreenshots();
-+			break;
-+		default: NOT_REACHED();
-+	}
-+}
-+
-+void TimelapseDailyCheck()
-+{
-+	DEBUG(misc, 1, "TimelapseDailyCheck()! _command_count_giant=%d, _command_count_local=%d)", _command_count_giant, _command_count_local);
-+
-+	CheckLocalScreenshots();
-+	CheckGiantScreenshot();
-+}
-+
-+void TimelapseCommandCheck()
-+{
-+	if ((_settings_client.gui.auto_screenshot & 0x02) != 0) {
-+		_command_count_giant++;
-+		if ((_settings_client.gui.auto_screenshot == 2) && (_command_count_giant >= _settings_client.gui.auto_screenshot_num_commands)) {
-+			_command_count_giant = 0;
-+			DoGiantScreenshot();
-+		}
-+	}
-+	if ((_settings_client.gui.auto_local_screen & 0x02) != 0) {
-+		_command_count_local++;
-+		if ((_settings_client.gui.auto_local_screen == 2) && (_command_count_local >= _settings_client.gui.auto_local_screen_num_commands)) {
-+			_command_count_local = 0;
-+			DoLocalScreenshots();
-+		}
-+	}
-+}
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/timelapse.h
---- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.h	Thu Apr 09 19:46:57 2009 +0200
-@@ -0,0 +1,33 @@
-+/* $Id */
-+
-+/** @file timelapse.h Functions of the timelapse patch */
-+
-+#ifndef TIMELAPSE_H
-+#define TIMELAPSE_H
-+
-+void TimelapseDailyCheck();
-+void TimelapseCommandCheck();
-+
-+#endif /* TIMELAPSE_H */
-+/* $Id */
-+
-+/** @file timelapse.h Functions of the timelapse patch */
-+
-+#ifndef TIMELAPSE_H
-+#define TIMELAPSE_H
-+
-+void TimelapseDailyCheck();
-+void TimelapseCommandCheck();
-+
-+#endif /* TIMELAPSE_H */
-+/* $Id */
-+
-+/** @file timelapse.h Functions of the timelapse patch */
-+
-+#ifndef TIMELAPSE_H
-+#define TIMELAPSE_H
-+
-+void TimelapseDailyCheck();
-+void TimelapseCommandCheck();
-+
-+#endif /* TIMELAPSE_H */
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/toolbar_gui.cpp
---- src/toolbar_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/toolbar_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
+ 
+ 	return (cost.GetCost() == 0) ? CMD_ERROR : cost;
+ }
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/terraform_gui.cpp
+--- src/terraform_gui.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/terraform_gui.cpp	Sun Apr 12 18:10:09 2009 +0200
+@@ -121,16 +121,16 @@
+ 
+ 	switch (proc) {
+ 		case DDSP_DEMOLISH_AREA:
+-			DoCommandP(end_tile, start_tile, 0, CMD_CLEAR_AREA | CMD_MSG(STR_00B5_CAN_T_CLEAR_THIS_AREA), CcPlaySound10);
++			DoCommandP(end_tile, start_tile, _ctrl_pressed ? ORIENTATION_DIAG : ORIENTATION_ORTH, CMD_CLEAR_AREA | CMD_MSG(STR_00B5_CAN_T_CLEAR_THIS_AREA), CcPlaySound10);
+ 			break;
+ 		case DDSP_RAISE_AND_LEVEL_AREA:
+-			DoCommandP(end_tile, start_tile, 1, CMD_LEVEL_LAND | CMD_MSG(STR_0808_CAN_T_RAISE_LAND_HERE), CcTerraform);
++			DoCommandP(end_tile, start_tile, LEVEL_RAISE | ORIENTATION_ORTH, CMD_LEVEL_LAND | CMD_MSG(STR_0808_CAN_T_RAISE_LAND_HERE), CcTerraform);
+ 			break;
+ 		case DDSP_LOWER_AND_LEVEL_AREA:
+-			DoCommandP(end_tile, start_tile, (uint32)-1, CMD_LEVEL_LAND | CMD_MSG(STR_0809_CAN_T_LOWER_LAND_HERE), CcTerraform);
++			DoCommandP(end_tile, start_tile, LEVEL_LOWER | ORIENTATION_ORTH, CMD_LEVEL_LAND | CMD_MSG(STR_0809_CAN_T_LOWER_LAND_HERE), CcTerraform);
+ 			break;
+ 		case DDSP_LEVEL_AREA:
+-			DoCommandP(end_tile, start_tile, 0, CMD_LEVEL_LAND | CMD_MSG(STR_CAN_T_LEVEL_LAND_HERE), CcTerraform);
++			DoCommandP(end_tile, start_tile, _ctrl_pressed ? ORIENTATION_DIAG : ORIENTATION_ORTH, CMD_LEVEL_LAND, CcPlaySound10);
+ 			break;
+ 		case DDSP_CREATE_ROCKS:
+ 			GenerateRockyArea(end_tile, start_tile);
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/tilehighlight_type.h
+--- src/tilehighlight_type.h	Sun Apr 12 15:17:27 2009 +0000
++++ src/tilehighlight_type.h	Sun Apr 12 18:10:09 2009 +0200
+@@ -72,6 +72,8 @@
+ 	ViewportDragDropSelectionProcess select_proc;
+ 
+ 	TileIndex redsq;
++	bool diagonal;     ///< true if dragging a 45 degrees rotated rectangle
++	bool new_diagonal;
+ };
+ 
+ #endif /* TILEHIGHLIGHT_TYPE_H */
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/toolbar_gui.cpp
+--- src/toolbar_gui.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/toolbar_gui.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -1090,6 +1090,7 @@
  			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
  			case WKC_CTRL  | 'G': MenuClickWorldScreenshot(); break;
@@ -2555,10 +2941,64 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/toolbar_gui.cpp
  			case 'A': if (CanBuildVehicleInfrastructure(VEH_TRAIN)) ShowBuildRailToolbar(_last_built_railtype, 4); break; // Invoke Autorail
  			case 'L': ShowTerraformToolbar(); break;
  			case 'M': ShowSmallMap(); break;
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/town_cmd.cpp
---- src/town_cmd.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/town_cmd.cpp	Thu Apr 09 19:46:57 2009 +0200
-@@ -2452,7 +2452,7 @@
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/town.h
+--- src/town.h	Sun Apr 12 15:17:27 2009 +0000
++++ src/town.h	Sun Apr 12 18:10:09 2009 +0200
+@@ -251,6 +251,7 @@
+ uint32 GetWorldPopulation();
+ 
+ void UpdateTownVirtCoord(Town *t);
++uint16 TownSignColour(Town *t);
+ void UpdateAllTownVirtCoords();
+ void InitializeTown();
+ void ShowTownViewWindow(TownID town);
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/town_cmd.cpp
+--- src/town_cmd.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/town_cmd.cpp	Sun Apr 12 18:10:09 2009 +0200
+@@ -316,6 +316,34 @@
+ }
+ 
+ /**
++ * Finds the required colour of the town sign based in the rating
++ * @param t Town that we need the colour for
++ */
++uint16 TownSignColour(Town *t)
++{
++	if((_game_mode == GM_EDITOR) || (!_settings_client.gui.rating_in_label) || (_current_company == COMPANY_SPECTATOR)) return TC_WHITE;
++
++	uint16 colour;
++
++	int r = t->ratings[_current_company];
++	
++	if(r <= RATING_VERYPOOR){
++		colour = TC_RED;
++	}
++	else if(r <= RATING_MEDIOCRE){
++		colour = TC_YELLOW;
++	}
++	else if(r <= RATING_VERYGOOD){
++		colour = TC_WHITE;
++	}
++	else{
++		colour = TC_GREEN;
++	}
++
++	return colour;
++}
++
++/**
+  * Resize the sign(label) of the town after changes in
+  * population (creation or growth or else)
+  * @param t Town to update
+@@ -2341,6 +2369,7 @@
+ 		 */
+ 		if (t->ratings[_current_company] > RATING_BRIBE_DOWN_TO) {
+ 			t->ratings[_current_company] = RATING_BRIBE_DOWN_TO;
++			UpdateTownVirtCoord(t);
+ 			InvalidateWindow(WC_TOWN_AUTHORITY, t->index);
+ 		}
+ 	} else {
+@@ -2452,7 +2481,7 @@
  	return cost;
  }
  
@@ -2567,9 +3007,17 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/town_cmd.cpp
  {
  	/* Increase company ratings if they're low */
  	const Company *c;
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/town_gui.cpp
---- src/town_gui.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/town_gui.cpp	Thu Apr 09 19:46:57 2009 +0200
+@@ -2690,6 +2719,7 @@
+ 	} else {
+ 		SetBit(t->have_ratings, _current_company);
+ 		t->ratings[_current_company] = rating;
++		UpdateTownVirtCoord(t);
+ 		InvalidateWindow(WC_TOWN_AUTHORITY, t->index);
+ 	}
+ }
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/town_gui.cpp
+--- src/town_gui.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/town_gui.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -93,6 +93,25 @@
  
  	virtual void OnPaint()
@@ -2609,9 +3057,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/town_gui.cpp
  				y += 10;
  			}
  		}
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/vehicle.cpp
---- src/vehicle.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/vehicle.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/vehicle.cpp
+--- src/vehicle.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/vehicle.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -224,7 +224,7 @@
  
  /* Size of the hash, 6 = 64 x 64, 7 = 128 x 128. Larger sizes will (in theory) reduce hash
@@ -2621,9 +3069,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/vehicle.cpp
  const int HASH_SIZE = 1 << HASH_BITS;
  const int HASH_MASK = HASH_SIZE - 1;
  const int TOTAL_HASH_SIZE = 1 << (HASH_BITS * 2);
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/viewport.cpp
---- src/viewport.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/viewport.cpp	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/viewport.cpp
+--- src/viewport.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/viewport.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -43,6 +43,8 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -2633,7 +3081,80 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/viewport.cpp
  PlaceProc *_place_proc;
  Point _tile_fract_coords;
  ZoomLevel _saved_scrollpos_zoom;
-@@ -1532,7 +1534,7 @@
+@@ -691,6 +693,17 @@
+ 	_vd.combine_sprites = 0;
+ }
+ 
++bool IsInsideRotatedRectangle(int x, int y)
++{
++	int dist_a = (_thd.size.x + _thd.size.y); // Rotated coordinate system for selected rectangle
++	int dist_b = (_thd.size.x - _thd.size.y); // We don't have to divide by 2. It's all relative!
++	int a = ((x - _thd.pos.x) + (y - _thd.pos.y)); // Rotated coordinate system for the point under scrutiny
++	int b = ((x - _thd.pos.x) - (y - _thd.pos.y));
++
++	return ((dist_a >= 0 && a <= dist_a && a >= 0) || (dist_a < 0 && a >= dist_a && a <= 0)) &&
++			((dist_b >= 0 && b <= dist_b && b >= 0) || (dist_b < 0 && b >= dist_b && b <= 0));
++}
++
+ /**
+  * Add a child sprite to a parent sprite.
+  *
+@@ -878,6 +891,26 @@
+ 	/* no selection active? */
+ 	if (_thd.drawstyle == 0) return;
+ 
++	if (_thd.diagonal) { // We're drawing a 45 degrees rotated (diagonal) rectangle
++		if (IsInsideRotatedRectangle((int)ti->x, (int)ti->y)) {
++			if (_thd.drawstyle & HT_RECT) { // highlighting a square (clear land)
++				SpriteID image = SPR_SELECT_TILE + _tileh_to_sprite[ti->tileh];
++				DrawSelectionSprite(image, _thd.make_square_red ? PALETTE_SEL_TILE_RED : PAL_NONE, ti, 7, FOUNDATION_PART_NORMAL);
++			} else { // highlighting a dot (level land)
++				/* Figure out the Z coordinate for the single dot. */
++				byte z = ti->z;
++				if (ti->tileh & 8) {
++					z += 8;
++					if (!(ti->tileh & 2) && (ti->tileh & 0x10)) {
++						z += 8;
++					}
++				}
++				DrawGroundSpriteAt(_cur_dpi->zoom != 2 ? SPR_DOT : SPR_DOT_SMALL, PAL_NONE, ti->x, ti->y, z);
++			}
++		}
++		return;
++	}
++
+ 	/* Inside the inner area? */
+ 	if (IsInsideBS(ti->x, _thd.pos.x, _thd.size.x) &&
+ 			IsInsideBS(ti->y, _thd.pos.y, _thd.size.y)) {
+@@ -1043,7 +1076,7 @@
+ 						left   < t->sign.left + t->sign.width_1) {
+ 					AddStringToDraw(t->sign.left + 1, t->sign.top + 1,
+ 						_settings_client.gui.population_in_label ? STR_TOWN_LABEL_POP : STR_TOWN_LABEL,
+-						t->index, t->population);
++						t->index, t->population, TownSignColour(t));
+ 				}
+ 			}
+ 			break;
+@@ -1059,7 +1092,7 @@
+ 						left   < t->sign.left + t->sign.width_1 * 2) {
+ 					AddStringToDraw(t->sign.left + 1, t->sign.top + 1,
+ 						_settings_client.gui.population_in_label ? STR_TOWN_LABEL_POP : STR_TOWN_LABEL,
+-						t->index, t->population);
++						t->index, t->population, TownSignColour(t));
+ 				}
+ 			}
+ 			break;
+@@ -1454,6 +1487,9 @@
+ 			/* Real colours need the IS_PALETTE_COLOUR flag
+ 			 * otherwise colours from _string_colourmap are assumed. */
+ 			colour = (TextColour)_colour_gradient[ss->colour][6] | IS_PALETTE_COLOUR;
++		} else if(ss->string != STR_2806 && ss->width == 0) {
++			/* Colours for town signs */
++			colour = (TextColour)ss->colour;
+ 		} else {
+ 			colour = TC_BLACK;
+ 		}
+@@ -1532,7 +1568,7 @@
   * If we do, the sprite memory will overflow. */
  static void ViewportDrawChk(const ViewPort *vp, int left, int top, int right, int bottom)
  {
@@ -2642,9 +3163,134 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/viewport.cpp
  		if ((bottom - top) > (right - left)) {
  			int t = (top + bottom) >> 1;
  			ViewportDrawChk(vp, left, top, right, t);
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/window.cpp
---- src/window.cpp	Thu Apr 09 01:22:45 2009 +0000
-+++ src/window.cpp	Thu Apr 09 19:46:57 2009 +0200
+@@ -1744,26 +1780,41 @@
+ 	x_size = _thd.size.x;
+ 	y_size = _thd.size.y;
+ 
+-	if (_thd.outersize.x) {
+-		x_size += _thd.outersize.x;
+-		x += _thd.offs.x;
+-		y_size += _thd.outersize.y;
+-		y += _thd.offs.y;
++	if (!_thd.diagonal) { // Selecting in a straigth rectangle (or a single square)
++		if (_thd.outersize.x) {
++			x_size += _thd.outersize.x;
++			x += _thd.offs.x;
++			y_size += _thd.outersize.y;
++			y += _thd.offs.y;
++		}
++		assert(x_size > 0);
++		assert(y_size > 0);
++
++		x_size += x;
++		y_size += y;
++
++		do {
++			int y_bk = y;
++			do {
++				MarkTileDirty(x, y);
++			} while ((y += TILE_SIZE) != y_size);
++			y = y_bk;
++		} while ((x += TILE_SIZE) != x_size);
++	} else { // Selecting in a 45 degrees rotated (diagonal) rectangle.
++		/* a_size, b_size describe a rectangle with rotated coordinates */
++		int a_size = x_size + y_size, b_size = x_size - y_size;
++
++		int interval_a = a_size < 0 ? -TILE_SIZE : TILE_SIZE;
++		int interval_b = b_size < 0 ? -TILE_SIZE : TILE_SIZE;
++
++		for (int a = -interval_a; a != a_size + interval_a; a += interval_a) {
++			for (int b = -interval_b; b != b_size + interval_b; b += interval_b) {
++				x = _thd.pos.x + (a + b) / 2;
++				y = _thd.pos.y + (a - b) / 2;
++				MarkTileDirty(x, y);
++			}
++		}
+ 	}
+-
+-	assert(x_size > 0);
+-	assert(y_size > 0);
+-
+-	x_size += x;
+-	y_size += y;
+-
+-	do {
+-		int y_bk = y;
+-		do {
+-			MarkTileDirty(x, y);
+-		} while ( (y += TILE_SIZE) != y_size);
+-		y = y_bk;
+-	} while ( (x += TILE_SIZE) != x_size);
+ }
+ 
+ 
+@@ -2135,6 +2186,12 @@
+ 	return HT_RAIL | _autorail_piece[x & 0xF][y & 0xF];
+ }
+ 
++static inline bool DraggingDiagonal()
++{
++	return _ctrl_pressed && _thd.select_method == VPM_X_AND_Y &&
++		(_thd.select_proc == DDSP_DEMOLISH_AREA || _thd.select_proc == DDSP_LEVEL_AREA);
++}
++
+ /**
+  * Updates tile highlighting for all cases.
+  * Uses _thd.selstart and _thd.selend and _thd.place_mode (set elsewhere) to determine _thd.pos and _thd.size
+@@ -2148,6 +2205,7 @@
+ 	int y1;
+ 
+ 	_thd.new_drawstyle = 0;
++	_thd.new_diagonal = false;
+ 
+ 	if (_thd.place_mode == VHM_SPECIAL) {
+ 		x1 = _thd.selend.x;
+@@ -2158,12 +2216,20 @@
+ 			x1 &= ~0xF;
+ 			y1 &= ~0xF;
+ 
+-			if (x1 >= x2) Swap(x1, x2);
+-			if (y1 >= y2) Swap(y1, y2);
++			if ( DraggingDiagonal() )
++				_thd.new_diagonal = true;
++			else {
++				if (x1 >= x2) Swap(x1,x2);
++				if (y1 >= y2) Swap(y1,y2);
++			}
+ 			_thd.new_pos.x = x1;
+ 			_thd.new_pos.y = y1;
+-			_thd.new_size.x = x2 - x1 + TILE_SIZE;
+-			_thd.new_size.y = y2 - y1 + TILE_SIZE;
++			_thd.new_size.x = x2 - x1;
++			_thd.new_size.y = y2 - y1;
++			if (!_thd.new_diagonal) {
++				_thd.new_size.x += TILE_SIZE;
++				_thd.new_size.y += TILE_SIZE;
++			}
+ 			_thd.new_drawstyle = _thd.next_drawstyle;
+ 		}
+ 	} else if (_thd.place_mode != VHM_NONE) {
+@@ -2197,7 +2263,8 @@
+ 			_thd.pos.x != _thd.new_pos.x || _thd.pos.y != _thd.new_pos.y ||
+ 			_thd.size.x != _thd.new_size.x || _thd.size.y != _thd.new_size.y ||
+ 			_thd.outersize.x != _thd.new_outersize.x ||
+-			_thd.outersize.y != _thd.new_outersize.y) {
++			_thd.outersize.y != _thd.new_outersize.y ||
++			_thd.diagonal    != _thd.new_diagonal) {
+ 		/* clear the old selection? */
+ 		if (_thd.drawstyle) SetSelectionTilesDirty();
+ 
+@@ -2205,6 +2272,7 @@
+ 		_thd.pos = _thd.new_pos;
+ 		_thd.size = _thd.new_size;
+ 		_thd.outersize = _thd.new_outersize;
++		_thd.diagonal = _thd.new_diagonal;
+ 		_thd.dirty = 0xff;
+ 
+ 		/* draw the new selection? */
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/window.cpp
+--- src/window.cpp	Sun Apr 12 15:17:27 2009 +0000
++++ src/window.cpp	Sun Apr 12 18:10:09 2009 +0200
 @@ -1304,7 +1304,6 @@
  static bool HandleDragDrop()
  {
@@ -2668,9 +3314,9 @@ diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r 9032b3f9e60b -r 4f8d411c1ab7 src/window_gui.h
---- src/window_gui.h	Thu Apr 09 01:22:45 2009 +0000
-+++ src/window_gui.h	Thu Apr 09 19:46:57 2009 +0200
+diff -r 76fc4bf1ce4b -r 9e821d4b10b8 src/window_gui.h
+--- src/window_gui.h	Sun Apr 12 15:17:27 2009 +0000
++++ src/window_gui.h	Sun Apr 12 18:10:09 2009 +0200
 @@ -455,6 +455,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  

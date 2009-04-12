@@ -1,6 +1,6 @@
-diff -r c920bf5e3c2e src/main_gui.cpp
---- src/main_gui.cpp	Fri Mar 20 17:17:19 2009 +0100
-+++ src/main_gui.cpp	Fri Mar 20 18:33:18 2009 +0100
+diff -r ef9bf25ac4b2 src/main_gui.cpp
+--- src/main_gui.cpp	Sat Apr 11 09:06:56 2009 +0200
++++ src/main_gui.cpp	Sat Apr 11 09:07:32 2009 +0200
 @@ -26,6 +26,7 @@
  #include "toolbar_gui.h"
  #include "statusbar_gui.h"

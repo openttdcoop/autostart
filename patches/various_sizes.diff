@@ -1,6 +1,6 @@
-diff -r b9d673266332 src/mixer.cpp
---- src/mixer.cpp	Fri Mar 20 18:21:26 2009 +0100
-+++ src/mixer.cpp	Fri Mar 20 18:33:06 2009 +0100
+diff -r 076b047866f2 src/mixer.cpp
+--- src/mixer.cpp	Sat Apr 11 09:09:54 2009 +0200
++++ src/mixer.cpp	Sat Apr 11 09:11:05 2009 +0200
 @@ -25,7 +25,7 @@
  	uint flags;
  };
@@ -10,9 +10,9 @@ diff -r b9d673266332 src/mixer.cpp
  static uint32 _play_rate;
  
  /**
-diff -r b9d673266332 src/spritecache.cpp
---- src/spritecache.cpp	Fri Mar 20 18:21:26 2009 +0100
-+++ src/spritecache.cpp	Fri Mar 20 18:33:06 2009 +0100
+diff -r 076b047866f2 src/spritecache.cpp
+--- src/spritecache.cpp	Sat Apr 11 09:09:54 2009 +0200
++++ src/spritecache.cpp	Sat Apr 11 09:11:05 2009 +0200
 @@ -16,8 +16,8 @@
  
  #include "table/sprites.h"
@@ -24,9 +24,9 @@ diff -r b9d673266332 src/spritecache.cpp
  
  typedef SimpleTinyEnumT<SpriteType, byte> SpriteTypeByte;
  
-diff -r b9d673266332 src/vehicle.cpp
---- src/vehicle.cpp	Fri Mar 20 18:21:26 2009 +0100
-+++ src/vehicle.cpp	Fri Mar 20 18:33:06 2009 +0100
+diff -r 076b047866f2 src/vehicle.cpp
+--- src/vehicle.cpp	Sat Apr 11 09:09:54 2009 +0200
++++ src/vehicle.cpp	Sat Apr 11 09:11:05 2009 +0200
 @@ -224,7 +224,7 @@
  
  /* Size of the hash, 6 = 64 x 64, 7 = 128 x 128. Larger sizes will (in theory) reduce hash
@@ -36,9 +36,9 @@ diff -r b9d673266332 src/vehicle.cpp
  const int HASH_SIZE = 1 << HASH_BITS;
  const int HASH_MASK = HASH_SIZE - 1;
  const int TOTAL_HASH_SIZE = 1 << (HASH_BITS * 2);
-diff -r b9d673266332 src/viewport.cpp
---- src/viewport.cpp	Fri Mar 20 18:21:26 2009 +0100
-+++ src/viewport.cpp	Fri Mar 20 18:33:06 2009 +0100
+diff -r 076b047866f2 src/viewport.cpp
+--- src/viewport.cpp	Sat Apr 11 09:09:54 2009 +0200
++++ src/viewport.cpp	Sat Apr 11 09:11:05 2009 +0200
 @@ -43,6 +43,8 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -48,7 +48,7 @@ diff -r b9d673266332 src/viewport.cpp
  PlaceProc *_place_proc;
  Point _tile_fract_coords;
  ZoomLevel _saved_scrollpos_zoom;
-@@ -1523,7 +1525,7 @@
+@@ -1532,7 +1534,7 @@
   * If we do, the sprite memory will overflow. */
  static void ViewportDrawChk(const ViewPort *vp, int left, int top, int right, int bottom)
  {

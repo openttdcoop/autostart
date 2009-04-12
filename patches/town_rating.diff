@@ -1,7 +1,7 @@
-diff -r 499a150f856c src/town_cmd.cpp
---- src/town_cmd.cpp	Tue Mar 24 10:31:43 2009 +0100
-+++ src/town_cmd.cpp	Tue Mar 31 22:39:04 2009 +0200
-@@ -2443,7 +2443,7 @@
+diff -r 0c5d44711b5e src/town_cmd.cpp
+--- src/town_cmd.cpp	Sat Apr 11 09:09:28 2009 +0200
++++ src/town_cmd.cpp	Sat Apr 11 09:09:54 2009 +0200
+@@ -2452,7 +2452,7 @@
  	return cost;
  }
  
@@ -10,9 +10,9 @@ diff -r 499a150f856c src/town_cmd.cpp
  {
  	/* Increase company ratings if they're low */
  	const Company *c;
-diff -r 499a150f856c src/town_gui.cpp
---- src/town_gui.cpp	Tue Mar 24 10:31:43 2009 +0100
-+++ src/town_gui.cpp	Tue Mar 31 22:39:04 2009 +0200
+diff -r 0c5d44711b5e src/town_gui.cpp
+--- src/town_gui.cpp	Sat Apr 11 09:09:28 2009 +0200
++++ src/town_gui.cpp	Sat Apr 11 09:09:54 2009 +0200
 @@ -93,6 +93,25 @@
  
  	virtual void OnPaint()
