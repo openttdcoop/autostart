@@ -1,6 +1,6 @@
-diff -r 669df266916b -r d4ceabdd16e3 config.lib
+diff -r 669df266916b -r 07b7932b2e68 config.lib
 --- config.lib	Thu Apr 23 17:54:05 2009 +0000
-+++ config.lib	Sat Apr 25 09:49:28 2009 +0200
++++ config.lib	Sat Apr 25 13:32:58 2009 +0200
 @@ -868,7 +868,7 @@
  			log 1 "WARNING: in most cases it is not safe for network use"
  			log 1 "WARNING: USE WITH CAUTION!"
@@ -10,18 +10,261 @@ diff -r 669df266916b -r d4ceabdd16e3 config.lib
  		elif [ -f "$ROOT_DIR/version" ]; then
  			revision="`cat $ROOT_DIR/version`"
  
-diff -r 669df266916b -r d4ceabdd16e3 src/lang/english.txt
+diff -r 669df266916b -r 07b7932b2e68 projects/openttd_vs80.vcproj
+--- projects/openttd_vs80.vcproj	Thu Apr 23 17:54:05 2009 +0000
++++ projects/openttd_vs80.vcproj	Sat Apr 25 13:32:58 2009 +0200
+@@ -740,6 +740,10 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath=".\..\src\timelapse.cpp"
++				>
++			</File>
++			<File
+ 				RelativePath=".\..\src\vehicle.cpp"
+ 				>
+ 			</File>
+@@ -1496,6 +1500,10 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath=".\..\src\timelapse.h"
++				>
++			</File>
++			<File
+ 				RelativePath=".\..\src\timetable.h"
+ 				>
+ 			</File>
+diff -r 669df266916b -r 07b7932b2e68 projects/openttd_vs90.vcproj
+--- projects/openttd_vs90.vcproj	Thu Apr 23 17:54:05 2009 +0000
++++ projects/openttd_vs90.vcproj	Sat Apr 25 13:32:58 2009 +0200
+@@ -737,6 +737,10 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath=".\..\src\timelapse.cpp"
++				>
++			</File>
++			<File
+ 				RelativePath=".\..\src\vehicle.cpp"
+ 				>
+ 			</File>
+@@ -1493,6 +1497,10 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath=".\..\src\timelapse.h"
++				>
++			</File>
++			<File
+ 				RelativePath=".\..\src\timetable.h"
+ 				>
+ 			</File>
+diff -r 669df266916b -r 07b7932b2e68 source.list
+--- source.list	Thu Apr 23 17:54:05 2009 +0000
++++ source.list	Sat Apr 25 13:32:58 2009 +0200
+@@ -95,6 +95,7 @@
+ 	thread_none.cpp
+ #end
+ tile_map.cpp
++timelapse.cpp
+ #if WIN32
+ #else
+ 	#if WINCE
+@@ -304,6 +305,7 @@
+ tile_type.h
+ tilehighlight_func.h
+ tilehighlight_type.h
++timelapse.h
+ timetable.h
+ toolbar_gui.h
+ town.h
+diff -r 669df266916b -r 07b7932b2e68 src/command.cpp
+--- src/command.cpp	Thu Apr 23 17:54:05 2009 +0000
++++ src/command.cpp	Sat Apr 25 13:32:58 2009 +0200
+@@ -9,6 +9,8 @@
+ #include "gui.h"
+ #include "command_func.h"
+ #include "network/network.h"
++#include "network/network_base.h"
++#include "network/network_func.h"
+ #include "genworld.h"
+ #include "newgrf_storage.h"
+ #include "strings_func.h"
+@@ -20,6 +22,9 @@
+ #include "company_func.h"
+ #include "company_base.h"
+ #include "signal_func.h"
++#include "window_func.h"
++#include "viewport_func.h"
++#include "timelapse.h"
+ 
+ #include "table/strings.h"
+ 
+@@ -468,9 +473,9 @@
+  * @param my_cmd indicator if the command is from a company or server (to display error messages for a user)
+  * @return true if the command succeeded, else false
+  */
+-bool DoCommandP(const CommandContainer *container, bool my_cmd)
++bool DoCommandP(const CommandContainer *container, ClientID client)
+ {
+-	return DoCommandP(container->tile, container->p1, container->p2, container->cmd, container->callback, container->text, my_cmd);
++	return DoCommandP(container->tile, container->p1, container->p2, container->cmd, container->callback, container->text, client);
+ }
+ 
+ /*!
+@@ -488,8 +493,10 @@
+  * @param my_cmd indicator if the command is from a company or server (to display error messages for a user)
+  * @return true if the command succeeded, else false
+  */
+-bool DoCommandP(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallback *callback, const char *text, bool my_cmd)
++bool DoCommandP(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallback *callback, const char *text, ClientID client)
+ {
++	bool my_cmd = (client != INVALID_CLIENT_ID && client == _network_own_client_id) || (!_networking && _current_company == _local_company);
++
+ 	assert(_docommand_recursive == 0);
+ 
+ 	CommandCost res, res2;
+@@ -589,9 +596,21 @@
+ #endif /* ENABLE_NETWORK */
+ 	DEBUG(desync, 1, "cmd: %08x; %08x; %1x; %06x; %08x; %08x; %04x; %s\n", _date, _date_fract, (int)_current_company, tile, p1, p2, cmd & ~CMD_NETWORK_COMMAND, text);
+ 
++	TimelapseCommandCheck();
++
+ 	/* update last build coordinate of company. */
+ 	if (tile != 0 && IsValidCompanyID(_current_company)) {
+ 		GetCompany(_current_company)->last_build_coordinate = tile;
++		if (client != INVALID_CLIENT_ID) {
++			NetworkClientInfo *ci = NetworkFindClientInfoFromClientID(client);
++			if (ci != NULL && IsValidCompanyID(ci->client_playas) && ci->client_playas == _current_company) {
++				if (ci->last_build_coordinate != tile) {
++					ci->last_build_coordinate = tile;
++					Window *w = FindWindowById(WC_BIG_BROTHER_WINDOW, client);
++					if (w != NULL) ScrollWindowTo(TileX(tile) * TILE_SIZE + TILE_SIZE / 2, TileY(tile) * TILE_SIZE + TILE_SIZE / 2, -1, w, true);
++				}
++			}
++		}
+ 	}
+ 
+ 	/* Actually try and execute the command. If no cost-type is given
+diff -r 669df266916b -r 07b7932b2e68 src/command_func.h
+--- src/command_func.h	Thu Apr 23 17:54:05 2009 +0000
++++ src/command_func.h	Sat Apr 25 13:32:58 2009 +0200
+@@ -6,6 +6,7 @@
+ #define COMMAND_FUNC_H
+ 
+ #include "command_type.h"
++#include "network/network_func.h"
+ 
+ /**
+  * Checks if a command failes.
+@@ -59,8 +60,8 @@
+ /**
+  * Execute a network safe DoCommand function
+  */
+-bool DoCommandP(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallback *callback = NULL, const char *text = NULL, bool my_cmd = true);
+-bool DoCommandP(const CommandContainer *container, bool my_cmd = true);
++bool DoCommandP(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallback *callback = NULL, const char *text = NULL, ClientID client = _network_own_client_id);
++bool DoCommandP(const CommandContainer *container, ClientID client = _network_own_client_id);
+ 
+ #ifdef ENABLE_NETWORK
+ 
+diff -r 669df266916b -r 07b7932b2e68 src/date.cpp
+--- src/date.cpp	Thu Apr 23 17:54:05 2009 +0000
++++ src/date.cpp	Sat Apr 25 13:32:58 2009 +0200
+@@ -15,6 +15,7 @@
+ #include "vehicle_base.h"
+ #include "debug.h"
+ #include "rail_gui.h"
++#include "timelapse.h"
+ #include "saveload/saveload.h"
+ 
+ Year      _cur_year;   ///< Current year, starting at 0
+@@ -230,6 +231,7 @@
+ 	if (_game_mode != GM_MENU) {
+ 		InvalidateWindowWidget(WC_STATUS_BAR, 0, 0);
+ 		EnginesDailyLoop();
++		TimelapseDailyCheck();
+ 	}
+ 
+ 	/* check if we entered a new month? */
+diff -r 669df266916b -r 07b7932b2e68 src/gui.h
+--- src/gui.h	Thu Apr 23 17:54:05 2009 +0000
++++ src/gui.h	Sat Apr 25 13:32:58 2009 +0200
+@@ -12,6 +12,7 @@
+ #include "tile_type.h"
+ #include "strings_type.h"
+ #include "transport_type.h"
++#include "network/network_type.h"
+ 
+ /* main_gui.cpp */
+ void CcPlaySound10(bool success, TileIndex tile, uint32 p1, uint32 p2);
+@@ -62,6 +63,7 @@
+ 
+ void ShowSmallMap();
+ void ShowExtraViewPortWindow(TileIndex tile = INVALID_TILE);
++void ShowBigBrotherWindow(ClientID cid);
+ 
+ void BuildFileList();
+ void SetFiosType(const byte fiostype);
+diff -r 669df266916b -r 07b7932b2e68 src/lang/english.txt
 --- src/lang/english.txt	Thu Apr 23 17:54:05 2009 +0000
-+++ src/lang/english.txt	Sat Apr 25 09:49:28 2009 +0200
-@@ -1087,6 +1087,7 @@
++++ src/lang/english.txt	Sat Apr 25 13:32:58 2009 +0200
+@@ -704,6 +704,7 @@
+ STR_MAP_MENU_EXTRA_VIEW_PORT                                    :Extra viewport
+ STR_MAP_MENU_SIGN_LIST                                          :Sign list
+ STR_TOWN_POPULATION                                             :{BLACK}World population: {COMMA}
++STR_BIG_BROTHER_CLIENT_NAME                                     :{WHITE}{CLIENTNAME}
+ STR_EXTRA_VIEW_PORT_TITLE                                       :{WHITE}Viewport {COMMA}
+ STR_EXTRA_VIEW_MOVE_VIEW_TO_MAIN                                :{BLACK}Copy to viewport
+ STR_EXTRA_VIEW_MOVE_VIEW_TO_MAIN_TT                             :{BLACK}Copy the location of the global view to this viewport
+@@ -1087,6 +1088,37 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :All
 +STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI                          :{LTBLUE}Enable previews for station building: {ORANGE}{STRING1}
++
++STR_CONFIG_SETTING_AUTOMATIC_SCREENSHOTS                        :{ORANGE}Automatic Screenshots
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN                            :{LTBLUE}Take giant screenshots: {ORANGE}{STRING1}
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_OFF                        :Off
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_DAYS                       :Every x days
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_COMMANDS                   :Every y commands
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_DAYS_COMMANDS              :Every x days and y commands
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_INTERVAL                   :{LTBLUE}Interval for automatic giant screenshots: {ORANGE}{STRING1} day(s)
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_NUM_COMMANDS               :{LTBLUE}Command limit for automatic giant screenshots: {ORANGE}{STRING1} commands
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_ZOOMLVL                    :{LTBLUE}Zoom level for automatic giant screenshots: {ORANGE}{STRING1}
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_ZOOMLVL_NORMAL             :Normal
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_ZOOMLVL_2X                 :2x
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_ZOOMLVL_4X                 :4x
++STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_ZOOMLVL_8X                 :8x
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN                            :{LTBLUE}Take local screenshots: {ORANGE}{STRING1}
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_OFF                        :Off
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_DAYS                       :Every x days
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_COMMANDS                   :Every y commands
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_DAYS_COMMANDS              :Every x days and y commands
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_TYPES                      :{LTBLUE}Local screenshots are taken at: {ORANGE}{STRING1}
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_TYPES_SIGNS                :Signs
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_TYPES_STATIONS             :Stations
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_TYPES_SIGNS_AND_STATIONS   :Signs and stations
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_INTERVAL                   :{LTBLUE}Interval for automatic local screenshots: {ORANGE}{STRING1} day(s)
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_NUM_COMMANDS               :{LTBLUE}Command limit for automatic local screenshots: {ORANGE}{STRING1} commands
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_ZOOMLVL                    :{LTBLUE}Zoom level for automatic local screenshots: {ORANGE}{STRING1}
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_ZOOMLVL_NORMAL             :Normal
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_ZOOMLVL_2X                 :2x
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_ZOOMLVL_4X                 :4x
++STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_ZOOMLVL_8X                 :8x
  
  STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
  STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
-@@ -3083,6 +3084,7 @@
+@@ -1517,6 +1549,7 @@
+ STR_NETWORK_CLIENTLIST_SPEAK_TO_ALL                             :Speak to all
+ STR_NETWORK_CLIENTLIST_SPEAK_TO_COMPANY                         :Speak to company
+ STR_NETWORK_CLIENTLIST_SPEAK_TO_CLIENT                          :Private message
++STR_NETWORK_CLIENTLIST_OPEN_WINDOW                              :Open window
+ 
+ 
+ STR_NETWORK_SEND                                                :{BLACK}Send
+@@ -3083,6 +3116,7 @@
  STR_NEWGRF_TOGGLE_PALETTE_TIP                                   :{BLACK}Toggle the palette of the selected NewGRF.{}Do this when the graphics from this NewGRF look pink in-game
  STR_NEWGRF_SET_PARAMETERS                                       :{BLACK}Set parameters
  STR_NEWGRF_FILENAME                                             :{BLACK}Filename: {SILVER}{RAW_STRING}
@@ -29,7 +272,7 @@ diff -r 669df266916b -r d4ceabdd16e3 src/lang/english.txt
  STR_NEWGRF_PALETTE                                              :{BLACK}Palette: {SILVER}{RAW_STRING}
  STR_NEWGRF_GRF_ID                                               :{BLACK}GRF ID: {SILVER}{RAW_STRING}
  STR_NEWGRF_MD5SUM                                               :{BLACK}MD5sum: {SILVER}{RAW_STRING}
-@@ -3118,19 +3120,23 @@
+@@ -3118,19 +3152,23 @@
  STR_NEWGRF_ADD_TIP                                              :{BLACK}Add a NewGRF file to the list
  STR_NEWGRF_REMOVE                                               :{BLACK}Remove
  STR_NEWGRF_REMOVE_TIP                                           :{BLACK}Remove the selected NewGRF file from the list
@@ -57,9 +300,9 @@ diff -r 669df266916b -r d4ceabdd16e3 src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-diff -r 669df266916b -r d4ceabdd16e3 src/main_gui.cpp
+diff -r 669df266916b -r 07b7932b2e68 src/main_gui.cpp
 --- src/main_gui.cpp	Thu Apr 23 17:54:05 2009 +0000
-+++ src/main_gui.cpp	Sat Apr 25 09:49:28 2009 +0200
++++ src/main_gui.cpp	Sat Apr 25 13:32:58 2009 +0200
 @@ -26,6 +26,7 @@
  #include "toolbar_gui.h"
  #include "statusbar_gui.h"
@@ -79,9 +322,29 @@ diff -r 669df266916b -r d4ceabdd16e3 src/main_gui.cpp
  
  #ifdef ENABLE_NETWORK
  			case WKC_RETURN: case 'T': // smart chat; send to team if any, otherwise to all
-diff -r 669df266916b -r d4ceabdd16e3 src/network/network_client.cpp
+diff -r 669df266916b -r 07b7932b2e68 src/network/network_base.h
+--- src/network/network_base.h	Thu Apr 23 17:54:05 2009 +0000
++++ src/network/network_base.h	Sat Apr 25 13:32:58 2009 +0200
+@@ -9,6 +9,8 @@
+ 
+ #include "network_type.h"
+ #include "../oldpool.h"
++#include "../tile_type.h"
++#include "core/address.h"
+ 
+ DECLARE_OLD_POOL(NetworkClientInfo, NetworkClientInfo, NCI_BITS_PER_POOL_BLOCK, MAX_CLIENT_SLOTS >> NCI_BITS_PER_POOL_BLOCK);
+ 
+@@ -20,6 +22,7 @@
+ 	NetworkAddress client_address;                  ///< IP-address of the client (so he can be banned)
+ 	Date join_date;                                 ///< Gamedate the client has joined
+ 	char unique_id[NETWORK_UNIQUE_ID_LENGTH];       ///< Every play sends an unique id so we can indentify him
++	TileIndex last_build_coordinate;
+ 
+ 	NetworkClientInfo(ClientID client_id = INVALID_CLIENT_ID) : client_id(client_id) {}
+ 	~NetworkClientInfo() { client_id = INVALID_CLIENT_ID; }
+diff -r 669df266916b -r 07b7932b2e68 src/network/network_client.cpp
 --- src/network/network_client.cpp	Thu Apr 23 17:54:05 2009 +0000
-+++ src/network/network_client.cpp	Sat Apr 25 09:49:28 2009 +0200
++++ src/network/network_client.cpp	Sat Apr 25 13:32:58 2009 +0200
 @@ -514,9 +514,15 @@
  			_password_game_seed = p->Recv_uint32();
  			p->Recv_string(_password_server_unique_id, sizeof(_password_server_unique_id));
@@ -101,9 +364,63 @@ diff -r 669df266916b -r d4ceabdd16e3 src/network/network_client.cpp
  			return NETWORK_RECV_STATUS_OKAY;
  
  		default: return NETWORK_RECV_STATUS_MALFORMED_PACKET;
-diff -r 669df266916b -r d4ceabdd16e3 src/network/network_internal.h
+@@ -683,6 +689,7 @@
+ 	const char *err = MY_CLIENT->Recv_Command(p, &cp);
+ 	cp.frame    = p->Recv_uint32();
+ 	cp.my_cmd   = p->Recv_bool();
++	cp.client   = p->pos + 4 == p->size ? (ClientID)p->Recv_uint32() : (cp.my_cmd ? _network_own_client_id : INVALID_CLIENT_ID);
+ 	cp.next     = NULL;
+ 
+ 	if (err != NULL) {
+diff -r 669df266916b -r 07b7932b2e68 src/network/network_command.cpp
+--- src/network/network_command.cpp	Thu Apr 23 17:54:05 2009 +0000
++++ src/network/network_command.cpp	Sat Apr 25 13:32:58 2009 +0200
+@@ -72,6 +72,7 @@
+ 		 */
+ 		c.frame = _frame_counter_max + 1;
+ 		c.my_cmd = true;
++		c.client = _network_own_client_id;
+ 
+ 		NetworkAddCommandQueue(c);
+ 
+@@ -113,7 +114,7 @@
+ 		/* We can execute this command */
+ 		_current_company = cp->company;
+ 		cp->cmd |= CMD_NETWORK_COMMAND;
+-		DoCommandP(cp, cp->my_cmd);
++		DoCommandP(cp, cp->client);
+ 
+ 		_local_command_queue = _local_command_queue->next;
+ 		free(cp);
+diff -r 669df266916b -r 07b7932b2e68 src/network/network_gui.cpp
+--- src/network/network_gui.cpp	Thu Apr 23 17:54:05 2009 +0000
++++ src/network/network_gui.cpp	Sat Apr 25 13:32:58 2009 +0200
+@@ -1612,6 +1612,12 @@
+ 	ShowNetworkChatQueryWindow(DESTTYPE_BROADCAST, 0);
+ }
+ 
++static void ClientList_OpenWindow(byte client_no)
++{
++	const NetworkClientInfo *ci = NetworkFindClientInfo(client_no);
++	if (ci != NULL && IsValidCompanyID(ci->client_playas)) ShowBigBrotherWindow(ci->client_id);
++}
++
+ static void ClientList_None(byte client_no)
+ {
+ 	/* No action ;) */
+@@ -1649,6 +1655,9 @@
+ 		GetString(this->action[i], STR_NETWORK_CLIENTLIST_SPEAK_TO_ALL, lastof(this->action[i]));
+ 		this->proc[i++] = &ClientList_SpeakToAll;
+ 
++		GetString(this->action[i], STR_NETWORK_CLIENTLIST_OPEN_WINDOW, lastof(this->action[i]));
++		this->proc[i++] = &ClientList_OpenWindow;
++
+ 		if (_network_own_client_id != ci->client_id) {
+ 			/* We are no spectator and the company we want to give money to is no spectator and money gifts are allowed */
+ 			if (IsValidCompanyID(_network_playas) && IsValidCompanyID(ci->client_playas) && _settings_game.economy.give_money) {
+diff -r 669df266916b -r 07b7932b2e68 src/network/network_internal.h
 --- src/network/network_internal.h	Thu Apr 23 17:54:05 2009 +0000
-+++ src/network/network_internal.h	Sat Apr 25 09:49:28 2009 +0200
++++ src/network/network_internal.h	Sat Apr 25 13:32:58 2009 +0200
 @@ -123,6 +123,9 @@
  
  void NetworkTCPQueryServer(NetworkAddress address);
@@ -114,9 +431,43 @@ diff -r 669df266916b -r d4ceabdd16e3 src/network/network_internal.h
  void GetBindAddresses(NetworkAddressList *addresses, uint16 port);
  void NetworkAddServer(const char *b);
  void NetworkRebuildHostList();
-diff -r 669df266916b -r d4ceabdd16e3 src/newgrf_gui.cpp
+@@ -139,6 +142,7 @@
+ 	CompanyByte company; ///< company that is executing the command
+ 	uint32 frame;        ///< the frame in which this packet is executed
+ 	bool my_cmd;         ///< did the command originate from "me"
++	ClientID client;
+ };
+ 
+ void NetworkAddCommandQueue(CommandPacket cp, NetworkClientSocket *cs = NULL);
+diff -r 669df266916b -r 07b7932b2e68 src/network/network_server.cpp
+--- src/network/network_server.cpp	Thu Apr 23 17:54:05 2009 +0000
++++ src/network/network_server.cpp	Sat Apr 25 13:32:58 2009 +0200
+@@ -483,6 +483,7 @@
+ 	cs->Send_Command(p, cp);
+ 	p->Send_uint32(cp->frame);
+ 	p->Send_bool  (cp->my_cmd);
++	p->Send_uint32(cp->client);
+ 
+ 	cs->Send_Packet(p);
+ }
+@@ -927,12 +928,14 @@
+ 			 *  first place. This filters that out. */
+ 			cp.callback = (new_cs != cs) ? NULL : callback;
+ 			cp.my_cmd = (new_cs == cs);
++			cp.client = ci->client_id;
+ 			NetworkAddCommandQueue(cp, new_cs);
+ 		}
+ 	}
+ 
+ 	cp.callback = NULL;
+ 	cp.my_cmd = false;
++	cp.client = ci->client_id;
+ 	NetworkAddCommandQueue(cp);
+ }
+ 
+diff -r 669df266916b -r 07b7932b2e68 src/newgrf_gui.cpp
 --- src/newgrf_gui.cpp	Thu Apr 23 17:54:05 2009 +0000
-+++ src/newgrf_gui.cpp	Sat Apr 25 09:49:28 2009 +0200
++++ src/newgrf_gui.cpp	Sat Apr 25 13:32:58 2009 +0200
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -1090,9 +1441,9 @@ diff -r 669df266916b -r d4ceabdd16e3 src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r 669df266916b -r d4ceabdd16e3 src/openttd.cpp
+diff -r 669df266916b -r 07b7932b2e68 src/openttd.cpp
 --- src/openttd.cpp	Thu Apr 23 17:54:05 2009 +0000
-+++ src/openttd.cpp	Sat Apr 25 09:49:28 2009 +0200
++++ src/openttd.cpp	Sat Apr 25 13:32:58 2009 +0200
 @@ -157,6 +157,8 @@
  		"  -G seed             = Set random seed\n"
  #if defined(ENABLE_NETWORK)
@@ -1135,9 +1486,9 @@ diff -r 669df266916b -r d4ceabdd16e3 src/openttd.cpp
  #endif /* ENABLE_NETWORK */
  		case 'r': ParseResolution(&resolution, mgo.opt); break;
  		case 't': startyear = atoi(mgo.opt); break;
-diff -r 669df266916b -r d4ceabdd16e3 src/rail_gui.cpp
+diff -r 669df266916b -r 07b7932b2e68 src/rail_gui.cpp
 --- src/rail_gui.cpp	Thu Apr 23 17:54:05 2009 +0000
-+++ src/rail_gui.cpp	Sat Apr 25 09:49:28 2009 +0200
++++ src/rail_gui.cpp	Sat Apr 25 13:32:58 2009 +0200
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -1536,10 +1887,176 @@ diff -r 669df266916b -r d4ceabdd16e3 src/rail_gui.cpp
  	}
  }
  
-diff -r 669df266916b -r d4ceabdd16e3 src/settings_gui.cpp
+diff -r 669df266916b -r 07b7932b2e68 src/screenshot.cpp
+--- src/screenshot.cpp	Thu Apr 23 17:54:05 2009 +0000
++++ src/screenshot.cpp	Sat Apr 25 13:32:58 2009 +0200
+@@ -16,6 +16,9 @@
+ #include "map_func.h"
+ #include "saveload/saveload.h"
+ #include "company_func.h"
++#include "settings_type.h"
++#include "signs_base.h"
++#include "landscape.h"
+ 
+ 
+ char _screenshot_format_name[8];
+@@ -548,6 +551,42 @@
+ 	return filename;
+ }
+ 
++static char *MakeTimelapseScreenshotName(const char *ext, const char *name = NULL)
++{
++	/* Path for automatic screenshots */
++	static char autoscreen_dir[MAX_PATH];
++	snprintf(autoscreen_dir, lengthof(autoscreen_dir), "%s%s%s", _personal_dir, "auto_screenshot", PATHSEP);
++	if (!FileExists(autoscreen_dir)) FioCreateDirectory(autoscreen_dir);
++	if (name != NULL) {
++		/* For local screens use subdirectory */
++		snprintf(autoscreen_dir, lengthof(autoscreen_dir), "%s%s%s", autoscreen_dir, name, PATHSEP);
++		if (!FileExists(autoscreen_dir)) FioCreateDirectory(autoscreen_dir);
++	}
++
++	/* File name base - "timelapse" */
++	ttd_strlcpy(_screenshot_name, "timelapse", lengthof(_screenshot_name));
++	size_t len = strlen(_screenshot_name);
++	/* Add '#' */
++	snprintf(&_screenshot_name[len], lengthof(_screenshot_name) - len, "#");
++	SanitizeFilename(_screenshot_name);
++	len = strlen(_screenshot_name);
++	/* Add initial numbers and file extension */
++	snprintf(&_screenshot_name[len], lengthof(_screenshot_name) - len, "000000.%s", ext);
++
++	uint diff = 5; // number of preceding zeros
++	static char filename[MAX_PATH];
++	for (uint serial = 1;; serial++) {
++		/* Try if the file name is available */
++		snprintf(filename, lengthof(filename), "%s%s", autoscreen_dir, _screenshot_name);
++		if (!FileExists(filename)) break;
++		/* If file already exists increase the serial */
++		if (serial == 10 || serial == 100 || serial == 1000 || serial == 10000 || serial == 100000) diff--;
++		snprintf(&_screenshot_name[len + diff], lengthof(_screenshot_name) - len, "%d.%s", serial, ext);
++	}
++
++	return filename;
++}
++
+ void SetScreenshotType(ScreenshotType t)
+ {
+ 	current_screenshot_type = t;
+@@ -583,7 +622,52 @@
+ 	return sf->proc(MakeScreenshotName(sf->extension), LargeWorldCallback, &vp, vp.width, vp.height, BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
+ }
+ 
+-bool MakeScreenshot()
++static bool MakeTimelapseScreenshot()
++{
++	ViewPort vp;
++	const ScreenshotFormat *sf;
++
++	uint8 zoom = _settings_client.gui.auto_screenshot_zoomlvl;
++
++	vp.zoom = (ZoomLevel)zoom;
++	vp.left = 0;
++	vp.top = 0;
++	vp.virtual_left = -(int)MapMaxX() * TILE_PIXELS;
++	vp.virtual_top = 0;
++	vp.virtual_width = (MapMaxX() + MapMaxY()) * TILE_PIXELS >> zoom;
++	vp.width = vp.virtual_width;
++	vp.virtual_height = (MapMaxX() + MapMaxY()) * (TILE_PIXELS >> 1) >> zoom;
++	vp.height = vp.virtual_height;
++
++	sf = _screenshot_formats + _cur_screenshot_format;
++	return sf->proc(MakeTimelapseScreenshotName(sf->extension), LargeWorldCallback, &vp, vp.width, vp.height, BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
++}
++
++static bool MakeTimelapseLocalScreenshot(const char *name, const Point *pt)
++{
++	ViewPort vp;
++	const ScreenshotFormat *sf;
++
++	uint16 size_x = _settings_client.gui.auto_local_screen_size_x;
++	uint16 size_y = _settings_client.gui.auto_local_screen_size_y;
++	uint8 zoom = _settings_client.gui.auto_local_screen_zoomlvl;
++
++	vp.zoom = ZoomLevel(zoom);
++
++	vp.left = 0;
++	vp.top = 0;
++	vp.virtual_left = pt->x - ((size_x / 2) << zoom);
++	vp.virtual_top = pt->y - ((size_y / 2) << zoom);
++	vp.virtual_width = size_x;
++	vp.width = vp.virtual_width;
++	vp.virtual_height = size_y;
++	vp.height = vp.virtual_height;
++
++	sf = _screenshot_formats + _cur_screenshot_format;
++	return sf->proc(MakeTimelapseScreenshotName(sf->extension, name), LargeWorldCallback, &vp, vp.width, vp.height, BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
++}
++
++bool MakeScreenshot(const void *name, const void *pt)
+ {
+ 	switch (current_screenshot_type) {
+ 		case SC_VIEWPORT:
+@@ -594,6 +678,12 @@
+ 		case SC_WORLD:
+ 			current_screenshot_type = SC_NONE;
+ 			return MakeWorldScreenshot();
++		case SC_TIMELAPSE:
++			current_screenshot_type = SC_NONE;
++			return MakeTimelapseScreenshot();
++		case SC_TIMELAPSE_LOCAL:
++			current_screenshot_type = SC_NONE;
++			return MakeTimelapseLocalScreenshot((const char*) name, (const Point*) pt);
+ 		default: return false;
+ 	}
+ }
+diff -r 669df266916b -r 07b7932b2e68 src/screenshot.h
+--- src/screenshot.h	Thu Apr 23 17:54:05 2009 +0000
++++ src/screenshot.h	Sat Apr 25 13:32:58 2009 +0200
+@@ -13,10 +13,12 @@
+ enum ScreenshotType {
+ 	SC_NONE,
+ 	SC_VIEWPORT,
+-	SC_WORLD
++	SC_WORLD,
++	SC_TIMELAPSE,
++	SC_TIMELAPSE_LOCAL
+ };
+ 
+-bool MakeScreenshot();
++bool MakeScreenshot(const void *name = NULL, const void *pt = NULL);
+ void SetScreenshotType(ScreenshotType t);
+ bool IsScreenshotRequested();
+ 
+diff -r 669df266916b -r 07b7932b2e68 src/settings_gui.cpp
 --- src/settings_gui.cpp	Thu Apr 23 17:54:05 2009 +0000
-+++ src/settings_gui.cpp	Sat Apr 25 09:49:28 2009 +0200
-@@ -1143,6 +1143,7 @@
++++ src/settings_gui.cpp	Sat Apr 25 13:32:58 2009 +0200
+@@ -1129,9 +1129,24 @@
+ /** Interaction sub-page */
+ static SettingsPage _settings_ui_interaction_page = {_settings_ui_interaction, lengthof(_settings_ui_interaction)};
+ 
++static SettingEntry _settings_ui_automatic_screenshots[] = {
++	SettingEntry("gui.auto_screenshot"),
++	SettingEntry("gui.auto_screenshot_interval"),
++	SettingEntry("gui.auto_screenshot_num_commands"),
++	SettingEntry("gui.auto_screenshot_zoomlvl"),
++	SettingEntry("gui.auto_local_screen"),
++	SettingEntry("gui.auto_local_screen_types"),
++	SettingEntry("gui.auto_local_screen_interval"),
++	SettingEntry("gui.auto_local_screen_num_commands"),
++	SettingEntry("gui.auto_local_screen_zoomlvl"),
++};
++/** Automatic Screenshots sub-page */
++static SettingsPage _settings_ui_automatic_screenshots_page = {_settings_ui_automatic_screenshots, lengthof(_settings_ui_automatic_screenshots)};
++
+ static SettingEntry _settings_ui[] = {
+ 	SettingEntry(&_settings_ui_display_page, STR_CONFIG_SETTING_DISPLAY_OPTIONS),
+ 	SettingEntry(&_settings_ui_interaction_page, STR_CONFIG_SETTING_INTERACTION),
++	SettingEntry(&_settings_ui_automatic_screenshots_page, STR_CONFIG_SETTING_AUTOMATIC_SCREENSHOTS),
+ 	SettingEntry("gui.show_finances"),
+ 	SettingEntry("gui.errmsg_duration"),
+ 	SettingEntry("gui.toolbar_pos"),
+@@ -1143,6 +1158,7 @@
  	SettingEntry("gui.always_build_infrastructure"),
  	SettingEntry("gui.persistent_buildingtools"),
  	SettingEntry("gui.coloured_news_year"),
@@ -1547,31 +2064,295 @@ diff -r 669df266916b -r d4ceabdd16e3 src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r 669df266916b -r d4ceabdd16e3 src/settings_type.h
+diff -r 669df266916b -r 07b7932b2e68 src/settings_type.h
 --- src/settings_type.h	Thu Apr 23 17:54:05 2009 +0000
-+++ src/settings_type.h	Sat Apr 25 09:49:28 2009 +0200
-@@ -91,6 +91,7 @@
++++ src/settings_type.h	Sat Apr 25 13:32:58 2009 +0200
+@@ -91,6 +91,20 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
  	uint8  expenses_layout;                  ///< layout of expenses window
 +	bool   imp_newstations_gui;              ///< use the new newstations selection ui
++
++	uint8  auto_screenshot;                  ///< automatically take giant screenshots (0 = off, 1 = after time interval, 2 = after number of commands, 3 = after time interval, but only if a number of commands were issued inbetween)
++	uint16 auto_screenshot_interval;         ///< the time interval for automatic giant screenshots
++	uint16 auto_screenshot_num_commands;     ///< the number of commands for automatic giant screenshots
++	uint8  auto_screenshot_zoomlvl;          ///< the zoom level used for automatic giant screenshots (zoomed out means smaller filesize but less quality)
++	uint8  auto_local_screen;                ///< automatically take local screenshots (0 = off, 1 = after time interval, 2 = after number of commands, 3 = after time interval, but only if a number of commands were issued inbetween)
++	uint8  auto_local_screen_types;          ///< where to take local screenshots (0 = at signs, 1 = at stations, 2 = at signs and stations)
++	uint16 auto_local_screen_interval;       ///< the interval for automatic local screenshots
++	uint16 auto_local_screen_num_commands;   ///< the number of commands for automatic local screenshots
++	uint16 auto_local_screen_zoomlvl;        ///< the zoom level used for automatic local screenshots
++	uint16 auto_local_screen_size_x;         ///< width of automatic local screenshots
++	uint16 auto_local_screen_size_y;         ///< heigth of automatic local screenshots
++	uint8  auto_local_screen_prefix;         ///< the character used to specify local screen signs (# by default)
  
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
-diff -r 669df266916b -r d4ceabdd16e3 src/table/settings.h
+diff -r 669df266916b -r 07b7932b2e68 src/smallmap_gui.cpp
+--- src/smallmap_gui.cpp	Thu Apr 23 17:54:05 2009 +0000
++++ src/smallmap_gui.cpp	Sat Apr 25 13:32:58 2009 +0200
+@@ -20,6 +20,8 @@
+ #include "vehicle_base.h"
+ #include "sound_func.h"
+ #include "window_func.h"
++#include "network/network_base.h"
++#include "network/network_func.h"
+ 
+ #include "table/strings.h"
+ #include "table/sprites.h"
+@@ -1132,7 +1134,7 @@
+ 	virtual void OnPaint()
+ 	{
+ 		/* set the number in the title bar */
+-		SetDParam(0, this->window_number + 1);
++		SetDParam(0, this->window_number + (this->window_class == WC_EXTRA_VIEW_PORT));
+ 
+ 		this->DrawWidgets();
+ 		this->DrawViewport();
+@@ -1214,6 +1216,18 @@
+ 	new ExtraViewportWindow(&_extra_view_port_desc, i, tile);
+ }
+ 
++void ShowBigBrotherWindow(ClientID client)
++{
++	if (BringWindowToFrontById(WC_BIG_BROTHER_WINDOW, client) != NULL) return;
++
++	const NetworkClientInfo *ci = NetworkFindClientInfoFromClientID(client);
++	if (ci == NULL || !IsValidCompanyID(ci->client_playas)) return;
++
++	Window *w = new ExtraViewportWindow(&_extra_view_port_desc, client, ci->last_build_coordinate);
++	w->window_class = WC_BIG_BROTHER_WINDOW;
++	w->widget[1].data = STR_BIG_BROTHER_CLIENT_NAME;
++}
++
+ /**
+  * Scrolls the main window to given coordinates.
+  * @param x x coordinate
+diff -r 669df266916b -r 07b7932b2e68 src/strings.cpp
+--- src/strings.cpp	Thu Apr 23 17:54:05 2009 +0000
++++ src/strings.cpp	Sat Apr 25 13:32:58 2009 +0200
+@@ -30,6 +30,8 @@
+ #include "video/video_driver.hpp"
+ #include "engine_base.h"
+ #include "strgen/strgen.h"
++#include "network/network_base.h"
++#include "network/network_func.h"
+ #include "gfx_func.h"
+ 
+ #include "table/strings.h"
+@@ -1003,6 +1005,13 @@
+ 				break;
+ 			}
+ 
++			case SCC_CLIENT_NAME: { // {CLIENTNAME}
++				const NetworkClientInfo *ci = NetworkFindClientInfoFromClientID((ClientID)GetInt32(&argv));
++				const char *src = (ci == NULL || StrEmpty(ci->client_name)) ? "(unnamed)" : ci->client_name;
++				buff = strecpy(buff, src, last);
++				break;
++			}
++
+ 			case SCC_SETCASE: { // {SETCASE}
+ 				/* This is a pseudo command, it's outputted when someone does {STRING.ack}
+ 				 * The modifier is added to all subsequent GetStringWithArgs that accept the modifier. */
+diff -r 669df266916b -r 07b7932b2e68 src/table/control_codes.h
+--- src/table/control_codes.h	Thu Apr 23 17:54:05 2009 +0000
++++ src/table/control_codes.h	Sat Apr 25 13:32:58 2009 +0200
+@@ -35,6 +35,7 @@
+ 	SCC_COMPANY_NAME,
+ 	SCC_COMPANY_NUM,
+ 	SCC_PRESIDENT_NAME,
++	SCC_CLIENT_NAME,
+ 	SCC_ENGINE_NAME,
+ 
+ 	SCC_CURRENCY_COMPACT,
+diff -r 669df266916b -r 07b7932b2e68 src/table/settings.h
 --- src/table/settings.h	Thu Apr 23 17:54:05 2009 +0000
-+++ src/table/settings.h	Sat Apr 25 09:49:28 2009 +0200
-@@ -566,6 +566,7 @@
++++ src/table/settings.h	Sat Apr 25 13:32:58 2009 +0200
+@@ -566,6 +566,20 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
  	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
 +	 SDTC_BOOL(gui.imp_newstations_gui,                  S,  0, false,                        STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI,         RedrawScreen),
++
++	  SDTC_VAR(gui.auto_screenshot,           SLE_UINT8, S, MS,     0,        0,        3, 1, STR_CONFIG_SETTING_AUTO_GIANT_SCREEN,           NULL),
++	  SDTC_VAR(gui.auto_screenshot_interval, SLE_UINT16, S,  0,    15,        1,     1000, 1, STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_INTERVAL,  NULL),
++	  SDTC_VAR(gui.auto_screenshot_num_commands,SLE_UINT16,S,0,   100,       10,    50000, 1, STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_NUM_COMMANDS, NULL),
++	  SDTC_VAR(gui.auto_screenshot_zoomlvl,   SLE_UINT8, S, MS,     0,        0,        3, 1, STR_CONFIG_SETTING_AUTO_GIANT_SCREEN_ZOOMLVL,   NULL),
++	  SDTC_VAR(gui.auto_local_screen,         SLE_UINT8, S, MS,     0,        0,        3, 1, STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN,           NULL),
++	  SDTC_VAR(gui.auto_local_screen_types,   SLE_UINT8, S, MS,     0,        0,        2, 1, STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_TYPES,     NULL),
++	  SDTC_VAR(gui.auto_local_screen_interval,SLE_UINT16,S,  0,    15,        1,     1000, 1, STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_INTERVAL,  NULL),
++	  SDTC_VAR(gui.auto_local_screen_num_commands,SLE_UINT16,S,0, 100,       10,    50000, 1, STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_NUM_COMMANDS, NULL),
++	  SDTC_VAR(gui.auto_local_screen_zoomlvl, SLE_UINT8, S, MS,     0,        0,        3, 1, STR_CONFIG_SETTING_AUTO_LOCAL_SCREEN_ZOOMLVL,   NULL),
++	  SDTC_VAR(gui.auto_local_screen_size_x, SLE_UINT16, S,  0,   800,      100,     8000, 1, STR_NULL,                                       NULL),
++	  SDTC_VAR(gui.auto_local_screen_size_y, SLE_UINT16, S,  0,   600,      100,     6000, 1, STR_NULL,                                       NULL),
++	  SDTC_VAR(gui.auto_local_screen_prefix,  SLE_UINT8, S,  0,    35,        0,      255, 1, STR_NULL,                                       NULL),
  
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
-diff -r 669df266916b -r d4ceabdd16e3 src/window.cpp
+diff -r 669df266916b -r 07b7932b2e68 src/table/strgen_tables.h
+--- src/table/strgen_tables.h	Thu Apr 23 17:54:05 2009 +0000
++++ src/table/strgen_tables.h	Sat Apr 25 13:32:58 2009 +0200
+@@ -106,6 +106,7 @@
+ 	{"COMPANY",         EmitSingleChar, SCC_COMPANY_NAME,       1, C_NONE},
+ 	{"COMPANYNUM",      EmitSingleChar, SCC_COMPANY_NUM,        1, C_NONE},
+ 	{"PRESIDENTNAME",   EmitSingleChar, SCC_PRESIDENT_NAME,     1, C_NONE},
++	{"CLIENTNAME",      EmitSingleChar, SCC_CLIENT_NAME,        1, C_NONE},
+ 
+ 	{"",                EmitSingleChar, '\n',                   0, C_DONTCOUNT},
+ 	{"{",               EmitSingleChar, '{',                    0, C_DONTCOUNT},
+diff -r 669df266916b -r 07b7932b2e68 src/timelapse.cpp
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ src/timelapse.cpp	Sat Apr 25 13:32:58 2009 +0200
+@@ -0,0 +1,131 @@
++/* $Id */
++
++/** @file timelapse.cpp Timelapse patch */
++
++#include "stdafx.h"
++#include "openttd.h"
++#include "functions.h"
++#include "core/bitmath_func.hpp"
++#include "settings_type.h"
++#include "date_type.h"
++#include "screenshot.h"
++#include "signs_base.h"
++#include "station_base.h"
++#include "landscape.h"
++#include "map_func.h"
++#include "transparency.h"
++#include "debug.h"
++
++uint32 _command_count_giant = 0;
++uint32 _command_count_local = 0;
++
++extern Date _date;
++
++void DoGiantScreenshot()
++{
++	/* save the current transparency setting */
++	uint8 transparency_backup = _transparency_opt;
++	/* disable transparency for all unlocked transparency settings */
++	_transparency_opt &= _transparency_lock;
++	/* take a giant screenshot */
++	SetScreenshotType(SC_TIMELAPSE);
++	MakeScreenshot();
++	/* reset transparency to the former state */
++	_transparency_opt = transparency_backup;
++}
++
++void DoLocalScreenshots()
++{
++	/* save the current transparency setting */
++	uint8 transparency_backup = _transparency_opt;
++	/* disable transparency for all unlocked transparency settings */
++	_transparency_opt &= _transparency_lock;
++
++	/* iterate through signs and take local screenshots if appropriate */
++	if (_settings_client.gui.auto_local_screen_types != 1) { // 1 == stations only
++		const Sign *si;
++		FOR_ALL_SIGNS(si) {
++			if (si->name != NULL && *si->name == _settings_client.gui.auto_local_screen_prefix) {
++				SetScreenshotType(SC_TIMELAPSE_LOCAL);
++				const Point pt = RemapCoords2(si->x, si->y);
++				MakeScreenshot(si->name, &pt);
++			}
++		}
++	}
++
++	/* iterate through stations and take local screenshots if appropriate */
++	if (_settings_client.gui.auto_local_screen_types != 0) { // 0 == signs only
++		const Station *s;
++		FOR_ALL_STATIONS(s) {
++			if (s->name != NULL && *s->name == _settings_client.gui.auto_local_screen_prefix) {
++				SetScreenshotType(SC_TIMELAPSE_LOCAL);
++				const Point pt = RemapCoords2(TileX(s->xy) * TILE_SIZE, TileY(s->xy) * TILE_SIZE);
++				MakeScreenshot(s->name, &pt);
++			}
++		}
++	}
++	/* reset transparency to the former state */
++	_transparency_opt = transparency_backup;
++}
++
++void CheckGiantScreenshot()
++{
++	switch (_settings_client.gui.auto_screenshot) {
++		case 0: break; // off
++		case 2: break; // number of commands
++		case 1: // time interval
++			if (_date % _settings_client.gui.auto_screenshot_interval == 0) DoGiantScreenshot();
++			break;
++		case 3: // time interval and number of commands
++			if (_date % _settings_client.gui.auto_screenshot_interval != 0) break;
++			if (_command_count_giant < _settings_client.gui.auto_screenshot_num_commands) break;
++			_command_count_giant = 0;
++			DoGiantScreenshot();
++			break;
++		default: NOT_REACHED();
++	}
++}
++
++void CheckLocalScreenshots()
++{
++	switch (_settings_client.gui.auto_local_screen) {
++		case 0: break; // off
++		case 2: break; // number of commands
++		case 1: // time interval
++			if (_date % _settings_client.gui.auto_local_screen_interval == 0) DoLocalScreenshots();
++			break;
++		case 3: // time interval and number of commands
++			if (_date % _settings_client.gui.auto_local_screen_interval != 0) break;
++			if (_command_count_local < _settings_client.gui.auto_local_screen_num_commands) break;
++			_command_count_local = 0;
++			DoLocalScreenshots();
++			break;
++		default: NOT_REACHED();
++	}
++}
++
++void TimelapseDailyCheck()
++{
++	DEBUG(misc, 1, "TimelapseDailyCheck()! _command_count_giant=%d, _command_count_local=%d)", _command_count_giant, _command_count_local);
++
++	CheckLocalScreenshots();
++	CheckGiantScreenshot();
++}
++
++void TimelapseCommandCheck()
++{
++	if ((_settings_client.gui.auto_screenshot & 0x02) != 0) {
++		_command_count_giant++;
++		if ((_settings_client.gui.auto_screenshot == 2) && (_command_count_giant >= _settings_client.gui.auto_screenshot_num_commands)) {
++			_command_count_giant = 0;
++			DoGiantScreenshot();
++		}
++	}
++	if ((_settings_client.gui.auto_local_screen & 0x02) != 0) {
++		_command_count_local++;
++		if ((_settings_client.gui.auto_local_screen == 2) && (_command_count_local >= _settings_client.gui.auto_local_screen_num_commands)) {
++			_command_count_local = 0;
++			DoLocalScreenshots();
++		}
++	}
++}
+diff -r 669df266916b -r 07b7932b2e68 src/timelapse.h
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ src/timelapse.h	Sat Apr 25 13:32:58 2009 +0200
+@@ -0,0 +1,11 @@
++/* $Id */
++
++/** @file timelapse.h Functions of the timelapse patch */
++
++#ifndef TIMELAPSE_H
++#define TIMELAPSE_H
++
++void TimelapseDailyCheck();
++void TimelapseCommandCheck();
++
++#endif /* TIMELAPSE_H */
+diff -r 669df266916b -r 07b7932b2e68 src/window.cpp
 --- src/window.cpp	Thu Apr 23 17:54:05 2009 +0000
-+++ src/window.cpp	Sat Apr 25 09:49:28 2009 +0200
++++ src/window.cpp	Sat Apr 25 13:32:58 2009 +0200
 @@ -1304,7 +1304,6 @@
  static bool HandleDragDrop()
  {
@@ -1595,9 +2376,9 @@ diff -r 669df266916b -r d4ceabdd16e3 src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r 669df266916b -r d4ceabdd16e3 src/window_gui.h
+diff -r 669df266916b -r 07b7932b2e68 src/window_gui.h
 --- src/window_gui.h	Thu Apr 23 17:54:05 2009 +0000
-+++ src/window_gui.h	Sat Apr 25 09:49:28 2009 +0200
++++ src/window_gui.h	Sat Apr 25 13:32:58 2009 +0200
 @@ -455,6 +455,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  
@@ -1612,3 +2393,14 @@ diff -r 669df266916b -r d4ceabdd16e3 src/window_gui.h
  	 * Handle the request for (viewport) scrolling.
  	 * @param delta the amount the viewport must be scrolled.
  	 */
+diff -r 669df266916b -r 07b7932b2e68 src/window_type.h
+--- src/window_type.h	Thu Apr 23 17:54:05 2009 +0000
++++ src/window_type.h	Sat Apr 25 13:32:58 2009 +0200
+@@ -79,6 +79,7 @@
+ 	WC_PERFORMANCE_DETAIL,
+ 	WC_CONSOLE,
+ 	WC_EXTRA_VIEW_PORT,
++	WC_BIG_BROTHER_WINDOW,
+ 	WC_CLIENT_LIST,
+ 	WC_NETWORK_STATUS_WINDOW,
+ 	WC_CUSTOM_CURRENCY,

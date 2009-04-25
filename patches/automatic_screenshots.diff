@@ -1,6 +1,6 @@
-diff -r 9d688e894e9c projects/openttd_vs80.vcproj
---- projects/openttd_vs80.vcproj	Mon Apr 13 00:16:40 2009 +0200
-+++ projects/openttd_vs80.vcproj	Mon Apr 13 23:04:49 2009 +0200
+diff -r cdcb18ad1f4d projects/openttd_vs80.vcproj
+--- projects/openttd_vs80.vcproj	Sat Apr 25 13:15:33 2009 +0200
++++ projects/openttd_vs80.vcproj	Sat Apr 25 13:32:56 2009 +0200
 @@ -740,6 +740,10 @@
  				>
  			</File>
@@ -23,9 +23,9 @@ diff -r 9d688e894e9c projects/openttd_vs80.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r 9d688e894e9c projects/openttd_vs90.vcproj
---- projects/openttd_vs90.vcproj	Mon Apr 13 00:16:40 2009 +0200
-+++ projects/openttd_vs90.vcproj	Mon Apr 13 23:04:49 2009 +0200
+diff -r cdcb18ad1f4d projects/openttd_vs90.vcproj
+--- projects/openttd_vs90.vcproj	Sat Apr 25 13:15:33 2009 +0200
++++ projects/openttd_vs90.vcproj	Sat Apr 25 13:32:56 2009 +0200
 @@ -737,6 +737,10 @@
  				>
  			</File>
@@ -48,9 +48,9 @@ diff -r 9d688e894e9c projects/openttd_vs90.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r 9d688e894e9c source.list
---- source.list	Mon Apr 13 00:16:40 2009 +0200
-+++ source.list	Mon Apr 13 23:04:49 2009 +0200
+diff -r cdcb18ad1f4d source.list
+--- source.list	Sat Apr 25 13:15:33 2009 +0200
++++ source.list	Sat Apr 25 13:32:56 2009 +0200
 @@ -95,6 +95,7 @@
  	thread_none.cpp
  #end
@@ -67,18 +67,18 @@ diff -r 9d688e894e9c source.list
  timetable.h
  toolbar_gui.h
  town.h
-diff -r 9d688e894e9c src/command.cpp
---- src/command.cpp	Mon Apr 13 00:16:40 2009 +0200
-+++ src/command.cpp	Mon Apr 13 23:04:49 2009 +0200
-@@ -20,6 +20,7 @@
- #include "company_func.h"
- #include "company_base.h"
+diff -r cdcb18ad1f4d src/command.cpp
+--- src/command.cpp	Sat Apr 25 13:15:33 2009 +0200
++++ src/command.cpp	Sat Apr 25 13:32:56 2009 +0200
+@@ -24,6 +24,7 @@
  #include "signal_func.h"
+ #include "window_func.h"
+ #include "viewport_func.h"
 +#include "timelapse.h"
  
  #include "table/strings.h"
  
-@@ -589,6 +590,8 @@
+@@ -595,6 +596,8 @@
  #endif /* ENABLE_NETWORK */
  	DEBUG(desync, 1, "cmd: %08x; %08x; %1x; %06x; %08x; %08x; %04x; %s\n", _date, _date_fract, (int)_current_company, tile, p1, p2, cmd & ~CMD_NETWORK_COMMAND, text);
  
@@ -87,9 +87,9 @@ diff -r 9d688e894e9c src/command.cpp
  	/* update last build coordinate of company. */
  	if (tile != 0 && IsValidCompanyID(_current_company)) {
  		GetCompany(_current_company)->last_build_coordinate = tile;
-diff -r 9d688e894e9c src/date.cpp
---- src/date.cpp	Mon Apr 13 00:16:40 2009 +0200
-+++ src/date.cpp	Mon Apr 13 23:04:49 2009 +0200
+diff -r cdcb18ad1f4d src/date.cpp
+--- src/date.cpp	Sat Apr 25 13:15:33 2009 +0200
++++ src/date.cpp	Sat Apr 25 13:32:56 2009 +0200
 @@ -15,6 +15,7 @@
  #include "vehicle_base.h"
  #include "debug.h"
@@ -106,10 +106,10 @@ diff -r 9d688e894e9c src/date.cpp
  	}
  
  	/* check if we entered a new month? */
-diff -r 9d688e894e9c src/lang/english.txt
---- src/lang/english.txt	Mon Apr 13 00:16:40 2009 +0200
-+++ src/lang/english.txt	Mon Apr 13 23:04:49 2009 +0200
-@@ -1092,6 +1092,36 @@
+diff -r cdcb18ad1f4d src/lang/english.txt
+--- src/lang/english.txt	Sat Apr 25 13:15:33 2009 +0200
++++ src/lang/english.txt	Sat Apr 25 13:32:56 2009 +0200
+@@ -1090,6 +1090,36 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :All
  STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI                          :{LTBLUE}Enable previews for station building: {ORANGE}{STRING1}
  
@@ -146,9 +146,9 @@ diff -r 9d688e894e9c src/lang/english.txt
  STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
  STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
  STR_CONFIG_SETTING_TOWN_LAYOUT_BETTER_ROADS                     :better roads
-diff -r 9d688e894e9c src/screenshot.cpp
---- src/screenshot.cpp	Mon Apr 13 00:16:40 2009 +0200
-+++ src/screenshot.cpp	Mon Apr 13 23:04:49 2009 +0200
+diff -r cdcb18ad1f4d src/screenshot.cpp
+--- src/screenshot.cpp	Sat Apr 25 13:15:33 2009 +0200
++++ src/screenshot.cpp	Sat Apr 25 13:32:56 2009 +0200
 @@ -16,6 +16,9 @@
  #include "map_func.h"
  #include "saveload/saveload.h"
@@ -269,9 +269,9 @@ diff -r 9d688e894e9c src/screenshot.cpp
  		default: return false;
  	}
  }
-diff -r 9d688e894e9c src/screenshot.h
---- src/screenshot.h	Mon Apr 13 00:16:40 2009 +0200
-+++ src/screenshot.h	Mon Apr 13 23:04:49 2009 +0200
+diff -r cdcb18ad1f4d src/screenshot.h
+--- src/screenshot.h	Sat Apr 25 13:15:33 2009 +0200
++++ src/screenshot.h	Sat Apr 25 13:32:56 2009 +0200
 @@ -13,10 +13,12 @@
  enum ScreenshotType {
  	SC_NONE,
@@ -287,9 +287,9 @@ diff -r 9d688e894e9c src/screenshot.h
  void SetScreenshotType(ScreenshotType t);
  bool IsScreenshotRequested();
  
-diff -r 9d688e894e9c src/settings_gui.cpp
---- src/settings_gui.cpp	Mon Apr 13 00:16:40 2009 +0200
-+++ src/settings_gui.cpp	Mon Apr 13 23:04:49 2009 +0200
+diff -r cdcb18ad1f4d src/settings_gui.cpp
+--- src/settings_gui.cpp	Sat Apr 25 13:15:33 2009 +0200
++++ src/settings_gui.cpp	Sat Apr 25 13:32:56 2009 +0200
 @@ -1129,9 +1129,24 @@
  /** Interaction sub-page */
  static SettingsPage _settings_ui_interaction_page = {_settings_ui_interaction, lengthof(_settings_ui_interaction)};
@@ -315,9 +315,9 @@ diff -r 9d688e894e9c src/settings_gui.cpp
  	SettingEntry("gui.show_finances"),
  	SettingEntry("gui.errmsg_duration"),
  	SettingEntry("gui.toolbar_pos"),
-diff -r 9d688e894e9c src/settings_type.h
---- src/settings_type.h	Mon Apr 13 00:16:40 2009 +0200
-+++ src/settings_type.h	Mon Apr 13 23:04:49 2009 +0200
+diff -r cdcb18ad1f4d src/settings_type.h
+--- src/settings_type.h	Sat Apr 25 13:15:33 2009 +0200
++++ src/settings_type.h	Sat Apr 25 13:32:56 2009 +0200
 @@ -93,6 +93,19 @@
  	uint8  expenses_layout;                  ///< layout of expenses window
  	bool   imp_newstations_gui;              ///< use the new newstations selection ui
@@ -338,9 +338,9 @@ diff -r 9d688e894e9c src/settings_type.h
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
  #ifdef ENABLE_NETWORK
-diff -r 9d688e894e9c src/table/settings.h
---- src/table/settings.h	Mon Apr 13 00:16:40 2009 +0200
-+++ src/table/settings.h	Mon Apr 13 23:04:49 2009 +0200
+diff -r cdcb18ad1f4d src/table/settings.h
+--- src/table/settings.h	Sat Apr 25 13:15:33 2009 +0200
++++ src/table/settings.h	Sat Apr 25 13:32:56 2009 +0200
 @@ -568,6 +568,19 @@
  	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
  	 SDTC_BOOL(gui.imp_newstations_gui,                  S,  0, false,                        STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI,         RedrawScreen),
@@ -361,9 +361,9 @@ diff -r 9d688e894e9c src/table/settings.h
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  #ifdef ENABLE_NETWORK
-diff -r 9d688e894e9c src/timelapse.cpp
+diff -r cdcb18ad1f4d src/timelapse.cpp
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.cpp	Mon Apr 13 23:04:49 2009 +0200
++++ src/timelapse.cpp	Sat Apr 25 13:32:56 2009 +0200
 @@ -0,0 +1,131 @@
 +/* $Id */
 +
@@ -496,32 +496,10 @@ diff -r 9d688e894e9c src/timelapse.cpp
 +		}
 +	}
 +}
-diff -r 9d688e894e9c src/timelapse.h
+diff -r cdcb18ad1f4d src/timelapse.h
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.h	Mon Apr 13 23:04:49 2009 +0200
-@@ -0,0 +1,33 @@
-+/* $Id */
-+
-+/** @file timelapse.h Functions of the timelapse patch */
-+
-+#ifndef TIMELAPSE_H
-+#define TIMELAPSE_H
-+
-+void TimelapseDailyCheck();
-+void TimelapseCommandCheck();
-+
-+#endif /* TIMELAPSE_H */
-+/* $Id */
-+
-+/** @file timelapse.h Functions of the timelapse patch */
-+
-+#ifndef TIMELAPSE_H
-+#define TIMELAPSE_H
-+
-+void TimelapseDailyCheck();
-+void TimelapseCommandCheck();
-+
-+#endif /* TIMELAPSE_H */
++++ src/timelapse.h	Sat Apr 25 13:32:56 2009 +0200
+@@ -0,0 +1,11 @@
 +/* $Id */
 +
 +/** @file timelapse.h Functions of the timelapse patch */
