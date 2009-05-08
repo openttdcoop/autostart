@@ -1,19 +1,7 @@
-diff -r f9b5e16c4172 config.lib
---- config.lib	Fri Apr 10 22:47:19 2009 +0000
-+++ config.lib	Sat Apr 11 09:06:29 2009 +0200
-@@ -868,7 +868,7 @@
- 			log 1 "WARNING: in most cases it is not safe for network use"
- 			log 1 "WARNING: USE WITH CAUTION!"
- 
--			sleep 5
-+		#	sleep 5
- 		elif [ -f "$ROOT_DIR/version" ]; then
- 			revision="`cat $ROOT_DIR/version`"
- 
-diff -r f9b5e16c4172 src/network/network_client.cpp
---- src/network/network_client.cpp	Fri Apr 10 22:47:19 2009 +0000
-+++ src/network/network_client.cpp	Sat Apr 11 09:06:29 2009 +0200
-@@ -514,9 +514,15 @@
+diff -r 6efca8d4d837 src/network/network_client.cpp
+--- src/network/network_client.cpp	Thu May 07 17:08:41 2009 +0000
++++ src/network/network_client.cpp	Fri May 08 20:04:18 2009 +0200
+@@ -515,9 +515,15 @@
  			_password_game_seed = p->Recv_uint32();
  			p->Recv_string(_password_server_unique_id, sizeof(_password_server_unique_id));
  			if (MY_CLIENT->HasClientQuit()) return NETWORK_RECV_STATUS_MALFORMED_PACKET;
@@ -32,9 +20,9 @@ diff -r f9b5e16c4172 src/network/network_client.cpp
  			return NETWORK_RECV_STATUS_OKAY;
  
  		default: return NETWORK_RECV_STATUS_MALFORMED_PACKET;
-diff -r f9b5e16c4172 src/network/network_internal.h
---- src/network/network_internal.h	Fri Apr 10 22:47:19 2009 +0000
-+++ src/network/network_internal.h	Sat Apr 11 09:06:29 2009 +0200
+diff -r 6efca8d4d837 src/network/network_internal.h
+--- src/network/network_internal.h	Thu May 07 17:08:41 2009 +0000
++++ src/network/network_internal.h	Fri May 08 20:04:18 2009 +0200
 @@ -123,6 +123,9 @@
  
  void NetworkTCPQueryServer(NetworkAddress address);
@@ -45,10 +33,10 @@ diff -r f9b5e16c4172 src/network/network_internal.h
  void GetBindAddresses(NetworkAddressList *addresses, uint16 port);
  void NetworkAddServer(const char *b);
  void NetworkRebuildHostList();
-diff -r f9b5e16c4172 src/openttd.cpp
---- src/openttd.cpp	Fri Apr 10 22:47:19 2009 +0000
-+++ src/openttd.cpp	Sat Apr 11 09:06:29 2009 +0200
-@@ -157,6 +157,8 @@
+diff -r 6efca8d4d837 src/openttd.cpp
+--- src/openttd.cpp	Thu May 07 17:08:41 2009 +0000
++++ src/openttd.cpp	Fri May 08 20:04:18 2009 +0200
+@@ -158,6 +158,8 @@
  		"  -G seed             = Set random seed\n"
  #if defined(ENABLE_NETWORK)
  		"  -n [ip:port#company]= Start networkgame\n"
@@ -57,7 +45,7 @@ diff -r f9b5e16c4172 src/openttd.cpp
  		"  -D [ip][:port]      = Start dedicated server\n"
  		"  -l ip[:port]        = Redirect DEBUG()\n"
  #if !defined(__MORPHOS__) && !defined(__AMIGA__) && !defined(WIN32)
-@@ -379,6 +381,10 @@
+@@ -380,6 +382,10 @@
  }
  
  byte _savegame_sort_order;
@@ -68,7 +56,7 @@ diff -r f9b5e16c4172 src/openttd.cpp
  #if defined(UNIX) && !defined(__MORPHOS__)
  extern void DedicatedFork();
  #endif
-@@ -415,7 +421,7 @@
+@@ -416,7 +422,7 @@
  	 *   a letter means: it accepts that param (e.g.: -h)
  	 *   a ':' behind it means: it need a param (e.g.: -m<driver>)
  	 *   a '::' behind it means: it can optional have a param (e.g.: -d<debug>) */
@@ -77,7 +65,7 @@ diff -r f9b5e16c4172 src/openttd.cpp
  #if !defined(__MORPHOS__) && !defined(__AMIGA__) && !defined(WIN32)
  		"f"
  #endif
-@@ -460,6 +466,12 @@
+@@ -461,6 +467,12 @@
  		case 'l':
  			debuglog_conn = mgo.opt;
  			break;
