@@ -139,6 +139,7 @@ function installation {
 			svn checkout -r $REVNUM svn://svn.openttd.org/trunk $CLIENTDIR
 			cd $CLIENTDIR
 			cpatching
+			./configure $CONFIGUREARGS
 		else
 			debug "updating from $CLIENTREV to $SERVERREV..."
 			cd $CLIENTDIR
