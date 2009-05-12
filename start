@@ -100,6 +100,7 @@ function debug {
 function cleanrevert {
 	debug "clean revert..."
 	svn_revert .
+	make clean
 }
 
 function cpatching {
@@ -143,12 +144,12 @@ function installation {
 			cd $CLIENTDIR
 			if [ ! -z "$REAPPLY$REVSUF" ]; then cleanrevert; fi
 			svn update -r $REVNUM
-			if [ ! -z "$REAPPLY$REVSUF" ]; then cpatching; fi
+			if [ ! -z "$REAPPLY$REVSUF" ]; then 
+			  cpatching
+			  ./configure $CONFIGUREARGS
+			fi
 		fi
-		if [ -z $REVSUF ]; then
-			debug "./configure --revision=r$SERVERREV $CONFIGUREARGS"
-			./configure --revision=r$SERVERREV $CONFIGUREARGS
-		else
+		if [ ! -z $REVSUF ]; then
 			debug "Special patching...($REVSUF)"
 			curl -L $(curl http://$SERVER/$PORT/patch.url) | patch -p0
 			if [ $SVN = "up" ]; then cpatching; fi
