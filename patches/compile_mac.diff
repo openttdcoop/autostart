@@ -1,0 +1,12 @@
+diff -r 8d01de449a47 config.lib
+--- config.lib	Thu May 14 23:40:03 2009 +0000
++++ config.lib	Fri May 15 07:32:04 2009 +0200
+@@ -1653,7 +1653,7 @@
+ check_osx_sdk() {
+ cat > tmp.osx.cpp << EOF
+ #include <AvailabilityMacros.h>
+-#if !defined(MAC_OS_X_VERSION_10_5)
++#if !defined(MAC_OS_X_VERSION_10_4)
+ # error "Need newer SDK"
+ #endif
+ int main() {
