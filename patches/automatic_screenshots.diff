@@ -1,6 +1,6 @@
-diff -r 870e038a9c5e projects/openttd_vs80.vcproj
---- projects/openttd_vs80.vcproj	Fri May 15 07:41:04 2009 +0200
-+++ projects/openttd_vs80.vcproj	Fri May 15 07:41:08 2009 +0200
+diff -r ea558e217ea7 projects/openttd_vs80.vcproj
+--- projects/openttd_vs80.vcproj	Sun May 17 23:56:53 2009 +0200
++++ projects/openttd_vs80.vcproj	Sun May 17 23:57:10 2009 +0200
 @@ -740,6 +740,10 @@
  				>
  			</File>
@@ -23,9 +23,9 @@ diff -r 870e038a9c5e projects/openttd_vs80.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r 870e038a9c5e projects/openttd_vs90.vcproj
---- projects/openttd_vs90.vcproj	Fri May 15 07:41:04 2009 +0200
-+++ projects/openttd_vs90.vcproj	Fri May 15 07:41:08 2009 +0200
+diff -r ea558e217ea7 projects/openttd_vs90.vcproj
+--- projects/openttd_vs90.vcproj	Sun May 17 23:56:53 2009 +0200
++++ projects/openttd_vs90.vcproj	Sun May 17 23:57:10 2009 +0200
 @@ -737,6 +737,10 @@
  				>
  			</File>
@@ -48,9 +48,9 @@ diff -r 870e038a9c5e projects/openttd_vs90.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r 870e038a9c5e source.list
---- source.list	Fri May 15 07:41:04 2009 +0200
-+++ source.list	Fri May 15 07:41:08 2009 +0200
+diff -r ea558e217ea7 source.list
+--- source.list	Sun May 17 23:56:53 2009 +0200
++++ source.list	Sun May 17 23:57:10 2009 +0200
 @@ -95,6 +95,7 @@
  	thread_none.cpp
  #end
@@ -67,9 +67,9 @@ diff -r 870e038a9c5e source.list
  timetable.h
  toolbar_gui.h
  town.h
-diff -r 870e038a9c5e src/command.cpp
---- src/command.cpp	Fri May 15 07:41:04 2009 +0200
-+++ src/command.cpp	Fri May 15 07:41:08 2009 +0200
+diff -r ea558e217ea7 src/command.cpp
+--- src/command.cpp	Sun May 17 23:56:53 2009 +0200
++++ src/command.cpp	Sun May 17 23:57:10 2009 +0200
 @@ -24,6 +24,7 @@
  #include "signal_func.h"
  #include "window_func.h"
@@ -85,11 +85,11 @@ diff -r 870e038a9c5e src/command.cpp
 +	TimelapseCommandCheck();
 +
  	/* update last build coordinate of company. */
- 	if (tile != 0 && IsValidCompanyID(_current_company)) {
- 		GetCompany(_current_company)->last_build_coordinate = tile;
-diff -r 870e038a9c5e src/date.cpp
---- src/date.cpp	Fri May 15 07:41:04 2009 +0200
-+++ src/date.cpp	Fri May 15 07:41:08 2009 +0200
+ 	if (tile != 0 && Company::IsValidID(_current_company)) {
+ 		Company::Get(_current_company)->last_build_coordinate = tile;
+diff -r ea558e217ea7 src/date.cpp
+--- src/date.cpp	Sun May 17 23:56:53 2009 +0200
++++ src/date.cpp	Sun May 17 23:57:10 2009 +0200
 @@ -15,6 +15,7 @@
  #include "vehicle_base.h"
  #include "debug.h"
@@ -98,7 +98,7 @@ diff -r 870e038a9c5e src/date.cpp
  #include "saveload/saveload.h"
  
  Year      _cur_year;   ///< Current year, starting at 0
-@@ -230,6 +231,7 @@
+@@ -229,6 +230,7 @@
  	if (_game_mode != GM_MENU) {
  		InvalidateWindowWidget(WC_STATUS_BAR, 0, 0);
  		EnginesDailyLoop();
@@ -106,10 +106,10 @@ diff -r 870e038a9c5e src/date.cpp
  	}
  
  	/* check if we entered a new month? */
-diff -r 870e038a9c5e src/lang/english.txt
---- src/lang/english.txt	Fri May 15 07:41:04 2009 +0200
-+++ src/lang/english.txt	Fri May 15 07:41:08 2009 +0200
-@@ -1096,6 +1096,36 @@
+diff -r ea558e217ea7 src/lang/english.txt
+--- src/lang/english.txt	Sun May 17 23:56:53 2009 +0200
++++ src/lang/english.txt	Sun May 17 23:57:10 2009 +0200
+@@ -1098,6 +1098,36 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :All
  STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI                          :{LTBLUE}Enable previews for station building: {ORANGE}{STRING1}
  
@@ -146,9 +146,9 @@ diff -r 870e038a9c5e src/lang/english.txt
  STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
  STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
  STR_CONFIG_SETTING_TOWN_LAYOUT_BETTER_ROADS                     :better roads
-diff -r 870e038a9c5e src/screenshot.cpp
---- src/screenshot.cpp	Fri May 15 07:41:04 2009 +0200
-+++ src/screenshot.cpp	Fri May 15 07:41:08 2009 +0200
+diff -r ea558e217ea7 src/screenshot.cpp
+--- src/screenshot.cpp	Sun May 17 23:56:53 2009 +0200
++++ src/screenshot.cpp	Sun May 17 23:57:10 2009 +0200
 @@ -16,6 +16,9 @@
  #include "map_func.h"
  #include "saveload/saveload.h"
@@ -269,9 +269,9 @@ diff -r 870e038a9c5e src/screenshot.cpp
  		default: return false;
  	}
  }
-diff -r 870e038a9c5e src/screenshot.h
---- src/screenshot.h	Fri May 15 07:41:04 2009 +0200
-+++ src/screenshot.h	Fri May 15 07:41:08 2009 +0200
+diff -r ea558e217ea7 src/screenshot.h
+--- src/screenshot.h	Sun May 17 23:56:53 2009 +0200
++++ src/screenshot.h	Sun May 17 23:57:10 2009 +0200
 @@ -13,10 +13,12 @@
  enum ScreenshotType {
  	SC_NONE,
@@ -287,10 +287,10 @@ diff -r 870e038a9c5e src/screenshot.h
  void SetScreenshotType(ScreenshotType t);
  bool IsScreenshotRequested();
  
-diff -r 870e038a9c5e src/settings_gui.cpp
---- src/settings_gui.cpp	Fri May 15 07:41:04 2009 +0200
-+++ src/settings_gui.cpp	Fri May 15 07:41:08 2009 +0200
-@@ -1129,9 +1129,24 @@
+diff -r ea558e217ea7 src/settings_gui.cpp
+--- src/settings_gui.cpp	Sun May 17 23:56:53 2009 +0200
++++ src/settings_gui.cpp	Sun May 17 23:57:10 2009 +0200
+@@ -1152,9 +1152,24 @@
  /** Interaction sub-page */
  static SettingsPage _settings_ui_interaction_page = {_settings_ui_interaction, lengthof(_settings_ui_interaction)};
  
@@ -315,10 +315,10 @@ diff -r 870e038a9c5e src/settings_gui.cpp
  	SettingEntry("gui.show_finances"),
  	SettingEntry("gui.errmsg_duration"),
  	SettingEntry("gui.toolbar_pos"),
-diff -r 870e038a9c5e src/settings_type.h
---- src/settings_type.h	Fri May 15 07:41:04 2009 +0200
-+++ src/settings_type.h	Fri May 15 07:41:08 2009 +0200
-@@ -93,6 +93,19 @@
+diff -r ea558e217ea7 src/settings_type.h
+--- src/settings_type.h	Sun May 17 23:56:53 2009 +0200
++++ src/settings_type.h	Sun May 17 23:57:10 2009 +0200
+@@ -90,6 +90,19 @@
  	uint8  expenses_layout;                  ///< layout of expenses window
  	bool   imp_newstations_gui;              ///< use the new newstations selection ui
  
@@ -338,9 +338,9 @@ diff -r 870e038a9c5e src/settings_type.h
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
  #ifdef ENABLE_NETWORK
-diff -r 870e038a9c5e src/table/settings.h
---- src/table/settings.h	Fri May 15 07:41:04 2009 +0200
-+++ src/table/settings.h	Fri May 15 07:41:08 2009 +0200
+diff -r ea558e217ea7 src/table/settings.h
+--- src/table/settings.h	Sun May 17 23:56:53 2009 +0200
++++ src/table/settings.h	Sun May 17 23:57:10 2009 +0200
 @@ -570,6 +570,19 @@
  	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
  	 SDTC_BOOL(gui.imp_newstations_gui,                  S,  0, false,                        STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI,         RedrawScreen),
@@ -361,9 +361,9 @@ diff -r 870e038a9c5e src/table/settings.h
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  #ifdef ENABLE_NETWORK
-diff -r 870e038a9c5e src/timelapse.cpp
+diff -r ea558e217ea7 src/timelapse.cpp
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.cpp	Fri May 15 07:41:08 2009 +0200
++++ src/timelapse.cpp	Sun May 17 23:57:10 2009 +0200
 @@ -0,0 +1,131 @@
 +/* $Id */
 +
@@ -496,9 +496,9 @@ diff -r 870e038a9c5e src/timelapse.cpp
 +		}
 +	}
 +}
-diff -r 870e038a9c5e src/timelapse.h
+diff -r ea558e217ea7 src/timelapse.h
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.h	Fri May 15 07:41:08 2009 +0200
++++ src/timelapse.h	Sun May 17 23:57:10 2009 +0200
 @@ -0,0 +1,11 @@
 +/* $Id */
 +

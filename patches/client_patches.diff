@@ -1,6 +1,6 @@
-diff -r e6845a218779 -r b341f2543058 config.lib
+diff -r e6845a218779 -r bcf4a5a14a8c config.lib
 --- config.lib	Sun May 17 20:38:22 2009 +0000
-+++ config.lib	Sun May 17 23:19:07 2009 +0200
++++ config.lib	Sun May 17 23:57:14 2009 +0200
 @@ -1653,7 +1653,7 @@
  check_osx_sdk() {
  cat > tmp.osx.cpp << EOF
@@ -10,18 +10,18 @@ diff -r e6845a218779 -r b341f2543058 config.lib
  # error "Need newer SDK"
  #endif
  int main() {
-diff -r e6845a218779 -r b341f2543058 findversion.sh
+diff -r e6845a218779 -r bcf4a5a14a8c findversion.sh
 --- findversion.sh	Sun May 17 20:38:22 2009 +0000
-+++ findversion.sh	Sun May 17 23:19:07 2009 +0200
++++ findversion.sh	Sun May 17 23:57:14 2009 +0200
 @@ -115,4 +115,4 @@
  	REV="${REV}-$BRANCH"
  fi
  
 -echo "$REV	$REV_NR	$MODIFIED	$CLEAN_REV"
 +echo "r$REV_NR	$REV_NR	$MODIFIED	$CLEAN_REV"
-diff -r e6845a218779 -r b341f2543058 projects/openttd_vs80.vcproj
+diff -r e6845a218779 -r bcf4a5a14a8c projects/openttd_vs80.vcproj
 --- projects/openttd_vs80.vcproj	Sun May 17 20:38:22 2009 +0000
-+++ projects/openttd_vs80.vcproj	Sun May 17 23:19:07 2009 +0200
++++ projects/openttd_vs80.vcproj	Sun May 17 23:57:14 2009 +0200
 @@ -740,6 +740,10 @@
  				>
  			</File>
@@ -44,9 +44,9 @@ diff -r e6845a218779 -r b341f2543058 projects/openttd_vs80.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r e6845a218779 -r b341f2543058 projects/openttd_vs90.vcproj
+diff -r e6845a218779 -r bcf4a5a14a8c projects/openttd_vs90.vcproj
 --- projects/openttd_vs90.vcproj	Sun May 17 20:38:22 2009 +0000
-+++ projects/openttd_vs90.vcproj	Sun May 17 23:19:07 2009 +0200
++++ projects/openttd_vs90.vcproj	Sun May 17 23:57:14 2009 +0200
 @@ -737,6 +737,10 @@
  				>
  			</File>
@@ -69,9 +69,9 @@ diff -r e6845a218779 -r b341f2543058 projects/openttd_vs90.vcproj
  				RelativePath=".\..\src\timetable.h"
  				>
  			</File>
-diff -r e6845a218779 -r b341f2543058 source.list
+diff -r e6845a218779 -r bcf4a5a14a8c source.list
 --- source.list	Sun May 17 20:38:22 2009 +0000
-+++ source.list	Sun May 17 23:19:07 2009 +0200
++++ source.list	Sun May 17 23:57:14 2009 +0200
 @@ -95,6 +95,7 @@
  	thread_none.cpp
  #end
@@ -88,9 +88,9 @@ diff -r e6845a218779 -r b341f2543058 source.list
  timetable.h
  toolbar_gui.h
  town.h
-diff -r e6845a218779 -r b341f2543058 src/command.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/command.cpp
 --- src/command.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/command.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/command.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -9,6 +9,8 @@
  #include "gui.h"
  #include "command_func.h"
@@ -145,7 +145,7 @@ diff -r e6845a218779 -r b341f2543058 src/command.cpp
  		Company::Get(_current_company)->last_build_coordinate = tile;
 +		if (client != INVALID_CLIENT_ID) {
 +			NetworkClientInfo *ci = NetworkFindClientInfoFromClientID(client);
-+			if (ci != NULL && IsValidCompanyID(ci->client_playas) && ci->client_playas == _current_company) {
++			if (ci != NULL && Company::IsValidID(ci->client_playas) && ci->client_playas == _current_company) {
 +				if (ci->last_build_coordinate != tile) {
 +					ci->last_build_coordinate = tile;
 +					Window *w = FindWindowById(WC_BIG_BROTHER_WINDOW, client);
@@ -156,9 +156,9 @@ diff -r e6845a218779 -r b341f2543058 src/command.cpp
  	}
  
  	/* Actually try and execute the command. If no cost-type is given
-diff -r e6845a218779 -r b341f2543058 src/command_func.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/command_func.h
 --- src/command_func.h	Sun May 17 20:38:22 2009 +0000
-+++ src/command_func.h	Sun May 17 23:19:07 2009 +0200
++++ src/command_func.h	Sun May 17 23:57:14 2009 +0200
 @@ -6,6 +6,7 @@
  #define COMMAND_FUNC_H
  
@@ -178,9 +178,9 @@ diff -r e6845a218779 -r b341f2543058 src/command_func.h
  
  #ifdef ENABLE_NETWORK
  
-diff -r e6845a218779 -r b341f2543058 src/date.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/date.cpp
 --- src/date.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/date.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/date.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -15,6 +15,7 @@
  #include "vehicle_base.h"
  #include "debug.h"
@@ -197,9 +197,9 @@ diff -r e6845a218779 -r b341f2543058 src/date.cpp
  	}
  
  	/* check if we entered a new month? */
-diff -r e6845a218779 -r b341f2543058 src/gui.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/gui.h
 --- src/gui.h	Sun May 17 20:38:22 2009 +0000
-+++ src/gui.h	Sun May 17 23:19:07 2009 +0200
++++ src/gui.h	Sun May 17 23:57:14 2009 +0200
 @@ -12,6 +12,7 @@
  #include "tile_type.h"
  #include "strings_type.h"
@@ -216,9 +216,9 @@ diff -r e6845a218779 -r b341f2543058 src/gui.h
  
  void BuildFileList();
  void SetFiosType(const byte fiostype);
-diff -r e6845a218779 -r b341f2543058 src/lang/english.txt
+diff -r e6845a218779 -r bcf4a5a14a8c src/lang/english.txt
 --- src/lang/english.txt	Sun May 17 20:38:22 2009 +0000
-+++ src/lang/english.txt	Sun May 17 23:19:07 2009 +0200
++++ src/lang/english.txt	Sun May 17 23:57:14 2009 +0200
 @@ -710,6 +710,7 @@
  ############ end of the 'Display map' dropdown
  
@@ -309,9 +309,9 @@ diff -r e6845a218779 -r b341f2543058 src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-diff -r e6845a218779 -r b341f2543058 src/main_gui.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/main_gui.cpp
 --- src/main_gui.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/main_gui.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/main_gui.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -26,6 +26,7 @@
  #include "toolbar_gui.h"
  #include "statusbar_gui.h"
@@ -331,9 +331,9 @@ diff -r e6845a218779 -r b341f2543058 src/main_gui.cpp
  
  #ifdef ENABLE_NETWORK
  			case WKC_RETURN: case 'T': // smart chat; send to team if any, otherwise to all
-diff -r e6845a218779 -r b341f2543058 src/network/network_base.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/network/network_base.h
 --- src/network/network_base.h	Sun May 17 20:38:22 2009 +0000
-+++ src/network/network_base.h	Sun May 17 23:19:07 2009 +0200
++++ src/network/network_base.h	Sun May 17 23:57:14 2009 +0200
 @@ -9,6 +9,8 @@
  
  #include "network_type.h"
@@ -351,9 +351,9 @@ diff -r e6845a218779 -r b341f2543058 src/network/network_base.h
  
  	NetworkClientInfo(ClientID client_id = INVALID_CLIENT_ID) : client_id(client_id) {}
  	~NetworkClientInfo() { client_id = INVALID_CLIENT_ID; }
-diff -r e6845a218779 -r b341f2543058 src/network/network_client.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/network/network_client.cpp
 --- src/network/network_client.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/network/network_client.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/network/network_client.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -515,9 +515,15 @@
  			_password_game_seed = p->Recv_uint32();
  			p->Recv_string(_password_server_unique_id, sizeof(_password_server_unique_id));
@@ -381,9 +381,9 @@ diff -r e6845a218779 -r b341f2543058 src/network/network_client.cpp
  	cp.next     = NULL;
  
  	if (err != NULL) {
-diff -r e6845a218779 -r b341f2543058 src/network/network_command.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/network/network_command.cpp
 --- src/network/network_command.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/network/network_command.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/network/network_command.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -72,6 +72,7 @@
  		 */
  		c.frame = _frame_counter_max + 1;
@@ -401,9 +401,9 @@ diff -r e6845a218779 -r b341f2543058 src/network/network_command.cpp
  
  		_local_command_queue = _local_command_queue->next;
  		free(cp);
-diff -r e6845a218779 -r b341f2543058 src/network/network_gui.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/network/network_gui.cpp
 --- src/network/network_gui.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/network/network_gui.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/network/network_gui.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -1778,6 +1778,12 @@
  	ShowNetworkChatQueryWindow(DESTTYPE_BROADCAST, 0);
  }
@@ -411,7 +411,7 @@ diff -r e6845a218779 -r b341f2543058 src/network/network_gui.cpp
 +static void ClientList_OpenWindow(byte client_no)
 +{
 +	const NetworkClientInfo *ci = NetworkFindClientInfo(client_no);
-+	if (ci != NULL && IsValidCompanyID(ci->client_playas)) ShowBigBrotherWindow(ci->client_id);
++	if (ci != NULL && Company::IsValidID(ci->client_playas)) ShowBigBrotherWindow(ci->client_id);
 +}
 +
  static void ClientList_None(byte client_no)
@@ -427,9 +427,9 @@ diff -r e6845a218779 -r b341f2543058 src/network/network_gui.cpp
  		if (_network_own_client_id != ci->client_id) {
  			/* We are no spectator and the company we want to give money to is no spectator and money gifts are allowed */
  			if (Company::IsValidID(_network_playas) && Company::IsValidID(ci->client_playas) && _settings_game.economy.give_money) {
-diff -r e6845a218779 -r b341f2543058 src/network/network_internal.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/network/network_internal.h
 --- src/network/network_internal.h	Sun May 17 20:38:22 2009 +0000
-+++ src/network/network_internal.h	Sun May 17 23:19:07 2009 +0200
++++ src/network/network_internal.h	Sun May 17 23:57:14 2009 +0200
 @@ -125,6 +125,9 @@
  
  void NetworkTCPQueryServer(NetworkAddress address);
@@ -448,9 +448,9 @@ diff -r e6845a218779 -r b341f2543058 src/network/network_internal.h
  };
  
  void NetworkAddCommandQueue(CommandPacket cp, NetworkClientSocket *cs = NULL);
-diff -r e6845a218779 -r b341f2543058 src/network/network_server.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/network/network_server.cpp
 --- src/network/network_server.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/network/network_server.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/network/network_server.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -484,6 +484,7 @@
  	cs->Send_Command(p, cp);
  	p->Send_uint32(cp->frame);
@@ -474,9 +474,9 @@ diff -r e6845a218779 -r b341f2543058 src/network/network_server.cpp
  	NetworkAddCommandQueue(cp);
  }
  
-diff -r e6845a218779 -r b341f2543058 src/newgrf_gui.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/newgrf_gui.cpp
 --- src/newgrf_gui.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/newgrf_gui.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/newgrf_gui.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -1495,9 +1495,9 @@ diff -r e6845a218779 -r b341f2543058 src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r e6845a218779 -r b341f2543058 src/openttd.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/openttd.cpp
 --- src/openttd.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/openttd.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/openttd.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -158,6 +158,8 @@
  		"  -G seed             = Set random seed\n"
  #if defined(ENABLE_NETWORK)
@@ -1540,9 +1540,9 @@ diff -r e6845a218779 -r b341f2543058 src/openttd.cpp
  #endif /* ENABLE_NETWORK */
  		case 'r': ParseResolution(&resolution, mgo.opt); break;
  		case 't': startyear = atoi(mgo.opt); break;
-diff -r e6845a218779 -r b341f2543058 src/rail_gui.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/rail_gui.cpp
 --- src/rail_gui.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/rail_gui.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/rail_gui.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -1943,9 +1943,9 @@ diff -r e6845a218779 -r b341f2543058 src/rail_gui.cpp
  	}
  }
  
-diff -r e6845a218779 -r b341f2543058 src/screenshot.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/screenshot.cpp
 --- src/screenshot.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/screenshot.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/screenshot.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -16,6 +16,9 @@
  #include "map_func.h"
  #include "saveload/saveload.h"
@@ -2066,9 +2066,9 @@ diff -r e6845a218779 -r b341f2543058 src/screenshot.cpp
  		default: return false;
  	}
  }
-diff -r e6845a218779 -r b341f2543058 src/screenshot.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/screenshot.h
 --- src/screenshot.h	Sun May 17 20:38:22 2009 +0000
-+++ src/screenshot.h	Sun May 17 23:19:07 2009 +0200
++++ src/screenshot.h	Sun May 17 23:57:14 2009 +0200
 @@ -13,10 +13,12 @@
  enum ScreenshotType {
  	SC_NONE,
@@ -2084,9 +2084,9 @@ diff -r e6845a218779 -r b341f2543058 src/screenshot.h
  void SetScreenshotType(ScreenshotType t);
  bool IsScreenshotRequested();
  
-diff -r e6845a218779 -r b341f2543058 src/settings_gui.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/settings_gui.cpp
 --- src/settings_gui.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/settings_gui.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/settings_gui.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -1152,9 +1152,24 @@
  /** Interaction sub-page */
  static SettingsPage _settings_ui_interaction_page = {_settings_ui_interaction, lengthof(_settings_ui_interaction)};
@@ -2120,9 +2120,9 @@ diff -r e6845a218779 -r b341f2543058 src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r e6845a218779 -r b341f2543058 src/settings_type.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/settings_type.h
 --- src/settings_type.h	Sun May 17 20:38:22 2009 +0000
-+++ src/settings_type.h	Sun May 17 23:19:07 2009 +0200
++++ src/settings_type.h	Sun May 17 23:57:14 2009 +0200
 @@ -88,6 +88,20 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
@@ -2144,9 +2144,9 @@ diff -r e6845a218779 -r b341f2543058 src/settings_type.h
  
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
-diff -r e6845a218779 -r b341f2543058 src/smallmap_gui.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/smallmap_gui.cpp
 --- src/smallmap_gui.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/smallmap_gui.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/smallmap_gui.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -20,6 +20,8 @@
  #include "vehicle_base.h"
  #include "sound_func.h"
@@ -2174,7 +2174,7 @@ diff -r e6845a218779 -r b341f2543058 src/smallmap_gui.cpp
 +	if (BringWindowToFrontById(WC_BIG_BROTHER_WINDOW, client) != NULL) return;
 +
 +	const NetworkClientInfo *ci = NetworkFindClientInfoFromClientID(client);
-+	if (ci == NULL || !IsValidCompanyID(ci->client_playas)) return;
++	if (ci == NULL || !Company::IsValidID(ci->client_playas)) return;
 +
 +	Window *w = new ExtraViewportWindow(&_extra_view_port_desc, client, ci->last_build_coordinate);
 +	w->window_class = WC_BIG_BROTHER_WINDOW;
@@ -2184,9 +2184,9 @@ diff -r e6845a218779 -r b341f2543058 src/smallmap_gui.cpp
  /**
   * Scrolls the main window to given coordinates.
   * @param x x coordinate
-diff -r e6845a218779 -r b341f2543058 src/strings.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/strings.cpp
 --- src/strings.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/strings.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/strings.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -30,6 +30,8 @@
  #include "video/video_driver.hpp"
  #include "engine_base.h"
@@ -2210,9 +2210,9 @@ diff -r e6845a218779 -r b341f2543058 src/strings.cpp
  			case SCC_SETCASE: { // {SETCASE}
  				/* This is a pseudo command, it's outputted when someone does {STRING.ack}
  				 * The modifier is added to all subsequent GetStringWithArgs that accept the modifier. */
-diff -r e6845a218779 -r b341f2543058 src/table/control_codes.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/table/control_codes.h
 --- src/table/control_codes.h	Sun May 17 20:38:22 2009 +0000
-+++ src/table/control_codes.h	Sun May 17 23:19:07 2009 +0200
++++ src/table/control_codes.h	Sun May 17 23:57:14 2009 +0200
 @@ -35,6 +35,7 @@
  	SCC_COMPANY_NAME,
  	SCC_COMPANY_NUM,
@@ -2221,9 +2221,9 @@ diff -r e6845a218779 -r b341f2543058 src/table/control_codes.h
  	SCC_ENGINE_NAME,
  
  	SCC_CURRENCY_COMPACT,
-diff -r e6845a218779 -r b341f2543058 src/table/settings.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/table/settings.h
 --- src/table/settings.h	Sun May 17 20:38:22 2009 +0000
-+++ src/table/settings.h	Sun May 17 23:19:07 2009 +0200
++++ src/table/settings.h	Sun May 17 23:57:14 2009 +0200
 @@ -568,6 +568,20 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
@@ -2245,9 +2245,9 @@ diff -r e6845a218779 -r b341f2543058 src/table/settings.h
  
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
-diff -r e6845a218779 -r b341f2543058 src/table/strgen_tables.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/table/strgen_tables.h
 --- src/table/strgen_tables.h	Sun May 17 20:38:22 2009 +0000
-+++ src/table/strgen_tables.h	Sun May 17 23:19:07 2009 +0200
++++ src/table/strgen_tables.h	Sun May 17 23:57:14 2009 +0200
 @@ -106,6 +106,7 @@
  	{"COMPANY",         EmitSingleChar, SCC_COMPANY_NAME,       1, C_NONE},
  	{"COMPANYNUM",      EmitSingleChar, SCC_COMPANY_NUM,        1, C_NONE},
@@ -2256,9 +2256,9 @@ diff -r e6845a218779 -r b341f2543058 src/table/strgen_tables.h
  
  	{"",                EmitSingleChar, '\n',                   0, C_DONTCOUNT},
  	{"{",               EmitSingleChar, '{',                    0, C_DONTCOUNT},
-diff -r e6845a218779 -r b341f2543058 src/timelapse.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/timelapse.cpp
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/timelapse.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -0,0 +1,131 @@
 +/* $Id */
 +
@@ -2391,9 +2391,9 @@ diff -r e6845a218779 -r b341f2543058 src/timelapse.cpp
 +		}
 +	}
 +}
-diff -r e6845a218779 -r b341f2543058 src/timelapse.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/timelapse.h
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ src/timelapse.h	Sun May 17 23:19:07 2009 +0200
++++ src/timelapse.h	Sun May 17 23:57:14 2009 +0200
 @@ -0,0 +1,11 @@
 +/* $Id */
 +
@@ -2406,9 +2406,9 @@ diff -r e6845a218779 -r b341f2543058 src/timelapse.h
 +void TimelapseCommandCheck();
 +
 +#endif /* TIMELAPSE_H */
-diff -r e6845a218779 -r b341f2543058 src/window.cpp
+diff -r e6845a218779 -r bcf4a5a14a8c src/window.cpp
 --- src/window.cpp	Sun May 17 20:38:22 2009 +0000
-+++ src/window.cpp	Sun May 17 23:19:07 2009 +0200
++++ src/window.cpp	Sun May 17 23:57:14 2009 +0200
 @@ -1285,7 +1285,6 @@
  static bool HandleDragDrop()
  {
@@ -2432,9 +2432,9 @@ diff -r e6845a218779 -r b341f2543058 src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r e6845a218779 -r b341f2543058 src/window_gui.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/window_gui.h
 --- src/window_gui.h	Sun May 17 20:38:22 2009 +0000
-+++ src/window_gui.h	Sun May 17 23:19:07 2009 +0200
++++ src/window_gui.h	Sun May 17 23:57:14 2009 +0200
 @@ -455,6 +455,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  
@@ -2449,9 +2449,9 @@ diff -r e6845a218779 -r b341f2543058 src/window_gui.h
  	 * Handle the request for (viewport) scrolling.
  	 * @param delta the amount the viewport must be scrolled.
  	 */
-diff -r e6845a218779 -r b341f2543058 src/window_type.h
+diff -r e6845a218779 -r bcf4a5a14a8c src/window_type.h
 --- src/window_type.h	Sun May 17 20:38:22 2009 +0000
-+++ src/window_type.h	Sun May 17 23:19:07 2009 +0200
++++ src/window_type.h	Sun May 17 23:57:14 2009 +0200
 @@ -79,6 +79,7 @@
  	WC_PERFORMANCE_DETAIL,
  	WC_CONSOLE,
