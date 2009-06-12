@@ -1,9 +1,0 @@
-diff -r 669df266916b findversion.sh
---- a/findversion.sh	Thu Apr 23 17:54:05 2009 +0000
-+++ b/findversion.sh	Fri Apr 24 00:39:46 2009 +0200
-@@ -115,4 +115,4 @@
- 	REV="${REV}-$BRANCH"
- fi
- 
--echo "$REV	$REV_NR	$MODIFIED	$CLEAN_REV"
-+echo "r$REV_NR	$REV_NR	$MODIFIED	$CLEAN_REV"
