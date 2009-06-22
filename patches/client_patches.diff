@@ -1,6 +1,6 @@
-diff -r 39ad7db1e63c -r 6588698270bb config.lib
---- config.lib	Wed Jun 03 00:05:51 2009 +0000
-+++ config.lib	Wed Jun 03 07:44:33 2009 +0200
+diff -r 2d5f6a926f01 -r 3fa103f43d92 config.lib
+--- config.lib	Mon Jun 22 17:28:50 2009 +0000
++++ config.lib	Mon Jun 22 20:59:06 2009 +0200
 @@ -1645,7 +1645,7 @@
  check_osx_sdk() {
  cat > tmp.osx.cpp << EOF
@@ -10,18 +10,18 @@ diff -r 39ad7db1e63c -r 6588698270bb config.lib
  # error "Need newer SDK"
  #endif
  int main() {
-diff -r 39ad7db1e63c -r 6588698270bb findversion.sh
---- findversion.sh	Wed Jun 03 00:05:51 2009 +0000
-+++ findversion.sh	Wed Jun 03 07:44:33 2009 +0200
+diff -r 2d5f6a926f01 -r 3fa103f43d92 findversion.sh
+--- findversion.sh	Mon Jun 22 17:28:50 2009 +0000
++++ findversion.sh	Mon Jun 22 20:59:06 2009 +0200
 @@ -115,4 +115,4 @@
  	REV="${REV}-$BRANCH"
  fi
  
 -echo "$REV	$REV_NR	$MODIFIED	$CLEAN_REV"
 +echo "r$REV_NR	$REV_NR	$MODIFIED	$CLEAN_REV"
-diff -r 39ad7db1e63c -r 6588698270bb src/lang/english.txt
---- src/lang/english.txt	Wed Jun 03 00:05:51 2009 +0000
-+++ src/lang/english.txt	Wed Jun 03 07:44:33 2009 +0200
+diff -r 2d5f6a926f01 -r 3fa103f43d92 src/lang/english.txt
+--- src/lang/english.txt	Mon Jun 22 17:28:50 2009 +0000
++++ src/lang/english.txt	Mon Jun 22 20:59:06 2009 +0200
 @@ -1095,6 +1095,7 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
@@ -66,9 +66,9 @@ diff -r 39ad7db1e63c -r 6588698270bb src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-diff -r 39ad7db1e63c -r 6588698270bb src/main_gui.cpp
---- src/main_gui.cpp	Wed Jun 03 00:05:51 2009 +0000
-+++ src/main_gui.cpp	Wed Jun 03 07:44:33 2009 +0200
+diff -r 2d5f6a926f01 -r 3fa103f43d92 src/main_gui.cpp
+--- src/main_gui.cpp	Mon Jun 22 17:28:50 2009 +0000
++++ src/main_gui.cpp	Mon Jun 22 20:59:06 2009 +0200
 @@ -26,6 +26,7 @@
  #include "toolbar_gui.h"
  #include "statusbar_gui.h"
@@ -88,44 +88,9 @@ diff -r 39ad7db1e63c -r 6588698270bb src/main_gui.cpp
  
  #ifdef ENABLE_NETWORK
  			case WKC_RETURN: case 'T': // smart chat; send to team if any, otherwise to all
-diff -r 39ad7db1e63c -r 6588698270bb src/network/network_client.cpp
---- src/network/network_client.cpp	Wed Jun 03 00:05:51 2009 +0000
-+++ src/network/network_client.cpp	Wed Jun 03 07:44:33 2009 +0200
-@@ -515,9 +515,15 @@
- 			_password_game_seed = p->Recv_uint32();
- 			p->Recv_string(_password_server_unique_id, sizeof(_password_server_unique_id));
- 			if (MY_CLIENT->HasClientQuit()) return NETWORK_RECV_STATUS_MALFORMED_PACKET;
--
--		case NETWORK_GAME_PASSWORD:
--			ShowNetworkNeedPassword(type);
-+	
-+			if (_company_pw != NULL) _login_pw = _company_pw;
-+			case NETWORK_GAME_PASSWORD:
-+				if (_login_pw == NULL) {
-+					ShowNetworkNeedPassword(type);
-+				} else {
-+					SEND_COMMAND(PACKET_CLIENT_PASSWORD)(type, _login_pw);
-+					_login_pw = NULL;
-+				}
- 			return NETWORK_RECV_STATUS_OKAY;
- 
- 		default: return NETWORK_RECV_STATUS_MALFORMED_PACKET;
-diff -r 39ad7db1e63c -r 6588698270bb src/network/network_internal.h
---- src/network/network_internal.h	Wed Jun 03 00:05:51 2009 +0000
-+++ src/network/network_internal.h	Wed Jun 03 07:44:33 2009 +0200
-@@ -125,6 +125,9 @@
- 
- void NetworkTCPQueryServer(NetworkAddress address);
- 
-+extern char *_login_pw;                      // login password from -p argument
-+extern char *_company_pw;                    // company password from -P argument
-+
- void GetBindAddresses(NetworkAddressList *addresses, uint16 port);
- void NetworkAddServer(const char *b);
- void NetworkRebuildHostList();
-diff -r 39ad7db1e63c -r 6588698270bb src/newgrf_gui.cpp
---- src/newgrf_gui.cpp	Wed Jun 03 00:05:51 2009 +0000
-+++ src/newgrf_gui.cpp	Wed Jun 03 07:44:33 2009 +0200
+diff -r 2d5f6a926f01 -r 3fa103f43d92 src/newgrf_gui.cpp
+--- src/newgrf_gui.cpp	Mon Jun 22 17:28:50 2009 +0000
++++ src/newgrf_gui.cpp	Mon Jun 22 20:59:06 2009 +0200
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -1144,54 +1109,9 @@ diff -r 39ad7db1e63c -r 6588698270bb src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r 39ad7db1e63c -r 6588698270bb src/openttd.cpp
---- src/openttd.cpp	Wed Jun 03 00:05:51 2009 +0000
-+++ src/openttd.cpp	Wed Jun 03 07:44:33 2009 +0200
-@@ -160,6 +160,8 @@
- 		"  -G seed             = Set random seed\n"
- #if defined(ENABLE_NETWORK)
- 		"  -n [ip:port#company]= Start networkgame\n"
-+		"  -p password         = Join password\n"
-+		"  -P password         = Company password\n"
- 		"  -D [ip][:port]      = Start dedicated server\n"
- 		"  -l ip[:port]        = Redirect DEBUG()\n"
- #if !defined(__MORPHOS__) && !defined(__AMIGA__) && !defined(WIN32)
-@@ -382,6 +384,10 @@
- }
- 
- byte _savegame_sort_order;
-+#if defined(ENABLE_NETWORK)
-+char *_login_pw = NULL;
-+char *_company_pw = NULL;
-+#endif /* ENABLE_NETWORK */
- #if defined(UNIX) && !defined(__MORPHOS__)
- extern void DedicatedFork();
- #endif
-@@ -418,7 +424,7 @@
- 	 *   a letter means: it accepts that param (e.g.: -h)
- 	 *   a ':' behind it means: it need a param (e.g.: -m<driver>)
- 	 *   a '::' behind it means: it can optional have a param (e.g.: -d<debug>) */
--	optformat = "m:s:v:b:hD::n::ei::I:t:d::r:g::G:c:xl:"
-+	optformat = "m:s:v:b:hD::n::ei::I:t:d::r:g::G:c:xl:p:P:"
- #if !defined(__MORPHOS__) && !defined(__AMIGA__) && !defined(WIN32)
- 		"f"
- #endif
-@@ -463,6 +469,12 @@
- 		case 'l':
- 			debuglog_conn = mgo.opt;
- 			break;
-+		case 'p':
-+			_login_pw = mgo.opt;
-+			break;
-+		case 'P':
-+			_company_pw = mgo.opt;
-+			break;
- #endif /* ENABLE_NETWORK */
- 		case 'r': ParseResolution(&resolution, mgo.opt); break;
- 		case 't': startyear = atoi(mgo.opt); break;
-diff -r 39ad7db1e63c -r 6588698270bb src/rail_gui.cpp
---- src/rail_gui.cpp	Wed Jun 03 00:05:51 2009 +0000
-+++ src/rail_gui.cpp	Wed Jun 03 07:44:33 2009 +0200
+diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
+--- src/rail_gui.cpp	Mon Jun 22 17:28:50 2009 +0000
++++ src/rail_gui.cpp	Mon Jun 22 20:59:06 2009 +0200
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -1599,9 +1519,9 @@ diff -r 39ad7db1e63c -r 6588698270bb src/rail_gui.cpp
  	}
  }
  
-diff -r 39ad7db1e63c -r 6588698270bb src/settings_gui.cpp
---- src/settings_gui.cpp	Wed Jun 03 00:05:51 2009 +0000
-+++ src/settings_gui.cpp	Wed Jun 03 07:44:33 2009 +0200
+diff -r 2d5f6a926f01 -r 3fa103f43d92 src/settings_gui.cpp
+--- src/settings_gui.cpp	Mon Jun 22 17:28:50 2009 +0000
++++ src/settings_gui.cpp	Mon Jun 22 20:59:06 2009 +0200
 @@ -1181,6 +1181,7 @@
  	SettingEntry("gui.always_build_infrastructure"),
  	SettingEntry("gui.persistent_buildingtools"),
@@ -1610,9 +1530,9 @@ diff -r 39ad7db1e63c -r 6588698270bb src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r 39ad7db1e63c -r 6588698270bb src/settings_type.h
---- src/settings_type.h	Wed Jun 03 00:05:51 2009 +0000
-+++ src/settings_type.h	Wed Jun 03 07:44:33 2009 +0200
+diff -r 2d5f6a926f01 -r 3fa103f43d92 src/settings_type.h
+--- src/settings_type.h	Mon Jun 22 17:28:50 2009 +0000
++++ src/settings_type.h	Mon Jun 22 20:59:06 2009 +0200
 @@ -88,6 +88,7 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
@@ -1621,9 +1541,9 @@ diff -r 39ad7db1e63c -r 6588698270bb src/settings_type.h
  
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
-diff -r 39ad7db1e63c -r 6588698270bb src/table/settings.h
---- src/table/settings.h	Wed Jun 03 00:05:51 2009 +0000
-+++ src/table/settings.h	Wed Jun 03 07:44:33 2009 +0200
+diff -r 2d5f6a926f01 -r 3fa103f43d92 src/table/settings.h
+--- src/table/settings.h	Mon Jun 22 17:28:50 2009 +0000
++++ src/table/settings.h	Mon Jun 22 20:59:06 2009 +0200
 @@ -563,6 +563,7 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
@@ -1632,10 +1552,10 @@ diff -r 39ad7db1e63c -r 6588698270bb src/table/settings.h
  
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
-diff -r 39ad7db1e63c -r 6588698270bb src/window.cpp
---- src/window.cpp	Wed Jun 03 00:05:51 2009 +0000
-+++ src/window.cpp	Wed Jun 03 07:44:33 2009 +0200
-@@ -1271,7 +1271,6 @@
+diff -r 2d5f6a926f01 -r 3fa103f43d92 src/window.cpp
+--- src/window.cpp	Mon Jun 22 17:28:50 2009 +0000
++++ src/window.cpp	Mon Jun 22 20:59:06 2009 +0200
+@@ -1359,7 +1359,6 @@
  static bool HandleDragDrop()
  {
  	if (_special_mouse_mode != WSM_DRAGDROP) return true;
@@ -1643,7 +1563,7 @@ diff -r 39ad7db1e63c -r 6588698270bb src/window.cpp
  
  	Window *w = GetCallbackWnd();
  
-@@ -1280,7 +1279,13 @@
+@@ -1368,7 +1367,13 @@
  		Point pt;
  		pt.x = _cursor.pos.x - w->left;
  		pt.y = _cursor.pos.y - w->top;
@@ -1658,10 +1578,10 @@ diff -r 39ad7db1e63c -r 6588698270bb src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r 39ad7db1e63c -r 6588698270bb src/window_gui.h
---- src/window_gui.h	Wed Jun 03 00:05:51 2009 +0000
-+++ src/window_gui.h	Wed Jun 03 07:44:33 2009 +0200
-@@ -458,6 +458,13 @@
+diff -r 2d5f6a926f01 -r 3fa103f43d92 src/window_gui.h
+--- src/window_gui.h	Mon Jun 22 17:28:50 2009 +0000
++++ src/window_gui.h	Mon Jun 22 20:59:06 2009 +0200
+@@ -493,6 +493,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  
  	/**
