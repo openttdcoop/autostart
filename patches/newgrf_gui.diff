@@ -1,7 +1,7 @@
-diff -r edb9bd2f68be src/lang/english.txt
---- src/lang/english.txt	Fri May 15 07:40:35 2009 +0200
-+++ src/lang/english.txt	Fri May 15 07:40:57 2009 +0200
-@@ -3090,6 +3090,7 @@
+diff -r e6a4b4208035 src/lang/english.txt
+--- src/lang/english.txt	Fri Jul 17 22:00:13 2009 +0000
++++ src/lang/english.txt	Sat Jul 18 10:08:14 2009 +0200
+@@ -3092,6 +3092,7 @@
  STR_NEWGRF_TOGGLE_PALETTE_TIP                                   :{BLACK}Toggle the palette of the selected NewGRF.{}Do this when the graphics from this NewGRF look pink in-game
  STR_NEWGRF_SET_PARAMETERS                                       :{BLACK}Set parameters
  STR_NEWGRF_FILENAME                                             :{BLACK}Filename: {SILVER}{RAW_STRING}
@@ -9,7 +9,7 @@ diff -r edb9bd2f68be src/lang/english.txt
  STR_NEWGRF_PALETTE                                              :{BLACK}Palette: {SILVER}{RAW_STRING}
  STR_NEWGRF_GRF_ID                                               :{BLACK}GRF ID: {SILVER}{RAW_STRING}
  STR_NEWGRF_MD5SUM                                               :{BLACK}MD5sum: {SILVER}{RAW_STRING}
-@@ -3125,19 +3126,23 @@
+@@ -3127,19 +3128,23 @@
  STR_NEWGRF_ADD_TIP                                              :{BLACK}Add a NewGRF file to the list
  STR_NEWGRF_REMOVE                                               :{BLACK}Remove
  STR_NEWGRF_REMOVE_TIP                                           :{BLACK}Remove the selected NewGRF file from the list
@@ -37,9 +37,9 @@ diff -r edb9bd2f68be src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-diff -r edb9bd2f68be src/newgrf_gui.cpp
---- src/newgrf_gui.cpp	Fri May 15 07:40:35 2009 +0200
-+++ src/newgrf_gui.cpp	Fri May 15 07:40:57 2009 +0200
+diff -r e6a4b4208035 src/newgrf_gui.cpp
+--- src/newgrf_gui.cpp	Fri Jul 17 22:00:13 2009 +0000
++++ src/newgrf_gui.cpp	Sat Jul 18 10:08:14 2009 +0200
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -48,7 +48,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  #include "gamelog.h"
  #include "settings_func.h"
  #include "widgets/dropdown_type.h"
-@@ -45,7 +46,7 @@
+@@ -44,7 +45,7 @@
  }
  
  
@@ -57,7 +57,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  {
  	char buff[256];
  
-@@ -67,8 +68,8 @@
+@@ -66,8 +67,8 @@
  
  	/* Draw filename or not if it is not known (GRF sent over internet) */
  	if (c->filename != NULL) {
@@ -68,7 +68,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  	}
  
  	/* Prepare and draw GRF ID */
-@@ -112,169 +113,6 @@
+@@ -111,169 +112,6 @@
  	}
  }
  
@@ -238,7 +238,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  static GRFPresetList _grf_preset_list;
  
  class DropDownListPresetItem : public DropDownListItem {
-@@ -320,22 +158,60 @@
+@@ -319,22 +157,60 @@
  };
  
  /**
@@ -310,7 +310,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  		this->list        = NULL;
  		this->orig_list   = config;
  		this->editable    = editable;
-@@ -350,6 +226,7 @@
+@@ -349,6 +225,7 @@
  		this->SetupNewGRFWindow();
  	}
  
@@ -318,7 +318,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  	~NewGRFWindow()
  	{
  		if (this->editable && !this->execute) {
-@@ -363,28 +240,14 @@
+@@ -362,28 +239,14 @@
  		_grf_preset_list.Clear();
  	}
  
@@ -351,7 +351,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  
  		this->SetWidgetsDisabledState(disable_all,
  			SNGRFS_REMOVE,
-@@ -392,14 +255,24 @@
+@@ -391,14 +254,24 @@
  			SNGRFS_MOVE_DOWN,
  			WIDGET_LIST_END
  		);
@@ -379,7 +379,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  		}
  
  		if (this->preset == -1) {
-@@ -427,12 +300,32 @@
+@@ -426,12 +299,32 @@
  
  		this->DrawWidgets();
  
@@ -417,7 +417,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  				SpriteID pal;
  				byte txtoffset;
  
-@@ -459,19 +352,104 @@
+@@ -458,19 +351,104 @@
  					}
  				}
  
@@ -528,7 +528,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  	}
  
  	virtual void OnClick(Point pt, int widget)
-@@ -507,30 +485,97 @@
+@@ -506,30 +484,97 @@
  				this->SetDirty();
  				break;
  
@@ -633,7 +633,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  				this->preset = -1;
  				this->SetupNewGRFWindow();
  				this->SetDirty();
-@@ -539,13 +584,13 @@
+@@ -538,13 +583,13 @@
  
  			case SNGRFS_MOVE_UP: { // Move GRF up
  				GRFConfig **pc, *c;
@@ -652,7 +652,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  						break;
  					}
  				}
-@@ -556,10 +601,10 @@
+@@ -555,10 +600,10 @@
  
  			case SNGRFS_MOVE_DOWN: { // Move GRF down
  				GRFConfig **pc, *c;
@@ -665,7 +665,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  						*pc = c->next;
  						c->next = c->next->next;
  						(*pc)->next = c;
-@@ -573,11 +618,15 @@
+@@ -572,11 +617,15 @@
  
  			case SNGRFS_FILE_LIST: { // Select a GRF
  				GRFConfig *c;
@@ -684,7 +684,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  				this->SetDirty();
  				break;
  			}
-@@ -598,29 +647,29 @@
+@@ -597,29 +646,29 @@
  				break;
  
  			case SNGRFS_SET_PARAMETERS: { // Edit parameters
@@ -721,7 +721,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  					ContentVector cv;
  					for (const GRFConfig *c = this->list; c != NULL; c = c->next) {
  						if (c->status != GCS_NOT_FOUND && !HasBit(c->flags, GCF_COMPATIBLE)) continue;
-@@ -638,7 +687,9 @@
+@@ -637,7 +686,9 @@
  #endif
  				}
  				break;
@@ -732,7 +732,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  		}
  	}
  
-@@ -651,14 +702,14 @@
+@@ -650,14 +701,14 @@
  			GRFConfig *c = LoadGRFPresetFromConfig(_grf_preset_list[index]);
  
  			if (c != NULL) {
@@ -749,7 +749,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  		this->SetupNewGRFWindow();
  		this->SetDirty();
  	}
-@@ -685,7 +736,7 @@
+@@ -684,7 +735,7 @@
  
  			case SNGRFS_SET_PARAMETERS: {
  				/* Parse our new "int list" */
@@ -758,7 +758,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  				c->num_params = parse_intlist(str, (int*)c->param, lengthof(c->param));
  
  				/* parse_intlist returns -1 on error */
-@@ -700,118 +751,123 @@
+@@ -699,118 +750,123 @@
  
  	virtual void OnResize(Point delta)
  	{
@@ -837,7 +837,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  		}
  
 -		this->vscroll.cap += delta.y / 14;
--		this->widget[SNGRFS_FILE_LIST].data = (this->vscroll.cap << 8) + 1;
+-		this->widget[SNGRFS_FILE_LIST].data = (this->vscroll.cap << MAT_ROW_START) + (1 << MAT_COL_START);
 +		w[SNGRFS_EMPTY_GRF_LIST].bottom =
 +		w[SNGRFS_AVAILABLE_GRF_LIST].bottom =
 +		w[SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR].bottom =
@@ -979,7 +979,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  /** Callback function for the newgrf 'apply changes' confirmation window
   * @param w Window which is calling this callback
   * @param confirmed boolean value, true when yes was clicked, false otherwise
-@@ -823,23 +879,64 @@
+@@ -822,23 +878,64 @@
  		GRFConfig *c;
  		int i = 0;
  
@@ -1050,7 +1050,7 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  
  /** Setup the NewGRF gui
   * @param editable allow the user to make changes to the grfconfig in the window
-@@ -850,5 +947,7 @@
+@@ -849,5 +946,7 @@
  void ShowNewGRFSettings(bool editable, bool show_params, bool exec_changes, GRFConfig **config)
  {
  	DeleteWindowByClass(WC_GAME_OPTIONS);
@@ -1058,10 +1058,10 @@ diff -r edb9bd2f68be src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r edb9bd2f68be src/window.cpp
---- src/window.cpp	Fri May 15 07:40:35 2009 +0200
-+++ src/window.cpp	Fri May 15 07:40:57 2009 +0200
-@@ -1285,7 +1285,6 @@
+diff -r e6a4b4208035 src/window.cpp
+--- src/window.cpp	Fri Jul 17 22:00:13 2009 +0000
++++ src/window.cpp	Sat Jul 18 10:08:14 2009 +0200
+@@ -1417,7 +1417,6 @@
  static bool HandleDragDrop()
  {
  	if (_special_mouse_mode != WSM_DRAGDROP) return true;
@@ -1069,7 +1069,7 @@ diff -r edb9bd2f68be src/window.cpp
  
  	Window *w = GetCallbackWnd();
  
-@@ -1294,7 +1293,13 @@
+@@ -1426,7 +1425,13 @@
  		Point pt;
  		pt.x = _cursor.pos.x - w->left;
  		pt.y = _cursor.pos.y - w->top;
@@ -1084,10 +1084,10 @@ diff -r edb9bd2f68be src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r edb9bd2f68be src/window_gui.h
---- src/window_gui.h	Fri May 15 07:40:35 2009 +0200
-+++ src/window_gui.h	Fri May 15 07:40:57 2009 +0200
-@@ -455,6 +455,13 @@
+diff -r e6a4b4208035 src/window_gui.h
+--- src/window_gui.h	Fri Jul 17 22:00:13 2009 +0000
++++ src/window_gui.h	Sat Jul 18 10:08:14 2009 +0200
+@@ -590,6 +590,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  
  	/**

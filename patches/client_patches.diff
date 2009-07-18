@@ -1,27 +1,15 @@
-diff -r 2d5f6a926f01 -r 3fa103f43d92 config.lib
---- config.lib	Mon Jun 22 17:28:50 2009 +0000
-+++ config.lib	Mon Jun 22 20:59:06 2009 +0200
-@@ -1645,7 +1645,7 @@
- check_osx_sdk() {
- cat > tmp.osx.cpp << EOF
- #include <AvailabilityMacros.h>
--#if !defined(MAC_OS_X_VERSION_10_5)
-+#if !defined(MAC_OS_X_VERSION_10_4)
- # error "Need newer SDK"
- #endif
- int main() {
-diff -r 2d5f6a926f01 -r 3fa103f43d92 findversion.sh
---- findversion.sh	Mon Jun 22 17:28:50 2009 +0000
-+++ findversion.sh	Mon Jun 22 20:59:06 2009 +0200
+diff -r e6a4b4208035 -r 0e3235d78376 findversion.sh
+--- findversion.sh	Fri Jul 17 22:00:13 2009 +0000
++++ findversion.sh	Sat Jul 18 10:08:25 2009 +0200
 @@ -115,4 +115,4 @@
  	REV="${REV}-$BRANCH"
  fi
  
 -echo "$REV	$REV_NR	$MODIFIED	$CLEAN_REV"
 +echo "r$REV_NR	$REV_NR	$MODIFIED	$CLEAN_REV"
-diff -r 2d5f6a926f01 -r 3fa103f43d92 src/lang/english.txt
---- src/lang/english.txt	Mon Jun 22 17:28:50 2009 +0000
-+++ src/lang/english.txt	Mon Jun 22 20:59:06 2009 +0200
+diff -r e6a4b4208035 -r 0e3235d78376 src/lang/english.txt
+--- src/lang/english.txt	Fri Jul 17 22:00:13 2009 +0000
++++ src/lang/english.txt	Sat Jul 18 10:08:25 2009 +0200
 @@ -1095,6 +1095,7 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
@@ -30,7 +18,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/lang/english.txt
  
  STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
  STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
-@@ -3091,6 +3092,7 @@
+@@ -3092,6 +3093,7 @@
  STR_NEWGRF_TOGGLE_PALETTE_TIP                                   :{BLACK}Toggle the palette of the selected NewGRF.{}Do this when the graphics from this NewGRF look pink in-game
  STR_NEWGRF_SET_PARAMETERS                                       :{BLACK}Set parameters
  STR_NEWGRF_FILENAME                                             :{BLACK}Filename: {SILVER}{RAW_STRING}
@@ -38,7 +26,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/lang/english.txt
  STR_NEWGRF_PALETTE                                              :{BLACK}Palette: {SILVER}{RAW_STRING}
  STR_NEWGRF_GRF_ID                                               :{BLACK}GRF ID: {SILVER}{RAW_STRING}
  STR_NEWGRF_MD5SUM                                               :{BLACK}MD5sum: {SILVER}{RAW_STRING}
-@@ -3126,19 +3128,23 @@
+@@ -3127,19 +3129,23 @@
  STR_NEWGRF_ADD_TIP                                              :{BLACK}Add a NewGRF file to the list
  STR_NEWGRF_REMOVE                                               :{BLACK}Remove
  STR_NEWGRF_REMOVE_TIP                                           :{BLACK}Remove the selected NewGRF file from the list
@@ -66,9 +54,9 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/lang/english.txt
  STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
  STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
  
-diff -r 2d5f6a926f01 -r 3fa103f43d92 src/main_gui.cpp
---- src/main_gui.cpp	Mon Jun 22 17:28:50 2009 +0000
-+++ src/main_gui.cpp	Mon Jun 22 20:59:06 2009 +0200
+diff -r e6a4b4208035 -r 0e3235d78376 src/main_gui.cpp
+--- src/main_gui.cpp	Fri Jul 17 22:00:13 2009 +0000
++++ src/main_gui.cpp	Sat Jul 18 10:08:25 2009 +0200
 @@ -26,6 +26,7 @@
  #include "toolbar_gui.h"
  #include "statusbar_gui.h"
@@ -88,9 +76,9 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/main_gui.cpp
  
  #ifdef ENABLE_NETWORK
  			case WKC_RETURN: case 'T': // smart chat; send to team if any, otherwise to all
-diff -r 2d5f6a926f01 -r 3fa103f43d92 src/newgrf_gui.cpp
---- src/newgrf_gui.cpp	Mon Jun 22 17:28:50 2009 +0000
-+++ src/newgrf_gui.cpp	Mon Jun 22 20:59:06 2009 +0200
+diff -r e6a4b4208035 -r 0e3235d78376 src/newgrf_gui.cpp
+--- src/newgrf_gui.cpp	Fri Jul 17 22:00:13 2009 +0000
++++ src/newgrf_gui.cpp	Sat Jul 18 10:08:25 2009 +0200
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -888,7 +876,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/newgrf_gui.cpp
  		}
  
 -		this->vscroll.cap += delta.y / 14;
--		this->widget[SNGRFS_FILE_LIST].data = (this->vscroll.cap << 8) + 1;
+-		this->widget[SNGRFS_FILE_LIST].data = (this->vscroll.cap << MAT_ROW_START) + (1 << MAT_COL_START);
 +		w[SNGRFS_EMPTY_GRF_LIST].bottom =
 +		w[SNGRFS_AVAILABLE_GRF_LIST].bottom =
 +		w[SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR].bottom =
@@ -1109,9 +1097,9 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
---- src/rail_gui.cpp	Mon Jun 22 17:28:50 2009 +0000
-+++ src/rail_gui.cpp	Mon Jun 22 20:59:06 2009 +0200
+diff -r e6a4b4208035 -r 0e3235d78376 src/rail_gui.cpp
+--- src/rail_gui.cpp	Fri Jul 17 22:00:13 2009 +0000
++++ src/rail_gui.cpp	Sat Jul 18 10:08:25 2009 +0200
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -1148,7 +1136,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
  };
  static RailStationGUISettings _railstation; ///< Settings of the station builder GUI
  
-@@ -932,7 +947,15 @@
+@@ -929,7 +944,15 @@
  
  	BRSW_NEWST_DROPDOWN,
  	BRSW_NEWST_LIST,
@@ -1165,7 +1153,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
  };
  
  struct BuildRailStationWindow : public PickerWindowBase {
-@@ -997,21 +1020,54 @@
+@@ -989,21 +1012,54 @@
  		this->SetWidgetLoweredState(BRSW_HIGHLIGHT_OFF, !_settings_client.gui.station_show_coverage);
  		this->SetWidgetLoweredState(BRSW_HIGHLIGHT_ON, _settings_client.gui.station_show_coverage);
  
@@ -1230,7 +1218,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
  		}
  	}
  
-@@ -1023,6 +1079,7 @@
+@@ -1015,6 +1071,7 @@
  	virtual void OnPaint()
  	{
  		bool newstations = _railstation.newstations;
@@ -1238,7 +1226,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
  		DrawPixelInfo tmp_dpi, *old_dpi;
  		const StationSpec *statspec = newstations ? GetCustomStationSpec(_railstation.station_class, _railstation.station_type) : NULL;
  
-@@ -1055,7 +1112,9 @@
+@@ -1047,7 +1104,9 @@
  		SetDParam(0, GetStationClassName(_railstation.station_class));
  		this->DrawWidgets();
  
@@ -1249,18 +1237,16 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
  
  		/* Set up a clipping area for the '/' station preview */
  		if (FillDrawPixelInfo(&tmp_dpi, 7, 26 + y_offset, 66, 48)) {
-@@ -1083,8 +1142,8 @@
- 		DrawString(this->widget[BRSW_PLATFORM_LEN_1].left, this->widget[BRSW_PLATFORM_LEN_7].right, 141 + y_offset, STR_STATION_BUILD_COVERAGE_AREA_TITLE, TC_FROMSTRING, SA_CENTER);
- 
- 		int text_end = DrawStationCoverageAreaText(2, 166 + y_offset, SCT_ALL, rad, false);
--		text_end = DrawStationCoverageAreaText(2, text_end + 4, SCT_ALL, rad, true) + 4;
--		if (text_end != this->widget[BRSW_BACKGROUND].bottom) {
-+		    text_end = DrawStationCoverageAreaText(2, text_end + 2, SCT_ALL, rad, true) + 4;
-+		if (text_end != this->widget[BRSW_BACKGROUND].bottom && !imp_newstations) {
+@@ -1078,7 +1137,7 @@
+ 		int top = 166 + y_offset;
+ 		top = DrawStationCoverageAreaText(this->widget[BRSW_BACKGROUND].left + WD_FRAMERECT_LEFT, this->widget[BRSW_BACKGROUND].right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, false) + WD_PAR_VSEP_NORMAL;
+ 		top = DrawStationCoverageAreaText(this->widget[BRSW_BACKGROUND].left + WD_FRAMERECT_LEFT, this->widget[BRSW_BACKGROUND].right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, true) + WD_PAR_VSEP_NORMAL;
+-		if (top != this->widget[BRSW_BACKGROUND].bottom) {
++		if (top != this->widget[BRSW_BACKGROUND].bottom & !imp_newstations) {
  			this->SetDirty();
- 			ResizeWindowForWidget(this, BRSW_BACKGROUND, 0, text_end - this->widget[BRSW_BACKGROUND].bottom);
+ 			ResizeWindowForWidget(this, BRSW_BACKGROUND, 0, top - this->widget[BRSW_BACKGROUND].bottom);
  			this->SetDirty();
-@@ -1093,20 +1152,61 @@
+@@ -1087,20 +1146,61 @@
  		if (newstations) {
  			uint y = 35;
  
@@ -1331,7 +1317,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
  			}
  		}
  	}
-@@ -1264,6 +1364,81 @@
+@@ -1258,6 +1358,81 @@
  				DeleteWindowById(WC_SELECT_STATION, 0);
  				break;
  			}
@@ -1413,7 +1399,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
  		}
  	}
  
-@@ -1289,6 +1464,27 @@
+@@ -1283,6 +1458,27 @@
  	{
  		CheckRedrawStationCoverage(this);
  	}
@@ -1441,7 +1427,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
  };
  
  /** Widget definition of the standard build rail station window */
-@@ -1462,6 +1658,51 @@
+@@ -1456,6 +1652,51 @@
  	EndContainer(),
  };
  
@@ -1493,7 +1479,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
  /** High level window description of the default station-build window */
  static const WindowDesc _station_builder_desc(
  	WDP_AUTO, WDP_AUTO, 148, 200, 148, 200,
-@@ -1478,13 +1719,24 @@
+@@ -1472,13 +1713,24 @@
  	_newstation_builder_widgets, _nested_newstation_builder_widgets, lengthof(_nested_newstation_builder_widgets)
  );
  
@@ -1519,10 +1505,10 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/rail_gui.cpp
  	}
  }
  
-diff -r 2d5f6a926f01 -r 3fa103f43d92 src/settings_gui.cpp
---- src/settings_gui.cpp	Mon Jun 22 17:28:50 2009 +0000
-+++ src/settings_gui.cpp	Mon Jun 22 20:59:06 2009 +0200
-@@ -1181,6 +1181,7 @@
+diff -r e6a4b4208035 -r 0e3235d78376 src/settings_gui.cpp
+--- src/settings_gui.cpp	Fri Jul 17 22:00:13 2009 +0000
++++ src/settings_gui.cpp	Sat Jul 18 10:08:25 2009 +0200
+@@ -1182,6 +1182,7 @@
  	SettingEntry("gui.always_build_infrastructure"),
  	SettingEntry("gui.persistent_buildingtools"),
  	SettingEntry("gui.coloured_news_year"),
@@ -1530,9 +1516,9 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r 2d5f6a926f01 -r 3fa103f43d92 src/settings_type.h
---- src/settings_type.h	Mon Jun 22 17:28:50 2009 +0000
-+++ src/settings_type.h	Mon Jun 22 20:59:06 2009 +0200
+diff -r e6a4b4208035 -r 0e3235d78376 src/settings_type.h
+--- src/settings_type.h	Fri Jul 17 22:00:13 2009 +0000
++++ src/settings_type.h	Sat Jul 18 10:08:25 2009 +0200
 @@ -88,6 +88,7 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
@@ -1541,10 +1527,10 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/settings_type.h
  
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
-diff -r 2d5f6a926f01 -r 3fa103f43d92 src/table/settings.h
---- src/table/settings.h	Mon Jun 22 17:28:50 2009 +0000
-+++ src/table/settings.h	Mon Jun 22 20:59:06 2009 +0200
-@@ -563,6 +563,7 @@
+diff -r e6a4b4208035 -r 0e3235d78376 src/table/settings.h
+--- src/table/settings.h	Fri Jul 17 22:00:13 2009 +0000
++++ src/table/settings.h	Sat Jul 18 10:08:25 2009 +0200
+@@ -564,6 +564,7 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
  	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
@@ -1552,10 +1538,10 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/table/settings.h
  
  	  SDTC_VAR(gui.console_backlog_timeout,  SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
  	  SDTC_VAR(gui.console_backlog_length,   SLE_UINT16, S,  0,   100,       10,    65500, 0, STR_NULL,                                       NULL),
-diff -r 2d5f6a926f01 -r 3fa103f43d92 src/window.cpp
---- src/window.cpp	Mon Jun 22 17:28:50 2009 +0000
-+++ src/window.cpp	Mon Jun 22 20:59:06 2009 +0200
-@@ -1359,7 +1359,6 @@
+diff -r e6a4b4208035 -r 0e3235d78376 src/window.cpp
+--- src/window.cpp	Fri Jul 17 22:00:13 2009 +0000
++++ src/window.cpp	Sat Jul 18 10:08:25 2009 +0200
+@@ -1417,7 +1417,6 @@
  static bool HandleDragDrop()
  {
  	if (_special_mouse_mode != WSM_DRAGDROP) return true;
@@ -1563,7 +1549,7 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/window.cpp
  
  	Window *w = GetCallbackWnd();
  
-@@ -1368,7 +1367,13 @@
+@@ -1426,7 +1425,13 @@
  		Point pt;
  		pt.x = _cursor.pos.x - w->left;
  		pt.y = _cursor.pos.y - w->top;
@@ -1578,10 +1564,10 @@ diff -r 2d5f6a926f01 -r 3fa103f43d92 src/window.cpp
  	}
  
  	ResetObjectToPlace();
-diff -r 2d5f6a926f01 -r 3fa103f43d92 src/window_gui.h
---- src/window_gui.h	Mon Jun 22 17:28:50 2009 +0000
-+++ src/window_gui.h	Mon Jun 22 20:59:06 2009 +0200
-@@ -493,6 +493,13 @@
+diff -r e6a4b4208035 -r 0e3235d78376 src/window_gui.h
+--- src/window_gui.h	Fri Jul 17 22:00:13 2009 +0000
++++ src/window_gui.h	Sat Jul 18 10:08:25 2009 +0200
+@@ -590,6 +590,13 @@
  	virtual void OnDragDrop(Point pt, int widget) {}
  
  	/**

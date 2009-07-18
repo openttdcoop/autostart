@@ -1,6 +1,6 @@
-diff -r db22e12eb36f src/lang/english.txt
---- src/lang/english.txt	Thu May 21 19:42:33 2009 +0200
-+++ src/lang/english.txt	Fri May 22 07:52:06 2009 +0200
+diff -r 13381476116d src/lang/english.txt
+--- src/lang/english.txt	Sat Jul 18 09:34:50 2009 +0200
++++ src/lang/english.txt	Sat Jul 18 09:50:06 2009 +0200
 @@ -1095,6 +1095,7 @@
  STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
  STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
@@ -9,9 +9,9 @@ diff -r db22e12eb36f src/lang/english.txt
  
  STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
  STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
-diff -r db22e12eb36f src/rail_gui.cpp
---- src/rail_gui.cpp	Thu May 21 19:42:33 2009 +0200
-+++ src/rail_gui.cpp	Fri May 22 07:52:06 2009 +0200
+diff -r 13381476116d src/rail_gui.cpp
+--- src/rail_gui.cpp	Sat Jul 18 09:34:50 2009 +0200
++++ src/rail_gui.cpp	Sat Jul 18 09:50:06 2009 +0200
 @@ -30,6 +30,10 @@
  #include "table/sprites.h"
  #include "table/strings.h"
@@ -48,7 +48,7 @@ diff -r db22e12eb36f src/rail_gui.cpp
  };
  static RailStationGUISettings _railstation; ///< Settings of the station builder GUI
  
-@@ -932,7 +947,15 @@
+@@ -929,7 +944,15 @@
  
  	BRSW_NEWST_DROPDOWN,
  	BRSW_NEWST_LIST,
@@ -65,7 +65,7 @@ diff -r db22e12eb36f src/rail_gui.cpp
  };
  
  struct BuildRailStationWindow : public PickerWindowBase {
-@@ -997,21 +1020,54 @@
+@@ -989,21 +1012,54 @@
  		this->SetWidgetLoweredState(BRSW_HIGHLIGHT_OFF, !_settings_client.gui.station_show_coverage);
  		this->SetWidgetLoweredState(BRSW_HIGHLIGHT_ON, _settings_client.gui.station_show_coverage);
  
@@ -130,7 +130,7 @@ diff -r db22e12eb36f src/rail_gui.cpp
  		}
  	}
  
-@@ -1023,6 +1079,7 @@
+@@ -1015,6 +1071,7 @@
  	virtual void OnPaint()
  	{
  		bool newstations = _railstation.newstations;
@@ -138,7 +138,7 @@ diff -r db22e12eb36f src/rail_gui.cpp
  		DrawPixelInfo tmp_dpi, *old_dpi;
  		const StationSpec *statspec = newstations ? GetCustomStationSpec(_railstation.station_class, _railstation.station_type) : NULL;
  
-@@ -1055,7 +1112,9 @@
+@@ -1047,7 +1104,9 @@
  		SetDParam(0, GetStationClassName(_railstation.station_class));
  		this->DrawWidgets();
  
@@ -149,18 +149,16 @@ diff -r db22e12eb36f src/rail_gui.cpp
  
  		/* Set up a clipping area for the '/' station preview */
  		if (FillDrawPixelInfo(&tmp_dpi, 7, 26 + y_offset, 66, 48)) {
-@@ -1083,8 +1142,8 @@
- 		DrawString(this->widget[BRSW_PLATFORM_LEN_1].left, this->widget[BRSW_PLATFORM_LEN_7].right, 141 + y_offset, STR_STATION_BUILD_COVERAGE_AREA_TITLE, TC_FROMSTRING, SA_CENTER);
- 
- 		int text_end = DrawStationCoverageAreaText(2, 166 + y_offset, SCT_ALL, rad, false);
--		text_end = DrawStationCoverageAreaText(2, text_end + 4, SCT_ALL, rad, true) + 4;
--		if (text_end != this->widget[BRSW_BACKGROUND].bottom) {
-+		    text_end = DrawStationCoverageAreaText(2, text_end + 2, SCT_ALL, rad, true) + 4;
-+		if (text_end != this->widget[BRSW_BACKGROUND].bottom && !imp_newstations) {
+@@ -1078,7 +1137,7 @@
+ 		int top = 166 + y_offset;
+ 		top = DrawStationCoverageAreaText(this->widget[BRSW_BACKGROUND].left + WD_FRAMERECT_LEFT, this->widget[BRSW_BACKGROUND].right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, false) + WD_PAR_VSEP_NORMAL;
+ 		top = DrawStationCoverageAreaText(this->widget[BRSW_BACKGROUND].left + WD_FRAMERECT_LEFT, this->widget[BRSW_BACKGROUND].right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, true) + WD_PAR_VSEP_NORMAL;
+-		if (top != this->widget[BRSW_BACKGROUND].bottom) {
++		if (top != this->widget[BRSW_BACKGROUND].bottom & !imp_newstations) {
  			this->SetDirty();
- 			ResizeWindowForWidget(this, BRSW_BACKGROUND, 0, text_end - this->widget[BRSW_BACKGROUND].bottom);
+ 			ResizeWindowForWidget(this, BRSW_BACKGROUND, 0, top - this->widget[BRSW_BACKGROUND].bottom);
  			this->SetDirty();
-@@ -1093,20 +1152,61 @@
+@@ -1087,20 +1146,61 @@
  		if (newstations) {
  			uint y = 35;
  
@@ -231,7 +229,7 @@ diff -r db22e12eb36f src/rail_gui.cpp
  			}
  		}
  	}
-@@ -1264,6 +1364,81 @@
+@@ -1258,6 +1358,81 @@
  				DeleteWindowById(WC_SELECT_STATION, 0);
  				break;
  			}
@@ -313,7 +311,7 @@ diff -r db22e12eb36f src/rail_gui.cpp
  		}
  	}
  
-@@ -1289,6 +1464,27 @@
+@@ -1283,6 +1458,27 @@
  	{
  		CheckRedrawStationCoverage(this);
  	}
@@ -341,7 +339,7 @@ diff -r db22e12eb36f src/rail_gui.cpp
  };
  
  /** Widget definition of the standard build rail station window */
-@@ -1462,6 +1658,51 @@
+@@ -1456,6 +1652,51 @@
  	EndContainer(),
  };
  
@@ -393,7 +391,7 @@ diff -r db22e12eb36f src/rail_gui.cpp
  /** High level window description of the default station-build window */
  static const WindowDesc _station_builder_desc(
  	WDP_AUTO, WDP_AUTO, 148, 200, 148, 200,
-@@ -1478,13 +1719,24 @@
+@@ -1472,13 +1713,24 @@
  	_newstation_builder_widgets, _nested_newstation_builder_widgets, lengthof(_nested_newstation_builder_widgets)
  );
  
@@ -419,10 +417,10 @@ diff -r db22e12eb36f src/rail_gui.cpp
  	}
  }
  
-diff -r db22e12eb36f src/settings_gui.cpp
---- src/settings_gui.cpp	Thu May 21 19:42:33 2009 +0200
-+++ src/settings_gui.cpp	Fri May 22 07:52:06 2009 +0200
-@@ -1166,6 +1166,7 @@
+diff -r 13381476116d src/settings_gui.cpp
+--- src/settings_gui.cpp	Sat Jul 18 09:34:50 2009 +0200
++++ src/settings_gui.cpp	Sat Jul 18 09:50:06 2009 +0200
+@@ -1182,6 +1182,7 @@
  	SettingEntry("gui.always_build_infrastructure"),
  	SettingEntry("gui.persistent_buildingtools"),
  	SettingEntry("gui.coloured_news_year"),
@@ -430,9 +428,9 @@ diff -r db22e12eb36f src/settings_gui.cpp
  };
  /** Interface subpage */
  static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
-diff -r db22e12eb36f src/settings_type.h
---- src/settings_type.h	Thu May 21 19:42:33 2009 +0200
-+++ src/settings_type.h	Fri May 22 07:52:06 2009 +0200
+diff -r 13381476116d src/settings_type.h
+--- src/settings_type.h	Sat Jul 18 09:34:50 2009 +0200
++++ src/settings_type.h	Sat Jul 18 09:50:06 2009 +0200
 @@ -88,6 +88,7 @@
  	bool   station_show_coverage;            ///< whether to highlight coverage area
  	bool   persistent_buildingtools;         ///< keep the building tools active after usage
@@ -441,10 +439,10 @@ diff -r db22e12eb36f src/settings_type.h
  
  	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
  	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
-diff -r db22e12eb36f src/table/settings.h
---- src/table/settings.h	Thu May 21 19:42:33 2009 +0200
-+++ src/table/settings.h	Fri May 22 07:52:06 2009 +0200
-@@ -568,6 +568,7 @@
+diff -r 13381476116d src/table/settings.h
+--- src/table/settings.h	Sat Jul 18 09:34:50 2009 +0200
++++ src/table/settings.h	Sat Jul 18 09:50:06 2009 +0200
+@@ -564,6 +564,7 @@
  	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
  	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0, false,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
  	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
