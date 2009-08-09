@@ -53,7 +53,7 @@ OS="linux-i686"
 TYPE="nightly"
 # which patches do you like to apply, relative to ./patches/
 # needs TYPE="svn"
-CPATCH="pw_argumensts.diff"
+CPATCH=""
 # Additional arguments for starting command (example="-d 1")
 ADDARGS=""
 # Additional arguments for make (example "-j 6")
