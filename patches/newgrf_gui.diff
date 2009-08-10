@@ -1,45 +1,48 @@
-diff -r e6a4b4208035 src/lang/english.txt
---- src/lang/english.txt	Fri Jul 17 22:00:13 2009 +0000
-+++ src/lang/english.txt	Sat Jul 18 10:08:14 2009 +0200
-@@ -3092,6 +3092,7 @@
- STR_NEWGRF_TOGGLE_PALETTE_TIP                                   :{BLACK}Toggle the palette of the selected NewGRF.{}Do this when the graphics from this NewGRF look pink in-game
- STR_NEWGRF_SET_PARAMETERS                                       :{BLACK}Set parameters
- STR_NEWGRF_FILENAME                                             :{BLACK}Filename: {SILVER}{RAW_STRING}
-+STR_NEWGRF_NAME                                                 :{BLACK}Name: {SILVER}{RAW_STRING}
- STR_NEWGRF_PALETTE                                              :{BLACK}Palette: {SILVER}{RAW_STRING}
- STR_NEWGRF_GRF_ID                                               :{BLACK}GRF ID: {SILVER}{RAW_STRING}
- STR_NEWGRF_MD5SUM                                               :{BLACK}MD5sum: {SILVER}{RAW_STRING}
-@@ -3127,19 +3128,23 @@
- STR_NEWGRF_ADD_TIP                                              :{BLACK}Add a NewGRF file to the list
- STR_NEWGRF_REMOVE                                               :{BLACK}Remove
- STR_NEWGRF_REMOVE_TIP                                           :{BLACK}Remove the selected NewGRF file from the list
--STR_NEWGRF_MOVEUP                                               :{BLACK}Move Up
-+STR_NEWGRF_JOINT_ADD                                            :{BLACK}>>
-+STR_NEWGRF_JOINT_REMOVE                                         :{BLACK}<<
-+STR_NEWGRF_TOGGLE_SHOW                                          :{BLACK}Disp. Mode
-+STR_NEWGRF_TOGGLE_SHOW_TIP                                      :{BLACK}Toggles filtering of already selected grfs in the left list. Ctrl-click toggles show file names in stead of grf names.
- STR_NEWGRF_MOVEUP_TIP                                           :{BLACK}Move the selected NewGRF file up the list
--STR_NEWGRF_MOVEDOWN                                             :{BLACK}Move Down
-+STR_NEWGRF_MOVEUP                                               :{BLACK}Up
-+STR_NEWGRF_MOVEDOWN                                             :{BLACK}Down
- STR_NEWGRF_MOVEDOWN_TIP                                         :{BLACK}Move the selected NewGRF file down the list
- STR_NEWGRF_FILE_TIP                                             :{BLACK}A list of the NewGRF files that are installed. Click a file to change its parameters
- STR_NEWGRF_PARAMETER                                            :{BLACK}Parameters: {SILVER}{STRING1}
- STR_NEWGRF_PARAMETER_QUERY                                      :{BLACK}Enter NewGRF parameters
- STR_NEWGRF_NO_INFO                                              :{BLACK}No information available
- 
+Index: src/lang/english.txt
+===================================================================
+--- src/lang/english.txt	(revisi¢n: 17143)
++++ src/lang/english.txt	(copia de trabajo)
+@@ -2256,9 +2256,13 @@
+ STR_NEWGRF_SETTINGS_ADD_TOOLTIP                                 :{BLACK}Add a NewGRF file to the list
+ STR_NEWGRF_SETTINGS_REMOVE                                      :{BLACK}Remove
+ STR_NEWGRF_SETTINGS_REMOVE_TOOLTIP                              :{BLACK}Remove the selected NewGRF file from the list
+-STR_NEWGRF_SETTINGS_MOVEUP                                      :{BLACK}Move Up
++STR_NEWGRF_SETTINGS_JOINT_ADD                                   :{BLACK}>>
++STR_NEWGRF_SETTINGS_JOINT_REMOVE                                :{BLACK}<<
++STR_NEWGRF_SETTINGS_TOGGLE_SHOW                                 :{BLACK}Disp. Mode
++STR_NEWGRF_SETTINGS_TOGGLE_SHOW_TIP                             :{BLACK}Toggles filtering of already selected grfs in the left list. Ctrl-click toggles show file names in stead of grf names.
++STR_NEWGRF_SETTINGS_MOVEUP                                      :{BLACK}Up
+ STR_NEWGRF_SETTINGS_MOVEUP_TOOLTIP                              :{BLACK}Move the selected NewGRF file up the list
+-STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Move Down
++STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Down
+ STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Move the selected NewGRF file down the list
+ STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}A list of the NewGRF files that are installed. Click a file to change its parameters
+
+@@ -2271,6 +2275,7 @@
+ STR_NEWGRF_SETTINGS_FIND_MISSING_CONTENT_TOOLTIP                :{BLACK}Check whether the missing content can be found online
+
+ STR_NEWGRF_SETTINGS_FILENAME                                    :{BLACK}Filename: {SILVER}{RAW_STRING}
++STR_NEWGRF_SETTINGS_NAME                                        :{BLACK}Name: {SILVER}{RAW_STRING}
+ STR_NEWGRF_SETTINGS_GRF_ID                                      :{BLACK}GRF ID: {SILVER}{RAW_STRING}
+ STR_NEWGRF_SETTINGS_MD5SUM                                      :{BLACK}MD5sum: {SILVER}{RAW_STRING}
+ STR_NEWGRF_SETTINGS_PALETTE                                     :{BLACK}Palette: {SILVER}{RAW_STRING}
+@@ -2283,10 +2288,10 @@
+ STR_NEWGRF_SETTINGS_PARAMETER_QUERY                             :{BLACK}Enter NewGRF parameters
+
+ # NewGRF add window
 -STR_NEWGRF_ADD_CAPTION                                          :{WHITE}Available NewGRF files
 +STR_NEWGRF_ADD_CAPTION                                          :{WHITE}Available NewGRFs
  STR_NEWGRF_ADD_FILE                                             :{BLACK}Add to selection
- STR_NEWGRF_ADD_FILE_TIP                                         :{BLACK}Add the selected NewGRF file to your configuration
--STR_NEWGRF_RESCAN_FILES                                         :{BLACK}Rescan files
-+STR_NEWGRF_RESCAN_FILES                                         :{BLACK}Rescan
- STR_NEWGRF_RESCAN_FILES_TIP                                     :{BLACK}Update the list of available NewGRF files
- STR_NEWGRF_DUPLICATE_GRFID                                      :{WHITE}Can't add file: duplicate GRF ID
- 
-diff -r e6a4b4208035 src/newgrf_gui.cpp
---- src/newgrf_gui.cpp	Fri Jul 17 22:00:13 2009 +0000
-+++ src/newgrf_gui.cpp	Sat Jul 18 10:08:14 2009 +0200
+ STR_NEWGRF_ADD_FILE_TOOLTIP                                     :{BLACK}Add the selected NewGRF file to your configuration
+-STR_NEWGRF_ADD_RESCAN_FILES                                     :{BLACK}Rescan files
++STR_NEWGRF_ADD_RESCAN_FILES                                     :{BLACK}Rescan
+ STR_NEWGRF_ADD_RESCAN_FILES_TOOLTIP                             :{BLACK}Update the list of available NewGRF files
+
+ # NewGRF (self) generated warnings/errors
+Index: src/newgrf_gui.cpp
+===================================================================
+--- src/newgrf_gui.cpp	(revisi¢n: 17143)
++++ src/newgrf_gui.cpp	(copia de trabajo)
 @@ -11,6 +11,7 @@
  #include "window_func.h"
  #include "string_func.h"
@@ -50,28 +53,28 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
  #include "widgets/dropdown_type.h"
 @@ -44,7 +45,7 @@
  }
- 
- 
+
+
 -static void ShowNewGRFInfo(const GRFConfig *c, uint x, uint y, uint w, uint bottom, bool show_params)
 +static void ShowNewGRFInfo(const GRFConfig *c, uint x, uint y, uint w, uint bottom, bool show_params, bool show_filenames)
  {
  	char buff[256];
- 
+
 @@ -66,8 +67,8 @@
- 
+
  	/* Draw filename or not if it is not known (GRF sent over internet) */
  	if (c->filename != NULL) {
 -		SetDParamStr(0, c->filename);
--		y = DrawStringMultiLine(x, x + w, y, bottom, STR_NEWGRF_FILENAME);
+-		y = DrawStringMultiLine(x, x + w, y, bottom, STR_NEWGRF_SETTINGS_FILENAME);
 +		SetDParamStr(0, (show_filenames) ? c->name : c->filename);
-+		y = DrawStringMultiLine(x, x + w, y, bottom, (show_filenames) ? STR_NEWGRF_NAME : STR_NEWGRF_FILENAME);
++		y = DrawStringMultiLine(x, x + w, y, bottom, (show_filenames) ? STR_NEWGRF_SETTINGS_NAME : STR_NEWGRF_SETTINGS_FILENAME);
  	}
- 
+
  	/* Prepare and draw GRF ID */
 @@ -111,169 +112,6 @@
  	}
  }
- 
+
 -
 -/** Names of the add a newgrf window widgets. */
 -enum AddNewGRFWindowWidgets {
@@ -202,9 +205,9 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 -{      WWT_INSET,      RESIZE_RB,  COLOUR_GREY,   2, 292,  16, 119, 0x0,                     STR_NULL },                             // ANGRFW_GRF_LIST
 -{  WWT_SCROLLBAR,     RESIZE_LRB,  COLOUR_GREY, 295, 306,  14, 121, 0x0,                     STR_TOOLTIP_VSCROLL_BAR_SCROLLS_LIST }, // ANGRFW_SCROLLBAR
 -{      WWT_PANEL,     RESIZE_RTB,  COLOUR_GREY,   0, 306, 122, 224, 0x0,                     STR_NULL },                             // ANGRFW_GRF_INFO
--{ WWT_PUSHTXTBTN,     RESIZE_RTB,  COLOUR_GREY,   0, 146, 225, 236, STR_NEWGRF_ADD_FILE,     STR_NEWGRF_ADD_FILE_TIP },              // ANGRFW_ADD
--{ WWT_PUSHTXTBTN,    RESIZE_LRTB,  COLOUR_GREY, 147, 294, 225, 236, STR_NEWGRF_RESCAN_FILES, STR_NEWGRF_RESCAN_FILES_TIP },          // ANGRFW_RESCAN
--{  WWT_RESIZEBOX,    RESIZE_LRTB,  COLOUR_GREY, 295, 306, 225, 236, 0x0,                     STR_RESIZE_BUTTON },                    // ANGRFW_RESIZE
+-{ WWT_PUSHTXTBTN,     RESIZE_RTB,  COLOUR_GREY,   0, 146, 225, 236, STR_NEWGRF_ADD_FILE,     STR_NEWGRF_ADD_FILE_TOOLTIP },              // ANGRFW_ADD
+-{ WWT_PUSHTXTBTN,    RESIZE_LRTB,  COLOUR_GREY, 147, 294, 225, 236, STR_NEWGRF_ADD_RESCAN_FILES, STR_NEWGRF_ADD_RESCAN_FILES_TOOLTIP },          // ANGRFW_RESCAN
+-{  WWT_RESIZEBOX,    RESIZE_LRTB,  COLOUR_GREY, 295, 306, 225, 236, 0x0,                     STR_TOOLTIP_RESIZE },                    // ANGRFW_RESIZE
 -{   WIDGETS_END },
 -};
 -
@@ -221,8 +224,8 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 -	EndContainer(),
 -	NWidget(WWT_PANEL, COLOUR_GREY, ANGRFW_GRF_INFO), SetResize(1, 0), SetMinimalSize(307, 103), EndContainer(),
 -	NWidget(NWID_HORIZONTAL),
--		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, ANGRFW_ADD), SetMinimalSize(147, 12), SetResize(1, 0), SetDataTip(STR_NEWGRF_ADD_FILE, STR_NEWGRF_ADD_FILE_TIP),
--		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, ANGRFW_RESCAN), SetMinimalSize(148, 12), SetDataTip(STR_NEWGRF_RESCAN_FILES, STR_NEWGRF_RESCAN_FILES_TIP),
+-		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, ANGRFW_ADD), SetMinimalSize(147, 12), SetResize(1, 0), SetDataTip(STR_NEWGRF_ADD_FILE, STR_NEWGRF_ADD_FILE_TOOLTIP),
+-		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, ANGRFW_RESCAN), SetMinimalSize(148, 12), SetDataTip(STR_NEWGRF_ADD_RESCAN_FILES, STR_NEWGRF_ADD_RESCAN_FILES_TOOLTIP),
 -		NWidget(WWT_RESIZEBOX, COLOUR_GREY, ANGRFW_RESIZE),
 -	EndContainer(),
 -};
@@ -236,14 +239,14 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 -);
 -
  static GRFPresetList _grf_preset_list;
- 
+
  class DropDownListPresetItem : public DropDownListItem {
 @@ -319,22 +157,60 @@
  };
- 
+
  /**
 - * Window for showing NewGRF files
-+ * Combined NewGrf Window 
++ * Combined NewGrf Window
   */
  struct NewGRFWindow : public Window {
 -	GRFConfig **orig_list; ///< grf list the window is shown with
@@ -254,7 +257,7 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 -	bool execute;          ///< on pressing 'apply changes' are grf changes applied immediately, or only list is updated
 -	int query_widget;      ///< widget that opened a query
 -	int preset;            ///< selected preset
-+
+
 +	/* Names of the window widgets */
 +	enum NewGRFListWindowWidgets {
 +		SNGRFS_CLOSE = 0,
@@ -296,7 +299,7 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +	bool show_file_names;
 +	int query_widget;        ///< widget that opened a query
 +	int preset;              ///< selected preset
- 
++
  	NewGRFWindow(const WindowDesc *desc, bool editable, bool show_params, bool exec_changes, GRFConfig **config) : Window(desc, 0)
  	{
 -		this->resize.step_height = 14;
@@ -313,28 +316,29 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 @@ -349,6 +225,7 @@
  		this->SetupNewGRFWindow();
  	}
- 
+
 +
  	~NewGRFWindow()
  	{
  		if (this->editable && !this->execute) {
-@@ -362,28 +239,14 @@
+@@ -362,43 +239,39 @@
  		_grf_preset_list.Clear();
  	}
- 
+
 -	void SetupNewGRFWindow()
 +	virtual void OnPaint()
  	{
  		const GRFConfig *c;
 -		int i;
- 
+
 -		for (c = this->list, i = 0; c != NULL; c = c->next, i++) {}
 +		int i, y;
 +		int n = 0;
- 
+
 -		this->vscroll.cap = (this->widget[SNGRFS_FILE_LIST].bottom - this->widget[SNGRFS_FILE_LIST].top) / 14 + 1;
 -		SetVScrollCount(this, i);
--
++		bool disable_all = this->sel_r == NULL || !this->editable;
+
 -		this->SetWidgetsDisabledState(!this->editable,
 -			SNGRFS_PRESET_LIST,
 -			SNGRFS_ADD,
@@ -347,11 +351,10 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 -	virtual void OnPaint()
 -	{
 -		bool disable_all = this->sel == NULL || !this->editable;
-+		bool disable_all = this->sel_r == NULL || !this->editable;
- 
+-
  		this->SetWidgetsDisabledState(disable_all,
  			SNGRFS_REMOVE,
-@@ -391,14 +254,24 @@
+ 			SNGRFS_MOVE_UP,
  			SNGRFS_MOVE_DOWN,
  			WIDGET_LIST_END
  		);
@@ -367,7 +370,7 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +		this->SetWidgetDisabledState(SNGRFS_ADD_FILE, !this->editable || this->sel_l == NULL || this->sel_l->IsOpenTTDBaseGRF());
  		this->SetWidgetDisabledState(SNGRFS_SET_PARAMETERS, !this->show_params || disable_all);
  		this->SetWidgetDisabledState(SNGRFS_TOGGLE_PALETTE, disable_all);
- 
+
  		if (!disable_all) {
  			/* All widgets are now enabled, so disable widgets we can't use */
 -			if (this->sel == this->list)       this->DisableWidget(SNGRFS_MOVE_UP);
@@ -377,12 +380,12 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +			if (this->sel_r->next == NULL) this->DisableWidget(SNGRFS_MOVE_DOWN);
 +			if (this->sel_r->IsOpenTTDBaseGRF()) this->DisableWidget(SNGRFS_REMOVE);
  		}
- 
+
  		if (this->preset == -1) {
 @@ -426,12 +299,32 @@
- 
+
  		this->DrawWidgets();
- 
+
 +		DrawString(this->widget[SNGRFS_AVAILABLE_GRF_CAPTION].left, this->widget[SNGRFS_AVAILABLE_GRF_CAPTION].right, 34, STR_NEWGRF_ADD_CAPTION, TC_WHITE,SA_CENTER);
 +		GfxFillRect(this->widget[SNGRFS_AVAILABLE_GRF_LIST].left + 1, this->widget[SNGRFS_AVAILABLE_GRF_LIST].top + 1, this->widget[SNGRFS_AVAILABLE_GRF_LIST].right, this->widget[SNGRFS_AVAILABLE_GRF_LIST].bottom, 0xD7);
 +
@@ -416,11 +419,11 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +				const char *text = (c->name != NULL && !StrEmpty(c->name) && !this->show_file_names) ? c->name : c->filename;
  				SpriteID pal;
  				byte txtoffset;
- 
-@@ -458,19 +351,104 @@
+
+@@ -458,21 +351,106 @@
  					}
  				}
- 
+
 -				DrawSprite(SPR_SQUARE, pal, 5, y + 2);
 -				if (c->error != NULL) DrawSprite(SPR_WARNING_SIGN, 0, 20, y + 2);
 +				DrawSprite(SPR_SQUARE, pal, this->widget[SNGRFS_FILE_LIST].left + 9, y + 2);
@@ -435,7 +438,7 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +				y += 13;
  			}
  		}
- 
+
 -		if (this->sel != NULL) {
 +		if (this->sel_r != NULL) {
  			/* Draw NewGRF file info */
@@ -449,8 +452,8 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +			ShowNewGRFInfo(this->sel_l, wi->left + 2, wi->top + 2, wi->right - wi->left - 2, wi->bottom, false, this->show_file_names);
 +		}
 +
-+	}
-+
+ 	}
+
 +	virtual void OnInvalidateData(int data)
 +	{
 +		switch (data) {
@@ -523,15 +526,17 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +	{
 +		if (widget == SNGRFS_AVAILABLE_GRF_LIST)
 +			this->OnClick(pt, SNGRFS_ADD_FILE);
-+		if (widget == SNGRFS_FILE_LIST && this->sel_r) 
++		if (widget == SNGRFS_FILE_LIST && this->sel_r)
 +			this->OnClick(pt, SNGRFS_REMOVE);
- 	}
- 
++	}
++
  	virtual void OnClick(Point pt, int widget)
+ 	{
+ 		switch (widget) {
 @@ -506,30 +484,97 @@
  				this->SetDirty();
  				break;
- 
+
 -			case SNGRFS_ADD: // Add GRF
 -				DeleteWindowByClass(WC_SAVELOAD);
 -				new NewGRFAddWindow(&_newgrf_add_dlg_desc, &this->list);
@@ -556,9 +561,9 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +				this->sel_l = c;
 +				this->sel_r = NULL;
 +				this->SetDirty();
-+				break;
+ 				break;
 +			}
-+
+
 +			case SNGRFS_ADD_FILE: // Add selection to list
 +				if (this->sel_l != NULL && this->editable) {
 +					const GRFConfig *src = this->sel_l;
@@ -605,21 +610,21 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +
 +				this->SetupNewGRFWindow(); // Adjust scroll bars
 +				this->SetDirty();
- 				break;
- 
++				break;
++
  			case SNGRFS_REMOVE: { // Remove GRF
  				GRFConfig **pc, *c, *newsel;
- 
+
  				/* Choose the next GRF file to be the selected file */
 -				newsel = this->sel->next;
 +				newsel = this->sel_r->next;
- 
+
  				for (pc = &this->list; (c = *pc) != NULL; pc = &c->next) {
  					/* If the new selection is empty (i.e. we're deleting the last item
  					 * in the list, pick the file just before the selected file */
 -					if (newsel == NULL && c->next == this->sel) newsel = c;
 +					if (newsel == NULL && c->next == this->sel_r) newsel = c;
- 
+
 -					if (c == this->sel) {
 +					if (c == this->sel_r) {
  						*pc = c->next;
@@ -627,19 +632,19 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
  						break;
  					}
  				}
- 
+
 -				this->sel = newsel;
 +				this->sel_r = newsel;
  				this->preset = -1;
  				this->SetupNewGRFWindow();
  				this->SetDirty();
 @@ -538,13 +583,13 @@
- 
+
  			case SNGRFS_MOVE_UP: { // Move GRF up
  				GRFConfig **pc, *c;
 -				if (this->sel == NULL) break;
 +				if (this->sel_r == NULL) break;
- 
+
  				for (pc = &this->list; (c = *pc) != NULL; pc = &c->next) {
 -					if (c->next == this->sel) {
 -						c->next = this->sel->next;
@@ -653,12 +658,12 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
  					}
  				}
 @@ -555,10 +600,10 @@
- 
+
  			case SNGRFS_MOVE_DOWN: { // Move GRF down
  				GRFConfig **pc, *c;
 -				if (this->sel == NULL) break;
 +				if (this->sel_r == NULL) break;
- 
+
  				for (pc = &this->list; (c = *pc) != NULL; pc = &c->next) {
 -					if (c == this->sel) {
 +					if (c == this->sel_r) {
@@ -666,40 +671,40 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
  						c->next = c->next->next;
  						(*pc)->next = c;
 @@ -572,11 +617,15 @@
- 
+
  			case SNGRFS_FILE_LIST: { // Select a GRF
  				GRFConfig *c;
 -				uint i = (pt.y - this->widget[SNGRFS_FILE_LIST].top) / 14 + this->vscroll.pos;
 +				uint i = (pt.y - this->widget[SNGRFS_FILE_LIST].top) / 13 + this->vscroll2.pos;
- 
+
 -				for (c = this->list; c != NULL && i > 0; c = c->next, i--) {}
 -				this->sel = c;
 +				for (c = this->list; c != NULL && i > 0; c = c->next, i--) ;
 +				this->sel_r = c;
 +				this->sel_l = NULL;
- 
+
 +				/* Activate drag and drop */
 +				SetObjectToPlaceWnd(SPR_CURSOR_MOUSE, PAL_NONE, HT_DRAG, this);
 +				
  				this->SetDirty();
  				break;
  			}
-@@ -597,29 +646,29 @@
+@@ -597,19 +646,19 @@
  				break;
- 
+
  			case SNGRFS_SET_PARAMETERS: { // Edit parameters
 -				if (this->sel == NULL) break;
 +				if (this->sel_r == NULL) break;
- 
+
  				this->query_widget = widget;
  				static char buff[512];
 -				GRFBuildParamList(buff, this->sel, lastof(buff));
 +				GRFBuildParamList(buff, this->sel_r, lastof(buff));
  				SetDParamStr(0, buff);
- 				ShowQueryString(STR_JUST_RAW_STRING, STR_NEWGRF_PARAMETER_QUERY, 63, 250, this, CS_ALPHANUMERAL, QSF_NONE);
+ 				ShowQueryString(STR_JUST_RAW_STRING, STR_NEWGRF_SETTINGS_PARAMETER_QUERY, 63, 250, this, CS_ALPHANUMERAL, QSF_NONE);
  				break;
  			}
- 
+
 -			case SNGRFS_TOGGLE_PALETTE:
 -				if (this->sel != NULL) {
 -					this->sel->windows_paletted ^= true;
@@ -709,18 +714,6 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
  					this->SetDirty();
  				}
  				break;
--
-+				
- 			case SNGRFS_CONTENT_DOWNLOAD:
- 				if (!_network_available) {
- 					ShowErrorMessage(INVALID_STRING_ID, STR_NETWORK_ERR_NOTAVAILABLE, 0, 0);
- 				} else {
- #if defined(ENABLE_NETWORK)
--				/* Only show the things in the current list, or everything when nothing's selected */
-+					/* Only show the things in the current list, or everything when nothing's selected */
- 					ContentVector cv;
- 					for (const GRFConfig *c = this->list; c != NULL; c = c->next) {
- 						if (c->status != GCS_NOT_FOUND && !HasBit(c->flags, GCF_COMPATIBLE)) continue;
 @@ -637,7 +686,9 @@
  #endif
  				}
@@ -731,10 +724,10 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +			}
  		}
  	}
- 
+
 @@ -650,14 +701,14 @@
  			GRFConfig *c = LoadGRFPresetFromConfig(_grf_preset_list[index]);
- 
+
  			if (c != NULL) {
 -				this->sel = NULL;
 +				this->sel_r = NULL;
@@ -743,23 +736,23 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
  				this->preset = index;
  			}
  		}
- 
+
 -		this->sel = NULL;
 +		this->sel_r = NULL;
  		this->SetupNewGRFWindow();
  		this->SetDirty();
  	}
 @@ -684,7 +735,7 @@
- 
+
  			case SNGRFS_SET_PARAMETERS: {
  				/* Parse our new "int list" */
 -				GRFConfig *c = this->sel;
 +				GRFConfig *c = this->sel_r;
  				c->num_params = parse_intlist(str, (int*)c->param, lengthof(c->param));
- 
+
  				/* parse_intlist returns -1 on error */
 @@ -699,118 +750,123 @@
- 
+
  	virtual void OnResize(Point delta)
  	{
 -		if (delta.x != 0) {
@@ -778,7 +771,7 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +		w[SNGRFS_TOGGLE_SHOW_MODE].left =
 +				(left_column_width / 2);
 +
-+		w[SNGRFS_AVAILABLE_GRF_LIST].right = 
++		w[SNGRFS_AVAILABLE_GRF_LIST].right =
 +				left_column_width - 14;
 +
 +		w[SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR].left =
@@ -788,7 +781,7 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +		w[SNGRFS_EMPTY_GRF_LIST].right =
 +		w[SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR].right =
 +		w[SNGRFS_TOGGLE_SHOW_MODE].right =
-+		w[SNGRFS_CONTENT_DOWNLOAD].right = 
++		w[SNGRFS_CONTENT_DOWNLOAD].right =
 +				left_column_width - 1;
 +
 +		w[SNGRFS_EMPTY_MIDDLE].left =
@@ -811,8 +804,8 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +
 +		w[SNGRFS_EMPTY_TOP_RIGHT].left =
 +		w[SNGRFS_FILE_LIST].left =
-+		w[SNGRFS_TOGGLE_PALETTE].left = 
-+		w[SNGRFS_APPLY_CHANGES].left = 
++		w[SNGRFS_TOGGLE_PALETTE].left =
++		w[SNGRFS_APPLY_CHANGES].left =
 +				rightwin_start;
 +		
 +		int button_width = (right_column_width < 198 ? 36 : 66);
@@ -835,7 +828,7 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +		} else {
 +			list_bottom = this->height - 106;
  		}
- 
+
 -		this->vscroll.cap += delta.y / 14;
 -		this->widget[SNGRFS_FILE_LIST].data = (this->vscroll.cap << MAT_ROW_START) + (1 << MAT_COL_START);
 +		w[SNGRFS_EMPTY_GRF_LIST].bottom =
@@ -845,9 +838,9 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +		w[SNGRFS_FILE_LIST_SCROLLBAR].bottom =
 +		w[SNGRFS_EMPTY_MIDDLE].bottom =
 +			list_bottom;
-+
+
 +		w[SNGRFS_NEWGRF_INFO].top = list_bottom + 1;
- 
++
  		this->SetupNewGRFWindow();
  	}
 +	
@@ -859,7 +852,7 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +		}
 +		return false;
 +	}
- 
+
 -	virtual void OnInvalidateData(int data)
 +	void SetupNewGRFWindow()
  	{
@@ -871,24 +864,24 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 -				break;
 +		const GRFConfig *c;
 +		uint16 n;
- 
+
 -			case 1:
 -				/* Search the list for items that are now found and mark them as such. */
 -				for (GRFConfig *c = this->list; c != NULL; c = c->next) {
 -					if (c->status != GCS_NOT_FOUND) continue;
 +		for (c = this->list, n = 0; c != NULL; c = c->next, n++) ;
- 
+
 -					const GRFConfig *f = FindGRFConfig(c->grfid, c->md5sum);
 -					if (f == NULL) continue;
 +		this->vscroll2.cap = (this->widget[SNGRFS_FILE_LIST].bottom - this->widget[SNGRFS_FILE_LIST].top) / 13;
- 
+
 -					free(c->filename);
 -					free(c->name);
 -					free(c->info);
 +		this->widget[SNGRFS_FILE_LIST].data = (this->vscroll2.cap << 8) + 1;
 +		SetVScroll2Count(this, n);
 +		this->SetWidgetDisabledState(SNGRFS_APPLY_CHANGES, !this->editable);
- 
+
 -					c->filename  = f->filename == NULL ? NULL : strdup(f->filename);
 -					c->name      = f->name == NULL ? NULL : strdup(f->name);;
 -					c->info      = f->info == NULL ? NULL : strdup(f->info);;
@@ -905,28 +898,28 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +		SetVScrollCount(this, n);
  	}
  };
- 
+
 -/* Widget definition of the manage newgrfs window */
 -static const Widget _newgrf_widgets[] = {
 -{   WWT_CLOSEBOX,  RESIZE_NONE,  COLOUR_MAUVE,    0,  10,   0,  13, STR_BLACK_CROSS,             STR_TOOLTIP_CLOSE_WINDOW },         // SNGRFS_CLOSEBOX
 -{    WWT_CAPTION, RESIZE_RIGHT,  COLOUR_MAUVE,   11, 299,   0,  13, STR_NEWGRF_SETTINGS_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS }, // SNGRFS_CAPTION
 -{      WWT_PANEL, RESIZE_RIGHT,  COLOUR_MAUVE,    0, 299,  14,  29, STR_NULL,                    STR_NULL },                         // SNGRFS_BACKGROUND1
--{   WWT_DROPDOWN, RESIZE_RIGHT,  COLOUR_YELLOW,  10, 103,  16,  27, STR_EMPTY,                   STR_NEWGRF_PRESET_LIST_TIP },       // SNGRFS_PRESET_LIST
--{ WWT_PUSHTXTBTN,    RESIZE_LR,  COLOUR_YELLOW, 104, 196,  16,  27, STR_NEWGRF_PRESET_SAVE,      STR_NEWGRF_PRESET_SAVE_TIP },       // SNGRFS_PRESET_SAVE
--{ WWT_PUSHTXTBTN,    RESIZE_LR,  COLOUR_YELLOW, 197, 289,  16,  27, STR_NEWGRF_PRESET_DELETE,    STR_NEWGRF_PRESET_DELETE_TIP },     // SNGRFS_PRESET_DELETE
+-{   WWT_DROPDOWN, RESIZE_RIGHT,  COLOUR_YELLOW,  10, 103,  16,  27, STR_EMPTY,                   STR_NEWGRF_SETTINGS_PRESET_LIST_TOOLTIP },       // SNGRFS_PRESET_LIST
+-{ WWT_PUSHTXTBTN,    RESIZE_LR,  COLOUR_YELLOW, 104, 196,  16,  27, STR_NEWGRF_SETTINGS_PRESET_SAVE,      STR_NEWGRF_SETTINGS_PRESET_SAVE_TOOLTIP },       // SNGRFS_PRESET_SAVE
+-{ WWT_PUSHTXTBTN,    RESIZE_LR,  COLOUR_YELLOW, 197, 289,  16,  27, STR_NEWGRF_SETTINGS_PRESET_DELETE,    STR_NEWGRF_SETTINGS_PRESET_DELETE_TOOLTIP },     // SNGRFS_PRESET_DELETE
 -{      WWT_PANEL, RESIZE_RIGHT,  COLOUR_MAUVE,    0, 299,  30,  45, STR_NULL,                    STR_NULL },                         // SNGRFS_BACKGROUND2
--{ WWT_PUSHTXTBTN,  RESIZE_NONE,  COLOUR_YELLOW,  10,  79,  32,  43, STR_NEWGRF_ADD,              STR_NEWGRF_ADD_TIP },               // SNGRFS_ADD
--{ WWT_PUSHTXTBTN,  RESIZE_NONE,  COLOUR_YELLOW,  80, 149,  32,  43, STR_NEWGRF_REMOVE,           STR_NEWGRF_REMOVE_TIP },            // SNGRFS_REMOVE
--{ WWT_PUSHTXTBTN,  RESIZE_NONE,  COLOUR_YELLOW, 150, 219,  32,  43, STR_NEWGRF_MOVEUP,           STR_NEWGRF_MOVEUP_TIP },            // SNGRFS_MOVE_UP
--{ WWT_PUSHTXTBTN, RESIZE_RIGHT,  COLOUR_YELLOW, 220, 289,  32,  43, STR_NEWGRF_MOVEDOWN,         STR_NEWGRF_MOVEDOWN_TIP },          // SNGRFS_MOVE_DOWN
--{     WWT_MATRIX,    RESIZE_RB,  COLOUR_MAUVE,    0, 287,  46, 115, 0x501,                       STR_NEWGRF_FILE_TIP },              // SNGRFS_FILE_LIST
+-{ WWT_PUSHTXTBTN,  RESIZE_NONE,  COLOUR_YELLOW,  10,  79,  32,  43, STR_NEWGRF_SETTINGS_ADD,              STR_NEWGRF_SETTINGS_ADD_TOOLTIP },               // SNGRFS_ADD
+-{ WWT_PUSHTXTBTN,  RESIZE_NONE,  COLOUR_YELLOW,  80, 149,  32,  43, STR_NEWGRF_SETTINGS_REMOVE,           STR_NEWGRF_SETTINGS_REMOVE_TOOLTIP },            // SNGRFS_REMOVE
+-{ WWT_PUSHTXTBTN,  RESIZE_NONE,  COLOUR_YELLOW, 150, 219,  32,  43, STR_NEWGRF_SETTINGS_MOVEUP,           STR_NEWGRF_SETTINGS_MOVEUP_TOOLTIP },            // SNGRFS_MOVE_UP
+-{ WWT_PUSHTXTBTN, RESIZE_RIGHT,  COLOUR_YELLOW, 220, 289,  32,  43, STR_NEWGRF_SETTINGS_MOVEDOWN,         STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP },          // SNGRFS_MOVE_DOWN
+-{     WWT_MATRIX,    RESIZE_RB,  COLOUR_MAUVE,    0, 287,  46, 115, 0x501,                       STR_NEWGRF_SETTINGS_FILE_TOOLTIP },              // SNGRFS_FILE_LIST
 -{  WWT_SCROLLBAR,   RESIZE_LRB,  COLOUR_MAUVE,  288, 299,  46, 115, 0x0,                         STR_TOOLTIP_VSCROLL_BAR_SCROLLS_LIST }, // SNGRFS_SCROLLBAR
 -{      WWT_PANEL,   RESIZE_RTB,  COLOUR_MAUVE,    0, 299, 116, 238, STR_NULL,                    STR_NULL },                         // SNGRFS_NEWGRF_INFO
--{ WWT_PUSHTXTBTN,    RESIZE_TB,  COLOUR_MAUVE,    0,  99, 239, 250, STR_NEWGRF_SET_PARAMETERS,   STR_NULL },                         // SNGRFS_SET_PARAMETERS
--{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,  100, 199, 239, 250, STR_NEWGRF_TOGGLE_PALETTE,   STR_NEWGRF_TOGGLE_PALETTE_TIP },    // SNGRFS_TOGGLE_PALETTE
--{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE,  200, 299, 239, 250, STR_NEWGRF_APPLY_CHANGES,    STR_NULL },                         // SNGRFS_APPLY_CHANGES
--{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,    0, 287, 251, 262, STR_CONTENT_INTRO_BUTTON,    STR_CONTENT_INTRO_BUTTON_TIP },     // SNGRFS_CONTENT_DOWNLOAD
--{  WWT_RESIZEBOX,  RESIZE_LRTB,  COLOUR_MAUVE,  288, 299, 251, 262, 0x0,                         STR_RESIZE_BUTTON },                // SNGRFS_RESIZE
+-{ WWT_PUSHTXTBTN,    RESIZE_TB,  COLOUR_MAUVE,    0,  99, 239, 250, STR_NEWGRF_SETTINGS_SET_PARAMETERS,   STR_NULL },                         // SNGRFS_SET_PARAMETERS
+-{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,  100, 199, 239, 250, STR_NEWGRF_SETTINGS_TOGGLE_PALETTE,   STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP },    // SNGRFS_TOGGLE_PALETTE
+-{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE,  200, 299, 239, 250, STR_NEWGRF_SETTINGS_APPLY_CHANGES,    STR_NULL },                         // SNGRFS_APPLY_CHANGES
+-{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,    0, 287, 251, 262, STR_INTRO_ONLINE_CONTENT,    STR_INTRO_TOOLTIP_ONLINE_CONTENT },     // SNGRFS_CONTENT_DOWNLOAD
+-{  WWT_RESIZEBOX,  RESIZE_LRTB,  COLOUR_MAUVE,  288, 299, 251, 262, 0x0,                         STR_TOOLTIP_RESIZE },                // SNGRFS_RESIZE
 -{ WIDGETS_END },
 -};
 -
@@ -937,33 +930,33 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 -	EndContainer(),
 -	NWidget(WWT_PANEL, COLOUR_MAUVE, SNGRFS_BACKGROUND1),
 -		NWidget(NWID_HORIZONTAL), SetPadding(2, 10, 2, 10),
--			NWidget(WWT_DROPDOWN, COLOUR_YELLOW, SNGRFS_PRESET_LIST), SetMinimalSize(94, 12), SetResize(1, 0), SetDataTip(STR_EMPTY, STR_NEWGRF_PRESET_LIST_TIP),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_PRESET_SAVE), SetMinimalSize(93, 12), SetDataTip(STR_NEWGRF_PRESET_SAVE, STR_NEWGRF_PRESET_SAVE_TIP),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_PRESET_DELETE), SetMinimalSize(93, 12), SetDataTip(STR_NEWGRF_PRESET_DELETE, STR_NEWGRF_PRESET_DELETE_TIP),
+-			NWidget(WWT_DROPDOWN, COLOUR_YELLOW, SNGRFS_PRESET_LIST), SetMinimalSize(94, 12), SetResize(1, 0), SetDataTip(STR_EMPTY, STR_NEWGRF_SETTINGS_PRESET_LIST_TOOLTIP),
+-			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_PRESET_SAVE), SetMinimalSize(93, 12), SetDataTip(STR_NEWGRF_SETTINGS_PRESET_SAVE, STR_NEWGRF_SETTINGS_PRESET_SAVE_TOOLTIP),
+-			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_PRESET_DELETE), SetMinimalSize(93, 12), SetDataTip(STR_NEWGRF_SETTINGS_PRESET_DELETE, STR_NEWGRF_SETTINGS_PRESET_DELETE_TOOLTIP),
 -		EndContainer(),
 -	EndContainer(),
 -	NWidget(WWT_PANEL, COLOUR_MAUVE, SNGRFS_BACKGROUND2),
 -		NWidget(NWID_HORIZONTAL), SetPadding(2, 10, 2, 10),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_ADD), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_ADD, STR_NEWGRF_ADD_TIP),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_REMOVE), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_REMOVE, STR_NEWGRF_REMOVE_TIP),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_MOVE_UP), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_MOVEUP, STR_NEWGRF_MOVEUP_TIP),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_MOVE_DOWN), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_MOVEDOWN, STR_NEWGRF_MOVEDOWN_TIP), SetResize(1, 0),
+-			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_ADD), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_SETTINGS_ADD, STR_NEWGRF_SETTINGS_ADD_TOOLTIP),
+-			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_REMOVE), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_SETTINGS_REMOVE, STR_NEWGRF_SETTINGS_REMOVE_TOOLTIP),
+-			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_MOVE_UP), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_SETTINGS_MOVEUP, STR_NEWGRF_SETTINGS_MOVEUP_TOOLTIP),
+-			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_MOVE_DOWN), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_SETTINGS_MOVEDOWN, STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP), SetResize(1, 0),
 -		EndContainer(),
 -	EndContainer(),
 -	NWidget(NWID_HORIZONTAL),
--		NWidget(WWT_MATRIX, COLOUR_MAUVE, SNGRFS_FILE_LIST), SetMinimalSize(288, 70), SetDataTip(0x501, STR_NEWGRF_FILE_TIP), SetResize(1, 14),
+-		NWidget(WWT_MATRIX, COLOUR_MAUVE, SNGRFS_FILE_LIST), SetMinimalSize(288, 70), SetDataTip(0x501, STR_NEWGRF_SETTINGS_FILE_TOOLTIP), SetResize(1, 14),
 -		NWidget(WWT_SCROLLBAR, COLOUR_MAUVE, SNGRFS_SCROLLBAR),
 -	EndContainer(),
 -	NWidget(WWT_PANEL, COLOUR_MAUVE, SNGRFS_NEWGRF_INFO), SetResize(1, 0), SetMinimalSize(300, 123), EndContainer(),
 -	NWidget(NWID_HORIZONTAL),
--		NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, SNGRFS_SET_PARAMETERS), SetMinimalSize(100, 12), SetDataTip(STR_NEWGRF_SET_PARAMETERS, STR_NULL),
+-		NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, SNGRFS_SET_PARAMETERS), SetMinimalSize(100, 12), SetDataTip(STR_NEWGRF_SETTINGS_SET_PARAMETERS, STR_NULL),
 -		NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, SNGRFS_TOGGLE_PALETTE), SetMinimalSize(100, 12), SetResize(1, 0),
--													SetDataTip(STR_NEWGRF_TOGGLE_PALETTE, STR_NEWGRF_TOGGLE_PALETTE_TIP),
--		NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, SNGRFS_APPLY_CHANGES), SetMinimalSize(100, 12), SetDataTip(STR_NEWGRF_APPLY_CHANGES, STR_NULL),
+-													SetDataTip(STR_NEWGRF_SETTINGS_TOGGLE_PALETTE, STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP),
+-		NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, SNGRFS_APPLY_CHANGES), SetMinimalSize(100, 12), SetDataTip(STR_NEWGRF_SETTINGS_APPLY_CHANGES, STR_NULL),
 -	EndContainer(),
 -	NWidget(NWID_HORIZONTAL),
 -		NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, SNGRFS_CONTENT_DOWNLOAD), SetFill(1, 0), SetMinimalSize(288, 12), SetResize(1, 0),
--													SetDataTip(STR_CONTENT_INTRO_BUTTON, STR_CONTENT_INTRO_BUTTON_TIP),
+-													SetDataTip(STR_INTRO_ONLINE_CONTENT, STR_INTRO_TOOLTIP_ONLINE_CONTENT),
 -		NWidget(WWT_RESIZEBOX, COLOUR_MAUVE, SNGRFS_RESIZE),
 -	EndContainer(),
 -};
@@ -982,13 +975,13 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 @@ -822,23 +878,64 @@
  		GRFConfig *c;
  		int i = 0;
- 
+
 -		GamelogStartAction(GLAT_GRF);
 -		GamelogGRFUpdate(_grfconfig, nw->list); // log GRF changes
  		CopyGRFConfigList(nw->orig_list, nw->list, false);
  		ReloadNewGRFData();
 -		GamelogStopAction();
- 
+
  		/* Show new, updated list */
 -		for (c = nw->list; c != NULL && c != nw->sel; c = c->next, i++) {}
 +		for (c = nw->list; c != NULL && c != nw->sel_r; c = c->next, i++) ;
@@ -997,19 +990,19 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 -		nw->sel = c;
 +		for (c = nw->list; c != NULL && i > 0; c = c->next, i--) ;
 +		nw->sel_r = c;
- 
+
  		w->SetDirty();
  	}
  }
- 
+
 +static const Widget _newgrf_widgets[] = {
 +{   WWT_CLOSEBOX,  RESIZE_NONE,  COLOUR_MAUVE,   0,  10,   0,  13, STR_BLACK_CROSS,             STR_TOOLTIP_CLOSE_WINDOW },            // SNGRFS_CLOSE
 +{    WWT_CAPTION, RESIZE_RIGHT,  COLOUR_MAUVE,  11, 599,   0,  13, STR_NEWGRF_SETTINGS_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS },  // SNGRFS_CAPTION
 +/* NewGRF Presets */
 +{      WWT_PANEL, RESIZE_RIGHT,  COLOUR_MAUVE,   0, 599,  14,  29, STR_NULL,                    STR_NULL },                            // SNGRFS_EMPTY_PRESET
-+{   WWT_DROPDOWN, RESIZE_RIGHT, COLOUR_YELLOW,  10, 403,  16,  27, STR_EMPTY,                   STR_NEWGRF_PRESET_LIST_TIP },          // SNGRFS_PRESET_LIST
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 404, 496,  16,  27, STR_NEWGRF_PRESET_SAVE,      STR_NEWGRF_PRESET_SAVE_TIP },          // SNGRFS_PRESET_SAVE
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 497, 587,  16,  27, STR_NEWGRF_PRESET_DELETE,    STR_NEWGRF_PRESET_DELETE_TIP },        // SNGRFS_PRESET_DELETE
++{   WWT_DROPDOWN, RESIZE_RIGHT, COLOUR_YELLOW,  10, 403,  16,  27, STR_EMPTY,                   STR_NEWGRF_SETTINGS_PRESET_LIST_TOOLTIP },          // SNGRFS_PRESET_LIST
++{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 404, 496,  16,  27, STR_NEWGRF_SETTINGS_PRESET_SAVE,      STR_NEWGRF_SETTINGS_PRESET_SAVE_TOOLTIP },          // SNGRFS_PRESET_SAVE
++{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 497, 587,  16,  27, STR_NEWGRF_SETTINGS_PRESET_DELETE,    STR_NEWGRF_SETTINGS_PRESET_DELETE_TOOLTIP },        // SNGRFS_PRESET_DELETE
 +/* List of files */
 +{      WWT_PANEL, RESIZE_RIGHT,  COLOUR_MAUVE,   0, 291,  30,  45, STR_NULL,                    STR_NULL },                            // SNGRFS_AVAILABLE_GRF_CAPTION
 +{      WWT_PANEL,    RESIZE_RB,  COLOUR_MAUVE,   0, 279,  46, 137, STR_NULL,                    STR_NULL },                            // SNGRFS_EMPTY_GRF_LIST
@@ -1018,36 +1011,36 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
 +/* NewGRF file info */
 +{      WWT_PANEL,   RESIZE_RTB,  COLOUR_MAUVE,   0, 599, 138, 237, STR_NULL,                    STR_NULL },                            // SNGRFS_NEWGRF_INFO
 +/* NewGRF file list buttons */
-+{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,   0, 145, 238, 249, STR_NEWGRF_RESCAN_FILES,     STR_NEWGRF_RESCAN_FILES_TIP },         // SNGRFS_RESCAN_FILES
-+{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 146, 291, 238, 249, STR_NEWGRF_TOGGLE_SHOW,      STR_NEWGRF_TOGGLE_SHOW_TIP },          // SNGRFS_TOGGLE_SHOW_MODE
-+{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,   0, 291, 250, 261, STR_CONTENT_INTRO_BUTTON,    STR_CONTENT_INTRO_BUTTON_TIP },        // SNGRFS_DOWNLOAD_CONTENT
++{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,   0, 145, 238, 249, STR_NEWGRF_ADD_RESCAN_FILES,     STR_NEWGRF_ADD_RESCAN_FILES_TOOLTIP },         // SNGRFS_RESCAN_FILES
++{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 146, 291, 238, 249, STR_NEWGRF_SETTINGS_TOGGLE_SHOW,      STR_NEWGRF_SETTINGS_TOGGLE_SHOW_TIP },          // SNGRFS_TOGGLE_SHOW_MODE
++{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,   0, 291, 250, 261, STR_INTRO_ONLINE_CONTENT,    STR_INTRO_TOOLTIP_ONLINE_CONTENT },        // SNGRFS_DOWNLOAD_CONTENT
 +/* Middle Panel */
 +{      WWT_PANEL,   RESIZE_LRB,  COLOUR_MAUVE, 292, 321,  30, 137, STR_NULL,                    STR_NULL },                             // SNGRFS_EMPTY_MIDDLE
 +{      WWT_PANEL,  RESIZE_LRTB,  COLOUR_MAUVE, 292, 321, 238, 261, STR_NULL,                    STR_NULL },                             // SNGRFS_EMPTY_BOTTOM_MIDDLE
 +/* NewGRF file Add, Remove, Move up, Move down */
 +{      WWT_PANEL,    RESIZE_LR,  COLOUR_MAUVE, 322, 599,  30,  45, STR_NULL,                    STR_NULL },                             // SNGRFS_EMPTY_TOP_RIGHT
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 297, 316,  36,  58, STR_NEWGRF_JOINT_ADD,        STR_NEWGRF_ADD_TIP },                   // SNGRFS_ADD_FILE
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 297, 316,  66,  88, STR_NEWGRF_JOINT_REMOVE,     STR_NEWGRF_REMOVE_TIP },                // SNGRFS_REMOVE
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 379, 445,  32,  43, STR_NEWGRF_MOVEUP,           STR_NEWGRF_MOVEUP_TIP },                // SNGRFS_MOVE_UP
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 484, 550,  32,  43, STR_NEWGRF_MOVEDOWN,         STR_NEWGRF_MOVEDOWN_TIP },              // SNGRFS_MOVE_DOWN
++{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 297, 316,  36,  58, STR_NEWGRF_SETTINGS_JOINT_ADD,        STR_NEWGRF_SETTINGS_ADD_TOOLTIP },          // SNGRFS_ADD_FILE
++{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 297, 316,  66,  88, STR_NEWGRF_SETTINGS_JOINT_REMOVE,     STR_NEWGRF_SETTINGS_REMOVE_TOOLTIP },       // SNGRFS_REMOVE
++{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 379, 445,  32,  43, STR_NEWGRF_SETTINGS_MOVEUP,           STR_NEWGRF_SETTINGS_MOVEUP_TOOLTIP },                // SNGRFS_MOVE_UP
++{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 484, 550,  32,  43, STR_NEWGRF_SETTINGS_MOVEDOWN,         STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP },              // SNGRFS_MOVE_DOWN
 +/* NewGRF file list */
-+{     WWT_MATRIX,   RESIZE_LRB,  COLOUR_MAUVE, 322, 588,  46, 137, 0x501,                       STR_NEWGRF_FILE_TIP },                  // SNGRFS_FILE_LIST
++{     WWT_MATRIX,   RESIZE_LRB,  COLOUR_MAUVE, 322, 588,  46, 137, 0x501,                       STR_NEWGRF_SETTINGS_FILE_TOOLTIP },                  // SNGRFS_FILE_LIST
 +{ WWT_SCROLL2BAR,   RESIZE_LRB,  COLOUR_MAUVE, 588, 599,  46, 137, STR_NULL,                    STR_TOOLTIP_VSCROLL_BAR_SCROLLS_LIST }, // SNGRFS_FILE_LIST_SCROLLBAR
 +/* Edit parameter and apply changes button... */
-+{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 322, 458, 238, 249, STR_NEWGRF_TOGGLE_PALETTE,   STR_NEWGRF_TOGGLE_PALETTE_TIP },        // SNGRFS_TOGGLE_PALETTE
-+{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 459, 599, 238, 249, STR_NEWGRF_SET_PARAMETERS,   STR_NULL },                             // SNGRFS_SET_PARAMETERS
-+{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 322, 587, 250, 261, STR_NEWGRF_APPLY_CHANGES,    STR_NULL },                             // SNGRFS_APPLY_CHANGES
-+{  WWT_RESIZEBOX,  RESIZE_LRTB,  COLOUR_MAUVE, 588, 599, 250, 261, STR_NULL,                    STR_RESIZE_BUTTON },
++{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 322, 458, 238, 249, STR_NEWGRF_SETTINGS_TOGGLE_PALETTE,   STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP },        // SNGRFS_TOGGLE_PALETTE
++{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 459, 599, 238, 249, STR_NEWGRF_SETTINGS_SET_PARAMETERS,   STR_NULL },                             // SNGRFS_SET_PARAMETERS
++{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 322, 587, 250, 261, STR_NEWGRF_SETTINGS_APPLY_CHANGES,    STR_NULL },                             // SNGRFS_APPLY_CHANGES
++{  WWT_RESIZEBOX,  RESIZE_LRTB,  COLOUR_MAUVE, 588, 599, 250, 261, STR_NULL,                    STR_TOOLTIP_RESIZE },
 +{   WIDGETS_END },
 +};
- 
+
 +static const WindowDesc _newgrf_desc(
 +	WDP_CENTER, WDP_CENTER, 600, 262, 600, 262,
 +	WC_GAME_OPTIONS, WC_NONE,
 +	WDF_STD_TOOLTIPS | WDF_DEF_WIDGET | WDF_STD_BTN | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE,
 +	_newgrf_widgets
 +);
- 
+
  /** Setup the NewGRF gui
   * @param editable allow the user to make changes to the grfconfig in the window
 @@ -849,5 +946,7 @@
@@ -1058,18 +1051,37 @@ diff -r e6a4b4208035 src/newgrf_gui.cpp
  	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
  }
 +
-diff -r e6a4b4208035 src/window.cpp
---- src/window.cpp	Fri Jul 17 22:00:13 2009 +0000
-+++ src/window.cpp	Sat Jul 18 10:08:14 2009 +0200
-@@ -1417,7 +1417,6 @@
+Index: src/window_gui.h
+===================================================================
+--- src/window_gui.h	(revisi¢n: 17143)
++++ src/window_gui.h	(copia de trabajo)
+@@ -609,6 +609,13 @@
+ 	virtual void OnDragDrop(Point pt, int widget) {}
+
+ 	/**
++	 * An 'object' is being dragged.
++	 * @param pt     the point inside the window where the cursor points to.
++	 * @param widget the widget where the cursor points to.
++	 */
++	virtual void OnDragMove(Point pt, int widget) {}
++
++	/**
+ 	 * Handle the request for (viewport) scrolling.
+ 	 * @param delta the amount the viewport must be scrolled.
+ 	 */
+Index: src/window.cpp
+===================================================================
+--- src/window.cpp	(revisi¢n: 17143)
++++ src/window.cpp	(copia de trabajo)
+@@ -1451,7 +1451,6 @@
  static bool HandleDragDrop()
  {
  	if (_special_mouse_mode != WSM_DRAGDROP) return true;
 -	if (_left_button_down) return false;
- 
+
  	Window *w = GetCallbackWnd();
- 
-@@ -1426,7 +1425,13 @@
+
+@@ -1460,7 +1459,13 @@
  		Point pt;
  		pt.x = _cursor.pos.x - w->left;
  		pt.y = _cursor.pos.y - w->top;
@@ -1082,22 +1094,5 @@ diff -r e6a4b4208035 src/window.cpp
 +			w->OnDragDrop(pt, GetWidgetFromPos(w, pt.x, pt.y));
 +		}
  	}
- 
+
  	ResetObjectToPlace();
-diff -r e6a4b4208035 src/window_gui.h
---- src/window_gui.h	Fri Jul 17 22:00:13 2009 +0000
-+++ src/window_gui.h	Sat Jul 18 10:08:14 2009 +0200
-@@ -590,6 +590,13 @@
- 	virtual void OnDragDrop(Point pt, int widget) {}
- 
- 	/**
-+	 * An 'object' is being dragged.
-+	 * @param pt     the point inside the window where the cursor points to.
-+	 * @param widget the widget where the cursor points to.
-+	 */
-+	virtual void OnDragMove(Point pt, int widget) {}
-+
-+	/**
- 	 * Handle the request for (viewport) scrolling.
- 	 * @param delta the amount the viewport must be scrolled.
- 	 */
