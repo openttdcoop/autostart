@@ -9,8 +9,8 @@
 # Usage: run ./start and it will create or update OpenTTD for
 # joining the server ;-)
 #
-# The script has 2 parts, first part is the explaination and 
-# setting of the default values. 
+# The script has 2 parts, first part is the explaination and
+# setting of the default values.
 #
 # ORDER
 # 1. Settings from this script
@@ -47,8 +47,14 @@ SPASSWORD=""
 CPASSWORD=""
 # if SPASSWORD="<PWKEY>", we need the KEY to the password file
 PWKEY="ask.members"
-# Possible OSes: linux-amd64,linux-i686,macosx,morphos,sunos-i386,win9x,win32
-OS="linux-i686"
+# Possible OSes:
+# linux-generic-amd64 (tar.bz2, tar.gz, zip)
+# linux-generic-i686 (tar.gz, tar.bz2, zip)
+# macosx-universal (zip)
+# windows-win32 (pdb, zip)
+# windows-win64 (pdb, zip)
+# windows-win9x (zip)
+OS="linux-generic-i686"
 # Possible types: nightly,svn,self (not empty)
 TYPE="nightly"
 # which patches do you like to apply, relative to ./patches/
@@ -66,13 +72,13 @@ BUNDLEDIR="bundles"
 # END of  CONF
 ###################################################################
 #
-# FLAGS: (do not use them in the conf file
+# FLAGS:
 #
 # PWPatch will be reverted and new applied
 REAPPLY=	# -r
 # deletes the CLIENT first
 DELETE=		# --del
-# creates the bundle 
+# creates the bundle
 CREATEBUNDLE=	# -b
 # show debug output
 DEBUG=		# -d
@@ -91,108 +97,112 @@ cd $(dirname $0)
 ###################################################################
 
 function debug {
-	if [ $DEBUG ]; then 
-		if [ $# -eq 0 ]; then echo;
-		else echo "DBG: $@"; fi
-	fi
+        if [ $DEBUG ]; then
+                if [ $# -eq 0 ]; then echo;
+                else echo "DBG: $@"; fi
+        fi
 }
 
 function cleanrevert {
-	debug "clean revert..."
-	svn_revert .
-	make clean
+        debug "clean revert..."
+        svn_revert .
+        make clean
 }
 
 function cpatching {
-	debug "Apply client patches..."
-	if [ -f ../patches/$CPATCH ]; then
-		patch -p0 < ../patches/$CPATCH;
-	fi
+        debug "Apply client patches..."
+        if [ -f ../patches/$CPATCH ]; then
+                patch -p0 < ../patches/$CPATCH;
+        fi
 }
 
 function createbundle {
-	if [ ! -z $CREATEBUNDLE ]; then
-		debug "Packing a binary package... (to $BUNDLEDIR)"
-		if [ ! -z $BUNDLEDIR ]; then BUNDLEDIR="bundles"; fi
-		if [ ! -d $BUNDLEDIR ]; then 
-			debug "creating directory $BUNDLEDIR..."
-			mkdir $BUNDLEDIR;
-		fi
-		cd $CLIENTDIR
-		if [ $DEBUG ]; then
-			make bundle_bzip2 BUNDLE_NAME:=OTTD-$OS-r$SERVERREV
-		else
-			echo "Bundle is processing..."
-			make bundle_bzip2 BUNDLE_NAME:=OTTD-$OS-r$SERVERREV > /dev/null
-		fi
-		mv bundles/OTTD-$OS-r$SERVERREV.tar.bz2 ../$BUNDLEDIR
-		rm bundle* -Rf
-		cd ..
-		echo "Bundle has been packed to $BUNDLEDIR/OTTD-$OS-r$SERVERREV.tar.bz2"
-	fi
+        if [ ! -z $CREATEBUNDLE ]; then
+                debug "Packing a binary package... (to $BUNDLEDIR)"
+                if [ ! -z $BUNDLEDIR ]; then BUNDLEDIR="bundles"; fi
+                if [ ! -d $BUNDLEDIR ]; then
+                        debug "creating directory $BUNDLEDIR..."
+                        mkdir $BUNDLEDIR;
+                fi
+                cd $CLIENTDIR
+                if [ $DEBUG ]; then
+                        make bundle_bzip2 BUNDLE_NAME:=OTTD-$OS-r$SERVERREV
+                else
+                        echo "Bundle is processing..."
+                        make bundle_bzip2 BUNDLE_NAME:=OTTD-$OS-r$SERVERREV > /dev/null
+                fi
+                mv bundles/OTTD-$OS-r$SERVERREV.tar.bz2 ../$BUNDLEDIR
+                rm bundle* -Rf
+                cd ..
+                echo "Bundle has been packed to $BUNDLEDIR/OTTD-$OS-r$SERVERREV.tar.bz2"
+        fi
 }
 
 function installation {
-	if [ $TYPE = "svn" ]; then
-		if [ $SVN = "co" ]; then
-			debug "checkout revision $REVNUM..."
-			svn checkout -r $REVNUM svn://svn.openttd.org/trunk $CLIENTDIR
-			cd $CLIENTDIR
-			cpatching
-			./configure $CONFIGUREARGS
-		else
-			debug "updating from $CLIENTREV to $SERVERREV..."
-			cd $CLIENTDIR
-			if [ ! -z "$REAPPLY$REVSUF" ]; then cleanrevert; fi
-			svn update -r $REVNUM
-			if [ ! -z "$REAPPLY$REVSUF" ]; then 
-			  cpatching
-			  ./configure $CONFIGUREARGS
-			fi
-		fi
-		if [ ! -z $REVSUF ]; then
-			debug "Special patching...($REVSUF)"
-			curl -L $(curl http://$SERVER/$PORT/patch.url) | patch -p0
-			if [ $SVN = "up" ]; then cpatching; fi
-			./configure $CONFIGUREARGS
-		fi
-		debug "make $MAKEARGS"
-		make $MAKEARGS
-		cd ..
-	else
-		debug "no binary support, >EXIT"
-		echo "No support for bundle download anymore. :-("
-		exit
-		debug "Downloading and installing revision: r$SERVERREV"
-		if [ $TYPE = "nightly" ]; then
-			# Possible OSes: linux-amd64,linux-i686,macosx,morphos,sunos-i386,win9x,win32
-			case $OS in
-				"macosx" | "win32" | "win9x")
-					# i.e.: http://nightly.openttd.org/latest/OTTD-macosx-nightly-r13784.zip
-					debug "downloading OTTD-$OS-nightly-r$SERVERREV.zip"
-					curl http://nightly.openttd.org/$OS/OTTD-$OS-nightly-r$SERVERREV.zip > OTTD-$OS-nightly-r$SERVERREV.zip;
-					unzip -q OTTD-$OS-nightly-r$SERVERREV.zip;
-					rm -f OTTD-$OS-nightly-r$SERVERREV.zip;;
-				"morphos")
-					# i.e.: http://nightly.openttd.org/latest/OTTD-morphos-nightly-r13784.lha
-					debug "downloading OTTD-$OS-nightly-r$SERVERREV.lha"
-					curl http://nightly.openttd.org/$OS/OTTD-$OS-nightly-r$SERVERREV.lha > OTTD-$OS-nightly-r$SERVERREV.lha;
-					echo "Sorry... further functions are not yet available :( for MorphOS";
-					echo "[Terminating]";
-					exit;;
-				*)
-					# i.e.: http://nightly.openttd.org/latest/OTTD-linux-amd64-nightly-r13784.tar.bz2
-					debug "downloading OTTD-$OS-nightly-r$SERVERREV.tar.bz2"
-					curl http://nightly.openttd.org/$OS/OTTD-$OS-nightly-r$SERVERREV.tar.bz2 | tar xj;;
-			esac
+        if [ $TYPE = "svn" ]; then
+                if [ $SVN = "co" ]; then
+                        debug "checkout revision $REVNUM..."
+                        svn checkout -r $REVNUM svn://svn.openttd.org/trunk $CLIENTDIR
+                        cd $CLIENTDIR
+                        cpatching
+                        ./configure $CONFIGUREARGS
+                else
+                        debug "updating from $CLIENTREV to $SERVERREV..."
+                        cd $CLIENTDIR
+                        if [ ! -z "$REAPPLY$REVSUF" ]; then cleanrevert; fi
+                        svn update -r $REVNUM
+                        if [ ! -z "$REAPPLY$REVSUF" ]; then
+                          cpatching
+                          ./configure $CONFIGUREARGS
+                        fi
+                fi
+                if [ ! -z $REVSUF ]; then
+                        debug "Special patching...($REVSUF)"
+                        curl -L $(curl http://$SERVER/$PORT/patch.url) | patch -p0
+                        if [ $SVN = "up" ]; then cpatching; fi
+                        ./configure $CONFIGUREARGS
+                fi
+                debug "make $MAKEARGS"
+                make $MAKEARGS
+                cd ..
+        else
+              #  debug "no binary support, >EXIT"
+              #  echo "No support for bundle download anymore. :-("
+              #  exit
+                debug "Downloading and installing revision: r$SERVERREV"
+                if [ $TYPE = "nightly" ]; then
+                        # Possible OSes:
+                        # linux-generic-amd64 (tar.bz2, tar.gz, zip)
+                        # linux-generic-i686 (tar.gz, tar.bz2, zip)
+                        # macosx-universal (zip)
+                        # windows-win32 (pdb, zip)
+                        # windows-win64 (pdb, zip)
+                        # windows-win9x (zip)
+                        case $OS in
+                                "macosx" | "win32" | "win9x")
+                                  echo "no support for this nightly type anymore :-( , please help!"
+                                  exit
+                                        # i.e.: http://nightly.openttd.org/latest/OTTD-macosx-nightly-r13784.zip
+                                        debug "downloading OTTD-$OS-nightly-r$SERVERREV.zip"
+                                        curl http://nightly.openttd.org/$OS/OTTD-$OS-nightly-r$SERVERREV.zip > OTTD-$OS-nightly-r$SERVERREV.zip;
+                                        unzip -q OTTD-$OS-nightly-r$SERVERREV.zip;
+                                        rm -f OTTD-$OS-nightly-r$SERVERREV.zip;;
+                                linux-generic-* )
+                                        # http://binaries.openttd.org/nightlies/trunk/r18604/openttd-trunk-r18604-linux-generic-i686.tar.bz2
+                                        debug "downloading openttd-trunk-r$SERVERREV-$OS.tar.bz2"
+                                        curl http://binaries.openttd.org/nightlies/trunk/r$SERVERREV/openttd-trunk-r$SERVERREV-$OS.tar.bz2 | tar xj;;
+                                * )
+                                  echo "no support for $OS"
+                                  exit;;
+                        esac
 
-		else
-			URL=curl http://$SERVER/$PORT/$OS.url
-			debug "Fetching bundle from $URL..."
-			curl -L $URL | tar xj
-		fi
-		mv O* $CLIENTDIR
-	fi
+                else
+                        URL=curl http://$SERVER/$PORT/$OS.url
+                        debug "Fetching bundle from $URL..."
+                        curl -L $URL | tar xj
+                fi
+                mv openttd-* $CLIENTDIR
+        fi
 }
 
 ###################################################################
@@ -204,56 +214,56 @@ function installation {
 # Arguments:
 # 1. argument is the conf file, if it isn't a option.
 if [ $# -eq 0 ]; then
-	CONF="ps";
+        CONF="ps";
 else
-	case $1 in
-		-*) CONF="ps";;
-		*) CONF=$1; shift;;
-	esac
+        case $1 in
+                -*) CONF="ps";;
+                *) CONF=$1; shift;;
+        esac
 fi
 
 # You can also use extern conf files to have support for multiple servers.
 # there are some templates already in the REPO, you can copy or move them
 # from ./config/*.tmpl to ./config/*.conf
 if [ -f config/$CONF.conf ]; then
-	source config/$CONF.conf;
+        source config/$CONF.conf;
 else
-	if [ -f $CONF ]; then
-		source $CONF;
-	else
+        if [ -f $CONF ]; then
+                source $CONF;
+        else
 # Conf files can still be located in the "root" directory. (downwards compatible)
-		if [ -f $CONF.conf ]; then
-			source $CONF.conf;
-		fi
-	fi
+                if [ -f $CONF.conf ]; then
+                        source $CONF.conf;
+                fi
+        fi
 fi
 
 # Settings downwards compatibility:
-if [ ! -z $CREATEPACK ]; then 
-	debug "Compatibility mode: CREATEPACK=$CREATEPACK"
-	BUNDLEDIR=$CREATEPACK
+if [ ! -z $CREATEPACK ]; then
+        debug "Compatibility mode: CREATEPACK=$CREATEPACK"
+        BUNDLEDIR=$CREATEPACK
 fi
-if [ ! -z $PWPATCH ]; then 
-	debug "Compatibility mode: PWPATCH=$PWPATCH"
-	CPATCH=$PWPATCH
+if [ ! -z $PWPATCH ]; then
+        debug "Compatibility mode: PWPATCH=$PWPATCH"
+        CPATCH=$PWPATCH
 fi
 
 # check header for explainations
 while getoptex "b. c: C: del d r company: SERVER: PORT: COMPANY: REVURL: SPASSWORD: CPASSWORD: PWKEY: OS: TYPE: CPATCH: ADDARGS: MAKEARGS: CONFIGUREARGS: CREATEPACK:" "$@"
 do
-	case $OPTOPT in 
-	b )		CREATEBUNDLE=1;
-			if [ ! -z $OPTARGS ];then
-				BUNDLEDIR=$OPTARG;
-			fi;;
-	c|C|company ) 	COMPANY=$OPTARG;;
-	del )		DELETE=1;;
-	d ) 		DEBUG=1
-			echo "Debug mode on.";;
-	r )		REAPPLY=1;;
-	SERVER|PORT|COMPANY|REVURL|SPASSWORD|CPASSWORD|PWKEY|OS|TYPE|CPATCH|ADDARGS|MAKEARGS|CONFIGUREARGS|BUNDLEDIR ) eval "$OPTOPT=\"$OPTARG\"";;
-	* ) break;;
-	esac
+        case $OPTOPT in
+        b )		CREATEBUNDLE=1;
+                        if [ ! -z $OPTARGS ];then
+                                BUNDLEDIR=$OPTARG;
+                        fi;;
+        c|C|company ) 	COMPANY=$OPTARG;;
+        del )		DELETE=1;;
+        d ) 		DEBUG=1
+                        echo "Debug mode on.";;
+        r )		REAPPLY=1;;
+        SERVER|PORT|COMPANY|REVURL|SPASSWORD|CPASSWORD|PWKEY|OS|TYPE|CPATCH|ADDARGS|MAKEARGS|CONFIGUREARGS|BUNDLEDIR ) eval "$OPTOPT=\"$OPTARG\"";;
+        * ) break;;
+        esac
 done
 shift $[OPTIND-1]
 
@@ -267,95 +277,91 @@ echo "-----------------------------------------------------------------"
 echo
 
 if [ -z $REVURL ]; then
-	SERVERREV="$(curl -s http://$SERVER/$PORT/finger/openttd | cut -f1 | cut -b 2-)";
+        SERVERREV="$(curl -s http://$SERVER/$PORT/finger/openttd | cut -f1 | cut -b 2-)";
 else
-	SERVERREV="$(curl -s $REVURL)";
+        SERVERREV="$(curl -s $REVURL)";
 fi
 
 if [ -z $SERVERREV ]; then
-	echo "Wasn't able to determine the server revision. Starting sequence aborted. :-(";
-	exit;
+        echo "Wasn't able to determine the server revision. Starting sequence aborted. :-(";
+        exit;
 fi
 REVNUM=$(echo $SERVERREV | cut -b -5)
 REVSUF=$(echo $SERVERREV | cut -b 6-)
 echo "  server revision: r$SERVERREV"
 echo
 if [ ! -z $REVSUF ]; then
-	if [ $TYPE = "nightly" ]; then
-		TYPE="self";
-		echo "TYPE changed to \"self\", because the server revision is modified.";
-		echo;
-	fi
+        if [ $TYPE = "nightly" ]; then
+                TYPE="self";
+                echo "TYPE changed to \"self\", because the server revision is modified.";
+                echo;
+        fi
 fi
 CLIENTDIR="$SERVER-$PORT-$TYPE"
 if [ $TYPE = "svn" ]; then
-	CLIENT="$CLIENTDIR/bin/openttd"
-	SVN="co"
+        CLIENT="$CLIENTDIR/bin/openttd"
+        SVN="co"
 else
-	if [ $OS = "macosx" ]; then
-		CLIENT="$CLIENTDIR/OpenTTD.app/Contents/MacOS/openttd"
-	else
-		CLIENT="$CLIENTDIR/openttd"
-	fi
+        if [ $OS = "macosx" ]; then
+                CLIENT="$CLIENTDIR/OpenTTD.app/Contents/MacOS/openttd"
+        else
+                CLIENT="$CLIENTDIR/openttd"
+        fi
 fi
 if [ ! -z $DELETE ]; then
-	rm $CLIENTDIR -Rf
-	debug "$CLIENTDIR has been deleted."
+        rm $CLIENTDIR -Rf
+        debug "$CLIENTDIR has been deleted."
 fi
 if [ -f $CLIENT ]; then
-	CLIENTREV="$(./$CLIENT -h | head -1 | cut -b 10-)"
-	echo "  client revision: r$CLIENTREV"
-	echo
-	if [ $SERVERREV = $CLIENTREV ]; then
-		echo "Your client is up2date! :-)"
-		if [ $REAPPLY ]; then
-			echo "... but you like to reapply patches, so we install again..."
-			SVN="up"
-			installation
-		fi
-	else
-		echo "Client will be updated!"
-		if [ $TYPE = "svn" ]; then
-			SVN="up"
-		else
-			debug "Deleting outdated revision..."
-			rm $CLIENTDIR -Rf
-		fi
-		installation
-	fi
+        CLIENTREV="$(./$CLIENT -h | head -1 | cut -b 10-)"
+        echo "  client revision: r$CLIENTREV"
+        echo
+        if [ $SERVERREV = $CLIENTREV ]; then
+                echo "Your client is up2date! :-)"
+                if [ $REAPPLY ]; then
+                        echo "... but you like to reapply patches, so we install again..."
+                        SVN="up"
+                        installation
+                fi
+        else
+                echo "Client will be updated!"
+                if [ $TYPE = "svn" ]; then
+                        SVN="up"
+                else
+                        debug "Deleting outdated revision..."
+                        rm $CLIENTDIR -Rf
+                fi
+                installation
+        fi
 else
-	echo "New client is going to be installed."
-	installation
+        echo "New client is going to be installed."
+        installation
 fi
 createbundle
 echo "------------------------------------------------------"
 PW=""
 PWECHO=""
 if [ ! -z "$SPASSWORD" ]; then
-	if [ "$SPASSWORD" = "<PWKEY>" ]; then
-		PASSWORD=$(curl -s http://$SERVER/$PORT/$PWKEY)
-	else
-		PASSWORD=$SPASSWORD
-	fi
-	if [ `echo $PASSWORD | grep -c " "` != 0 ]; then
-		echo "Server password can't have spaces"
-		exit
-	fi
-	if [ $TYPE = "nightly" ]; then
-		PWECHO="(Password: $PASSWORD)"
-	else
-		PW="-p $PASSWORD"
-	fi
+        if [ "$SPASSWORD" = "<PWKEY>" ]; then
+                PASSWORD=$(curl -s http://$SERVER/$PORT/$PWKEY)
+        else
+                PASSWORD=$SPASSWORD
+        fi
+        if [ `echo $PASSWORD | grep -c " "` != 0 ]; then
+                echo "Server password can't have spaces"
+                exit
+        fi
+        PW="-p $PASSWORD"
 fi
 if [ ! -z "$CPASSWORD" ]; then
-	if [ -f $CPATCH ]; then
-		if [ `echo $CPASSWORD | grep -c " "` != 0 ]; then
-			echo "Company password can't have spaces"
-			exit
-		else
-			PW="$PW -P $CPASSWORD"
-		fi
-	fi
+        if [ -f $CPATCH ]; then
+                if [ `echo $CPASSWORD | grep -c " "` != 0 ]; then
+                        echo "Company password can't have spaces"
+                        exit
+                else
+                        PW="$PW -P $CPASSWORD"
+                fi
+        fi
 fi
 echo "...starting... $PWECHO"
 debug "./$CLIENT -n $ADDRESS\#1 $PW $ADDARGS"
