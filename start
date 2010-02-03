@@ -190,7 +190,7 @@ function installation {
                                 linux-generic-* )
                                         # http://binaries.openttd.org/nightlies/trunk/r18604/openttd-trunk-r18604-linux-generic-i686.tar.bz2
                                         debug "downloading openttd-trunk-r$SERVERREV-$OS.tar.bz2"
-                                        curl http://binaries.openttd.org/nightlies/trunk/r$SERVERREV/openttd-trunk-r$SERVERREV-$OS.tar.bz2 | tar xj;;
+                                        curl -L http://binaries.openttd.org/nightlies/trunk/r$SERVERREV/openttd-trunk-r$SERVERREV-$OS.tar.bz2 | tar xj;;
                                 * )
                                   echo "no support for $OS"
                                   exit;;
