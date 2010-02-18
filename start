@@ -184,7 +184,7 @@ function installation {
                                   exit
                                         # i.e.: http://nightly.openttd.org/latest/OTTD-macosx-nightly-r13784.zip
                                         debug "downloading OTTD-$OS-nightly-r$SERVERREV.zip"
-                                        curl http://nightly.openttd.org/$OS/OTTD-$OS-nightly-r$SERVERREV.zip > OTTD-$OS-nightly-r$SERVERREV.zip;
+                                        curl -L http://nightly.openttd.org/$OS/OTTD-$OS-nightly-r$SERVERREV.zip > OTTD-$OS-nightly-r$SERVERREV.zip;
                                         unzip -q OTTD-$OS-nightly-r$SERVERREV.zip;
                                         rm -f OTTD-$OS-nightly-r$SERVERREV.zip;;
                                 linux-generic-* )
