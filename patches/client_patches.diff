@@ -1,1106 +1,1267 @@
+Index: src/toolbar_gui.cpp
+===================================================================
+--- src/toolbar_gui.cpp	(revision 19145)
++++ src/toolbar_gui.cpp	(working copy)
+@@ -1281,6 +1281,7 @@
+ 			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
+ 			case WKC_CTRL  | 'G': MenuClickWorldScreenshot(); break;
+ 			case WKC_CTRL | WKC_ALT | 'C': if (!_networking) ShowCheatWindow(); break;
++			case WKC_CTRL | 'L': ShowSignList(); break;
+ 			case 'A': if (CanBuildVehicleInfrastructure(VEH_TRAIN)) ShowBuildRailToolbar(_last_built_railtype, 4); break; // Invoke Autorail
+ 			case 'L': ShowTerraformToolbar(); break;
+ 			case 'Q': case 'W': case 'E': case 'D': ShowTerraformToolbarWithTool(key, keycode); break;
 Index: src/lang/english.txt
 ===================================================================
---- src/lang/english.txt	(Revision 17134)
-+++ src/lang/english.txt	(Arbeitskopie)
-@@ -2251,9 +2251,13 @@
- STR_NEWGRF_SETTINGS_ADD_TOOLTIP                                 :{BLACK}Add a NewGRF file to the list
- STR_NEWGRF_SETTINGS_REMOVE                                      :{BLACK}Remove
- STR_NEWGRF_SETTINGS_REMOVE_TOOLTIP                              :{BLACK}Remove the selected NewGRF file from the list
--STR_NEWGRF_SETTINGS_MOVEUP                                      :{BLACK}Move Up
-+STR_NEWGRF_SETTINGS_JOINT_ADD                                   :{BLACK}>>
-+STR_NEWGRF_SETTINGS_JOINT_REMOVE                                :{BLACK}<<
-+STR_NEWGRF_SETTINGS_TOGGLE_SHOW                                 :{BLACK}Disp. Mode
-+STR_NEWGRF_SETTINGS_TOGGLE_SHOW_TIP                             :{BLACK}Toggles filtering of already selected grfs in the left list. Ctrl-click toggles show file names in stead of grf names.
-+STR_NEWGRF_SETTINGS_MOVEUP                                      :{BLACK}Up
- STR_NEWGRF_SETTINGS_MOVEUP_TOOLTIP                              :{BLACK}Move the selected NewGRF file up the list
--STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Move Down
-+STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Down
- STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Move the selected NewGRF file down the list
- STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}A list of the NewGRF files that are installed. Click a file to change its parameters
+--- src/lang/english.txt	(revision 19145)
++++ src/lang/english.txt	(working copy)
+@@ -1259,6 +1259,7 @@
+ STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
+ STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
+ STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :All
++STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI                          :{LTBLUE}Enable previews for station building: {ORANGE}{STRING1}
  
-@@ -2266,6 +2270,7 @@
- STR_NEWGRF_SETTINGS_FIND_MISSING_CONTENT_TOOLTIP                :{BLACK}Check whether the missing content can be found online
+ STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
+@@ -2579,6 +2580,10 @@
+ STR_COMPANY_VIEW_VIEW_HQ_TOOLTIP                                :{BLACK}View company headquarters
+ STR_COMPANY_VIEW_RELOCATE_HQ                                    :{BLACK}Relocate HQ
+ STR_COMPANY_VIEW_RELOCATE_COMPANY_HEADQUARTERS                  :{BLACK}Rebuild company headquarters elsewhere for 1% cost of company value
++STR_COMPANY_VIEW_CENTER_VIEWPORT                                :{BLACK}Center viewport to place where company built last time
++STR_COMPANY_VIEW_OPEN_VIEWPORT                                  :{BLACK}Open new viewport to watch company's actions
++STR_COMPANY_VIEW_CENTER                                         :{BLACK}Center view
++STR_COMPANY_VIEW_OPEN                                           :{BLACK}Open window
  
- STR_NEWGRF_SETTINGS_FILENAME                                    :{BLACK}Filename: {SILVER}{RAW_STRING}
-+STR_NEWGRF_SETTINGS_NAME                                        :{BLACK}Name: {SILVER}{RAW_STRING}
- STR_NEWGRF_SETTINGS_GRF_ID                                      :{BLACK}GRF ID: {SILVER}{RAW_STRING}
- STR_NEWGRF_SETTINGS_MD5SUM                                      :{BLACK}MD5sum: {SILVER}{RAW_STRING}
- STR_NEWGRF_SETTINGS_PALETTE                                     :{BLACK}Palette: {SILVER}{RAW_STRING}
-@@ -2278,10 +2283,10 @@
- STR_NEWGRF_SETTINGS_PARAMETER_QUERY                             :{BLACK}Enter NewGRF parameters
+ STR_COMPANY_VIEW_NEW_FACE_BUTTON                                :{BLACK}New Face
+ STR_COMPANY_VIEW_NEW_FACE_TOOLTIP                               :{BLACK}Select new face for manager
+@@ -3626,6 +3631,12 @@
+ STR_ERROR_CAN_T_CHANGE_SIGN_NAME                                :{WHITE}Can't change sign name...
+ STR_ERROR_CAN_T_DELETE_SIGN                                     :{WHITE}Can't delete sign...
  
- # NewGRF add window
--STR_NEWGRF_ADD_CAPTION                                          :{WHITE}Available NewGRF files
-+STR_NEWGRF_ADD_CAPTION                                          :{WHITE}Available NewGRFs
- STR_NEWGRF_ADD_FILE                                             :{BLACK}Add to selection
- STR_NEWGRF_ADD_FILE_TOOLTIP                                     :{BLACK}Add the selected NewGRF file to your configuration
--STR_NEWGRF_ADD_RESCAN_FILES                                     :{BLACK}Rescan files
-+STR_NEWGRF_ADD_RESCAN_FILES                                     :{BLACK}Rescan
- STR_NEWGRF_ADD_RESCAN_FILES_TOOLTIP                             :{BLACK}Update the list of available NewGRF files
- 
- # NewGRF (self) generated warnings/errors
-Index: src/newgrf_gui.cpp
++# GUI Sign list filter
++STR_FILTER                                                      :{BLACK}Filter
++STR_FILTER_OSKTITLE                                             :{BLACK}Enter a filter string
++STR_FILTER_MATCH_CASE                                           :{BLACK}Match case
++STR_FILTER_CLEAR                                                :{BLACK}Clear filter
++
+ ##id 0x2000
+ # Town building names
+ STR_TOWN_BUILDING_NAME_TALL_OFFICE_BLOCK_1                      :Tall office block
+Index: src/settings_gui.cpp
 ===================================================================
---- src/newgrf_gui.cpp	(Revision 17134)
-+++ src/newgrf_gui.cpp	(Arbeitskopie)
-@@ -11,6 +11,7 @@
- #include "window_func.h"
- #include "string_func.h"
- #include "gfx_func.h"
-+#include "tilehighlight_func.h"
- #include "gamelog.h"
- #include "settings_func.h"
- #include "widgets/dropdown_type.h"
-@@ -44,7 +45,7 @@
- }
- 
- 
--static void ShowNewGRFInfo(const GRFConfig *c, uint x, uint y, uint w, uint bottom, bool show_params)
-+static void ShowNewGRFInfo(const GRFConfig *c, uint x, uint y, uint w, uint bottom, bool show_params, bool show_filenames)
- {
- 	char buff[256];
- 
-@@ -66,8 +67,8 @@
- 
- 	/* Draw filename or not if it is not known (GRF sent over internet) */
- 	if (c->filename != NULL) {
--		SetDParamStr(0, c->filename);
--		y = DrawStringMultiLine(x, x + w, y, bottom, STR_NEWGRF_SETTINGS_FILENAME);
-+		SetDParamStr(0, (show_filenames) ? c->name : c->filename);
-+		y = DrawStringMultiLine(x, x + w, y, bottom, (show_filenames) ? STR_NEWGRF_SETTINGS_NAME : STR_NEWGRF_SETTINGS_FILENAME);
- 	}
- 
- 	/* Prepare and draw GRF ID */
-@@ -111,169 +112,6 @@
- 	}
- }
- 
--
--/** Names of the add a newgrf window widgets. */
--enum AddNewGRFWindowWidgets {
--	ANGRFW_CLOSEBOX = 0,
--	ANGRFW_CAPTION,
--	ANGRFW_BACKGROUND,
--	ANGRFW_GRF_LIST,
--	ANGRFW_SCROLLBAR,
--	ANGRFW_GRF_INFO,
--	ANGRFW_ADD,
--	ANGRFW_RESCAN,
--	ANGRFW_RESIZE,
--};
--
--/**
-- * Window for adding NewGRF files
-- */
--struct NewGRFAddWindow : public Window {
--	GRFConfig **list;
--	const GRFConfig *sel;
--
--	NewGRFAddWindow(const WindowDesc *desc, GRFConfig **list) : Window(desc, 0)
--	{
--		this->list = list;
--		this->resize.step_height = 10;
--
--		this->FindWindowPlacementAndResize(desc);
--	}
--
--	virtual void OnPaint()
--	{
--		const GRFConfig *c;
--		const Widget *wl = &this->widget[ANGRFW_GRF_LIST];
--		int n = 0;
--
--		/* Count the number of GRFs */
--		for (c = _all_grfs; c != NULL; c = c->next) n++;
--
--		this->vscroll.cap = (wl->bottom - wl->top) / 10;
--		SetVScrollCount(this, n);
--
--		this->SetWidgetDisabledState(ANGRFW_ADD, this->sel == NULL || this->sel->IsOpenTTDBaseGRF());
--		this->DrawWidgets();
--
--		GfxFillRect(wl->left + 1, wl->top + 1, wl->right, wl->bottom, 0xD7);
--
--		uint y = wl->top + 1;
--		for (c = _all_grfs, n = 0; c != NULL && n < (this->vscroll.pos + this->vscroll.cap); c = c->next, n++) {
--			if (n >= this->vscroll.pos) {
--				bool h = c == this->sel;
--				const char *text = (c->name != NULL && !StrEmpty(c->name)) ? c->name : c->filename;
--
--				/* Draw selection background */
--				if (h) GfxFillRect(this->widget[ANGRFW_GRF_LIST].left + 1, y, this->widget[ANGRFW_GRF_LIST].right, y + 9, 156);
--				DrawString(this->widget[ANGRFW_GRF_LIST].left + 2, this->widget[ANGRFW_GRF_LIST].right - 2, y, text, h ? TC_WHITE : TC_ORANGE);
--				y += 10;
--			}
--		}
--
--		if (this->sel != NULL) {
--			const Widget *wi = &this->widget[ANGRFW_GRF_INFO];
--			ShowNewGRFInfo(this->sel, wi->left + 2, wi->top + 2, wi->right - wi->left - 2, wi->bottom, false);
--		}
--	}
--
--	virtual void OnDoubleClick(Point pt, int widget)
--	{
--		if (widget == ANGRFW_GRF_LIST) this->OnClick(pt, ANGRFW_ADD);
--	}
--
--	virtual void OnClick(Point pt, int widget)
--	{
--		switch (widget) {
--			case ANGRFW_GRF_LIST: {
--				/* Get row... */
--				const GRFConfig *c;
--				uint i = (pt.y - this->widget[ANGRFW_GRF_LIST].top) / 10 + this->vscroll.pos;
--
--				for (c = _all_grfs; c != NULL && i > 0; c = c->next, i--) {}
--				this->sel = c;
--				this->SetDirty();
--				break;
--			}
--
--			case ANGRFW_ADD: // Add selection to list
--				if (this->sel != NULL) {
--					const GRFConfig *src = this->sel;
--					GRFConfig **list;
--
--					/* Find last entry in the list, checking for duplicate grfid on the way */
--					for (list = this->list; *list != NULL; list = &(*list)->next) {
--						if ((*list)->grfid == src->grfid) {
--							ShowErrorMessage(INVALID_STRING_ID, STR_NEWGRF_DUPLICATE_GRFID, 0, 0);
--							return;
--						}
--					}
--
--					/* Copy GRF details from scanned list */
--					GRFConfig *c = CallocT<GRFConfig>(1);
--					*c = *src;
--					c->filename = strdup(src->filename);
--					if (src->name      != NULL) c->name      = strdup(src->name);
--					if (src->info      != NULL) c->info      = strdup(src->info);
--					c->next = NULL;
--
--					/* Append GRF config to configuration list */
--					*list = c;
--
--					DeleteWindowByClass(WC_SAVELOAD);
--					InvalidateWindowData(WC_GAME_OPTIONS, 0);
--				}
--				break;
--
--			case ANGRFW_RESCAN: // Rescan list
--				this->sel = NULL;
--				ScanNewGRFFiles();
--				this->SetDirty();
--				break;
--		}
--	}
--};
--
--/* Widget definition for the add a newgrf window */
--static const Widget _newgrf_add_dlg_widgets[] = {
--{   WWT_CLOSEBOX,    RESIZE_NONE,  COLOUR_GREY,   0,  10,   0,  13, STR_BLACK_CROSS,         STR_TOOLTIP_CLOSE_WINDOW },             // ANGRFW_CLOSEBOX
--{    WWT_CAPTION,   RESIZE_RIGHT,  COLOUR_GREY,  11, 306,   0,  13, STR_NEWGRF_ADD_CAPTION,  STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS },   // ANGRFW_CAPTION
--{      WWT_PANEL,      RESIZE_RB,  COLOUR_GREY,   0, 294,  14, 121, 0x0,                     STR_NULL },                             // ANGRFW_BACKGROUND
--{      WWT_INSET,      RESIZE_RB,  COLOUR_GREY,   2, 292,  16, 119, 0x0,                     STR_NULL },                             // ANGRFW_GRF_LIST
--{  WWT_SCROLLBAR,     RESIZE_LRB,  COLOUR_GREY, 295, 306,  14, 121, 0x0,                     STR_TOOLTIP_VSCROLL_BAR_SCROLLS_LIST }, // ANGRFW_SCROLLBAR
--{      WWT_PANEL,     RESIZE_RTB,  COLOUR_GREY,   0, 306, 122, 224, 0x0,                     STR_NULL },                             // ANGRFW_GRF_INFO
--{ WWT_PUSHTXTBTN,     RESIZE_RTB,  COLOUR_GREY,   0, 146, 225, 236, STR_NEWGRF_ADD_FILE,     STR_NEWGRF_ADD_FILE_TOOLTIP },              // ANGRFW_ADD
--{ WWT_PUSHTXTBTN,    RESIZE_LRTB,  COLOUR_GREY, 147, 294, 225, 236, STR_NEWGRF_ADD_RESCAN_FILES, STR_NEWGRF_ADD_RESCAN_FILES_TOOLTIP },          // ANGRFW_RESCAN
--{  WWT_RESIZEBOX,    RESIZE_LRTB,  COLOUR_GREY, 295, 306, 225, 236, 0x0,                     STR_TOOLTIP_RESIZE },                    // ANGRFW_RESIZE
--{   WIDGETS_END },
--};
--
--static const NWidgetPart _nested_newgrf_add_dlg_widgets[] = {
--	NWidget(NWID_HORIZONTAL),
--		NWidget(WWT_CLOSEBOX, COLOUR_GREY, ANGRFW_CLOSEBOX),
--		NWidget(WWT_CAPTION, COLOUR_GREY, ANGRFW_CAPTION), SetDataTip(STR_NEWGRF_ADD_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
--	EndContainer(),
--	NWidget(NWID_HORIZONTAL),
--		NWidget(WWT_PANEL, COLOUR_GREY, ANGRFW_BACKGROUND),
--			NWidget(WWT_INSET, COLOUR_GREY, ANGRFW_GRF_LIST), SetMinimalSize(291, 104), SetResize(1, 10), SetPadding(2, 2, 2, 2), EndContainer(),
--		EndContainer(),
--		NWidget(WWT_SCROLLBAR, COLOUR_GREY, ANGRFW_SCROLLBAR),
--	EndContainer(),
--	NWidget(WWT_PANEL, COLOUR_GREY, ANGRFW_GRF_INFO), SetResize(1, 0), SetMinimalSize(307, 103), EndContainer(),
--	NWidget(NWID_HORIZONTAL),
--		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, ANGRFW_ADD), SetMinimalSize(147, 12), SetResize(1, 0), SetDataTip(STR_NEWGRF_ADD_FILE, STR_NEWGRF_ADD_FILE_TOOLTIP),
--		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, ANGRFW_RESCAN), SetMinimalSize(148, 12), SetDataTip(STR_NEWGRF_ADD_RESCAN_FILES, STR_NEWGRF_ADD_RESCAN_FILES_TOOLTIP),
--		NWidget(WWT_RESIZEBOX, COLOUR_GREY, ANGRFW_RESIZE),
--	EndContainer(),
--};
--
--/* Window definition for the add a newgrf window */
--static const WindowDesc _newgrf_add_dlg_desc(
--	WDP_CENTER, WDP_CENTER, 307, 237, 307, 337,
--	WC_SAVELOAD, WC_NONE,
--	WDF_STD_TOOLTIPS | WDF_DEF_WIDGET | WDF_STD_BTN | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE,
--	_newgrf_add_dlg_widgets, _nested_newgrf_add_dlg_widgets, lengthof(_nested_newgrf_add_dlg_widgets)
--);
--
- static GRFPresetList _grf_preset_list;
- 
- class DropDownListPresetItem : public DropDownListItem {
-@@ -319,22 +157,60 @@
+--- src/settings_gui.cpp	(revision 19145)
++++ src/settings_gui.cpp	(working copy)
+@@ -1301,6 +1301,7 @@
+ 	SettingEntry("gui.always_build_infrastructure"),
+ 	SettingEntry("gui.persistent_buildingtools"),
+ 	SettingEntry("gui.coloured_news_year"),
++	SettingEntry("gui.imp_newstations_gui"),
  };
+ /** Interface subpage */
+ static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
+Index: src/smallmap_gui.cpp
+===================================================================
+--- src/smallmap_gui.cpp	(revision 19145)
++++ src/smallmap_gui.cpp	(working copy)
+@@ -277,6 +277,21 @@
+ 	_legend_land_contours[4].colour = _heightmap_schemes[_settings_client.gui.smallmap_land_colour].height_colours[14];
+ }
  
- /**
-- * Window for showing NewGRF files
-+ * Combined NewGrf Window
-  */
- struct NewGRFWindow : public Window {
--	GRFConfig **orig_list; ///< grf list the window is shown with
--	GRFConfig *list;       ///< temporary grf list to which changes are made
--	GRFConfig *sel;        ///< selected grf item
--	bool editable;         ///< is the window editable
--	bool show_params;      ///< are the grf-parameters shown in the info-panel
--	bool execute;          ///< on pressing 'apply changes' are grf changes applied immediately, or only list is updated
--	int query_widget;      ///< widget that opened a query
--	int preset;            ///< selected preset
- 
-+	/* Names of the window widgets */
-+	enum NewGRFListWindowWidgets {
-+		SNGRFS_CLOSE = 0,
-+		SNGRFS_CAPTION,
-+		SNGRFS_EMPTY_PRESET,
-+		SNGRFS_PRESET_LIST,
-+		SNGRFS_PRESET_SAVE,
-+		SNGRFS_PRESET_DELETE,
-+		SNGRFS_AVAILABLE_GRF_CAPTION,
-+		SNGRFS_EMPTY_GRF_LIST,
-+		SNGRFS_AVAILABLE_GRF_LIST,
-+		SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR,
-+		SNGRFS_NEWGRF_INFO,
-+		SNGRFS_RESCAN_FILES,
-+		SNGRFS_TOGGLE_SHOW_MODE,
-+		SNGRFS_CONTENT_DOWNLOAD,
-+		SNGRFS_EMPTY_MIDDLE,
-+		SNGRFS_EMPTY_BOTTOM_MIDDLE,
-+		SNGRFS_EMPTY_TOP_RIGHT,
-+		SNGRFS_ADD_FILE,
-+		SNGRFS_REMOVE,
-+		SNGRFS_MOVE_UP,
-+		SNGRFS_MOVE_DOWN,
-+		SNGRFS_FILE_LIST,
-+		SNGRFS_FILE_LIST_SCROLLBAR,
-+		SNGRFS_TOGGLE_PALETTE,
-+		SNGRFS_SET_PARAMETERS,
-+		SNGRFS_APPLY_CHANGES,
-+	};
-+	
-+	const GRFConfig *sel_l;
-+	GRFConfig **orig_list;   ///< grf list the window is shown with
-+	GRFConfig *list;         ///< temporary grf list to which changes are made
-+	GRFConfig *sel_r;        ///< selected grf item
-+	bool editable;           ///< is the window editable
-+	bool show_params;        ///< are the grf-parameters shown in the info-panel
-+	bool execute;            ///< on pressing 'apply changes' are grf changes applied immediately, or only list is updated
-+	bool show_all;
-+	bool show_file_names;
-+	int query_widget;        ///< widget that opened a query
-+	int preset;              ///< selected preset
++/**
++ * Colour Coding for Stuck Counter
++ */
++static const uint32 _stuck_counter_colours[] = {
++	MKCOLOUR(0xD0D0D0D0),
++	MKCOLOUR(0xCECECECE),
++	MKCOLOUR(0xBFBFBFBF),
++	MKCOLOUR(0xBDBDBDBD),
++	MKCOLOUR(0xBABABABA),
++	MKCOLOUR(0xB8B8B8B8),
++	MKCOLOUR(0xB6B6B6B6),
++	MKCOLOUR(0xB4B4B4B4),
++};
++assert_compile(lengthof(_stuck_counter_colours) == 8);
 +
- 	NewGRFWindow(const WindowDesc *desc, bool editable, bool show_params, bool exec_changes, GRFConfig **config) : Window(desc, 0)
- 	{
--		this->resize.step_height = 14;
--		this->sel         = NULL;
-+		this->resize.step_height = 13;
-+		this->resize.step_width = 8;
-+		this->resize.height = this->height - 78;
-+		this->resize.width  = this->width / 2 - 64;
-+
-+		this->sel_r       = NULL;
- 		this->list        = NULL;
- 		this->orig_list   = config;
- 		this->editable    = editable;
-@@ -349,6 +225,7 @@
- 		this->SetupNewGRFWindow();
- 	}
- 
-+
- 	~NewGRFWindow()
- 	{
- 		if (this->editable && !this->execute) {
-@@ -362,43 +239,39 @@
- 		_grf_preset_list.Clear();
- 	}
- 
--	void SetupNewGRFWindow()
-+	virtual void OnPaint()
- 	{
- 		const GRFConfig *c;
--		int i;
- 
--		for (c = this->list, i = 0; c != NULL; c = c->next, i++) {}
-+		int i, y;
-+		int n = 0;
- 
--		this->vscroll.cap = (this->widget[SNGRFS_FILE_LIST].bottom - this->widget[SNGRFS_FILE_LIST].top) / 14 + 1;
--		SetVScrollCount(this, i);
-+		bool disable_all = this->sel_r == NULL || !this->editable;
- 
--		this->SetWidgetsDisabledState(!this->editable,
--			SNGRFS_PRESET_LIST,
--			SNGRFS_ADD,
--			SNGRFS_APPLY_CHANGES,
--			SNGRFS_TOGGLE_PALETTE,
--			WIDGET_LIST_END
--		);
--	}
--
--	virtual void OnPaint()
--	{
--		bool disable_all = this->sel == NULL || !this->editable;
--
- 		this->SetWidgetsDisabledState(disable_all,
- 			SNGRFS_REMOVE,
- 			SNGRFS_MOVE_UP,
- 			SNGRFS_MOVE_DOWN,
- 			WIDGET_LIST_END
- 		);
-+
-+		this->SetWidgetsDisabledState(!this->editable,
-+			SNGRFS_RESCAN_FILES,
-+			SNGRFS_NEWGRF_INFO,
-+			SNGRFS_AVAILABLE_GRF_LIST,
-+			SNGRFS_APPLY_CHANGES,
-+			WIDGET_LIST_END
-+		);
-+
-+		this->SetWidgetDisabledState(SNGRFS_ADD_FILE, !this->editable || this->sel_l == NULL || this->sel_l->IsOpenTTDBaseGRF());
- 		this->SetWidgetDisabledState(SNGRFS_SET_PARAMETERS, !this->show_params || disable_all);
- 		this->SetWidgetDisabledState(SNGRFS_TOGGLE_PALETTE, disable_all);
- 
- 		if (!disable_all) {
- 			/* All widgets are now enabled, so disable widgets we can't use */
--			if (this->sel == this->list)       this->DisableWidget(SNGRFS_MOVE_UP);
--			if (this->sel->next == NULL)       this->DisableWidget(SNGRFS_MOVE_DOWN);
--			if (this->sel->IsOpenTTDBaseGRF()) this->DisableWidget(SNGRFS_REMOVE);
-+			if (this->sel_r == this->list) this->DisableWidget(SNGRFS_MOVE_UP);
-+			if (this->sel_r->next == NULL) this->DisableWidget(SNGRFS_MOVE_DOWN);
-+			if (this->sel_r->IsOpenTTDBaseGRF()) this->DisableWidget(SNGRFS_REMOVE);
+ struct AndOr {
+ 	uint32 mor;
+ 	uint32 mand;
+@@ -421,6 +436,12 @@
  		}
+ 	}
  
- 		if (this->preset == -1) {
-@@ -426,12 +299,32 @@
++	byte c = GetStuckCounter(tile);
++	if (t == MP_RAILWAY) {
++		if (c==0) return 0;
++		return _stuck_counter_colours[c/32];
++	}
++
+ 	/* Ground colour */
+ 	const SmallMapColourScheme *cs = &_heightmap_schemes[_settings_client.gui.smallmap_land_colour];
+ 	return ApplyMask(cs->default_colour, &_smallmap_contours_andor[t]);
+Index: src/rail_cmd.cpp
+===================================================================
+--- src/rail_cmd.cpp	(revision 19145)
++++ src/rail_cmd.cpp	(working copy)
+@@ -2274,6 +2274,8 @@
+ 	RailGroundType old_ground = GetRailGroundType(tile);
+ 	RailGroundType new_ground;
+ 
++	ReduceStuckCounter(tile);
++
+ 	if (old_ground == RAIL_GROUND_WATER) {
+ 		TileLoop_Water(tile);
+ 		return;
+Index: src/table/settings.h
+===================================================================
+--- src/table/settings.h	(revision 19145)
++++ src/table/settings.h	(working copy)
+@@ -592,6 +592,7 @@
+ 	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
+ 	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0,  true,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
+ 	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
++	 SDTC_BOOL(gui.imp_newstations_gui,                  S,  0, false,                        STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI,         RedrawScreen),
+ 
+ /* For the dedicated build we'll enable dates in logs by default. */
+ #ifdef DEDICATED
+Index: src/company_cmd.cpp
+===================================================================
+--- src/company_cmd.cpp	(revision 19145)
++++ src/company_cmd.cpp	(working copy)
+@@ -52,7 +52,8 @@
+ Company::Company(uint16 name_1, bool is_ai) :
+ 	name_1(name_1),
+ 	location_of_HQ(INVALID_TILE),
+-	is_ai(is_ai)
++	is_ai(is_ai),
++	window(-1)
+ {
+ 	for (uint j = 0; j < 4; j++) this->share_owners[j] = COMPANY_SPECTATOR;
+ 	InvalidateWindowData(WC_PERFORMANCE_DETAIL, 0, INVALID_COMPANY);
+Index: src/train_cmd.cpp
+===================================================================
+--- src/train_cmd.cpp	(revision 19145)
++++ src/train_cmd.cpp	(working copy)
+@@ -3342,6 +3342,9 @@
+ 
+ 						/* Don't handle stuck trains here. */
+ 						if (HasBit(v->flags, VRF_TRAIN_STUCK)) return;
++						/* this codepath seems to be run every 5 ticks, so increase counter twice every 20 ticks */
++						IncreaseStuckCounter(v->tile);
++						if (v->tick_counter % 4 == 0) IncreaseStuckCounter(v->tile);
+ 
+ 						if (!HasSignalOnTrackdir(gp.new_tile, ReverseTrackdir(i))) {
+ 							v->cur_speed = 0;
+@@ -3954,6 +3957,7 @@
+ 	/* Handle stuck trains. */
+ 	if (!mode && HasBit(v->flags, VRF_TRAIN_STUCK)) {
+ 		++v->wait_counter;
++		if (v->tick_counter % 4 == 0) IncreaseStuckCounter(v->tile);
+ 
+ 		/* Should we try reversing this tick if still stuck? */
+ 		bool turn_around = v->wait_counter % (_settings_game.pf.wait_for_pbs_path * DAY_TICKS) == 0 && _settings_game.pf.wait_for_pbs_path < 255;
+Index: src/command.cpp
+===================================================================
+--- src/command.cpp	(revision 19145)
++++ src/command.cpp	(working copy)
+@@ -23,6 +23,9 @@
+ #include "town.h"
+ #include "date_func.h"
+ #include "debug.h"
++#include "window_func.h"
++#include "viewport_type.h"
++#include "viewport_func.h"
+ #include "company_func.h"
+ #include "company_base.h"
+ #include "signal_func.h"
+@@ -669,7 +672,17 @@
+ 	/* update last build coordinate of company. */
+ 	if (tile != 0) {
+ 		Company *c = Company::GetIfValid(_current_company);
+-		if (c != NULL) c->last_build_coordinate = tile;
++		if (c != NULL && c->last_build_coordinate != tile) {
++			c->last_build_coordinate = tile;
++			if (c->window != -1) {
++				Window *w = FindWindowById(WC_EXTRA_VIEW_PORT, c->window);
++				if (w != NULL) {
++					ScrollWindowTo(TileX(tile) * TILE_SIZE + TILE_SIZE / 2, TileY(tile) * TILE_SIZE + TILE_SIZE / 2, -1, w, true);
++				} else {
++					c->window = -1;
++				}
++			}
++		}
+ 	}
+ 
+ 	SubtractMoneyFromCompany(res2);
+Index: src/rail_gui.cpp
+===================================================================
+--- src/rail_gui.cpp	(revision 19145)
++++ src/rail_gui.cpp	(working copy)
+@@ -37,6 +37,8 @@
+ #include "table/sprites.h"
+ #include "table/strings.h"
+ 
++#include <vector>
++
+ static RailType _cur_railtype;               ///< Rail type of the current build-rail toolbar.
+ static bool _remove_button_clicked;          ///< Flag whether 'remove' toggle-button is currently enabled
+ static DiagDirection _build_depot_direction; ///< Currently selected depot direction
+@@ -49,13 +51,25 @@
+ /* Map the setting: default_signal_type to the corresponding signal type */
+ static const SignalType _default_signal_type[] = {SIGTYPE_NORMAL, SIGTYPE_PBS, SIGTYPE_PBS_ONEWAY};
+ 
++struct StationClass_Testing {
++		int result;      ///< Custom station class offset
++		StringID string; ///< Custom station class name
++};
++
++typedef std::vector<StationClass_Testing *> StationClasses;
++
+ struct RailStationGUISettings {
+ 	Axis orientation;                 ///< Currently selected rail station orientation
+ 
+ 	bool newstations;                 ///< Are custom station definitions available?
++	bool imp_newstations;             ///< Use the improved newstations gui?
+ 	StationClassIDByte station_class; ///< Currently selected custom station class (if newstations is \c true )
+ 	byte station_type;                ///< Station type within the currently selected custom station class (if newstations is \c true )
+ 	byte station_count;               ///< Number of custom stations (if newstations is \c true )
++	byte station_class_count;         ///< Number of custom stations classes (if imp_newstations is \c true)
++	StationClasses station_classes;   ///< Cache of custom stations classes (if imp_newstations is \c true)
++	Dimension window_size;            ///< Last used size of the window (if imp_newstations is \c true)
++	uint window_size_line_height;     ///< Last used line_height (if imp_newstations is \c true)
+ };
+ static RailStationGUISettings _railstation; ///< Settings of the station builder GUI
+ 
+@@ -945,6 +959,16 @@
+ 	BRSW_NEWST_LIST,
+ 	BRSW_NEWST_SCROLL,
+ 
++	BRSW_NEWGUI_LIST,             ///< Matrix of custom stations names (if imp_newstations is \c true)
++	BRSW_NEWGUI_CLASS_SCROLL,     ///< (if imp_newstations is \c true)
++
++	BRSW_NEWGUI_STATIONS_LIST,    ///< Matrix of stations types within the currently selected station class (if imp_newstations is \c true)
++	BRSW_NEWGUI_STATION_SCROLL,   ///< (if imp_newstations is \c true)
++
++	BRSW_NEWGUI_STATION_COVERAGE, ///< Text area used to draw 'Accepts' and 'Supplies' texts (if imp_newstations is \c true)
++
++	BRSW_NEWGUI_RESIZE,           ///< Resize button (if imp_newstations is \c true)
++
+ 	BRSW_PLATFORM_NUM_BEGIN = BRSW_PLATFORM_NUM_1 - 1,
+ 	BRSW_PLATFORM_LEN_BEGIN = BRSW_PLATFORM_LEN_1 - 1,
+ };
+@@ -952,6 +976,8 @@
+ struct BuildRailStationWindow : public PickerWindowBase {
+ private:
+ 	uint line_height; ///< Height of a single line in the newstation selection matrix (#BRSW_NEWST_LIST widget).
++	int station_coverage_resize;  ///< Of how many pixels should the station coverage area text be resized (#BRSW_NEWGUI_STATION_COVERAGE widget).
++	Pair original_resize_heights; ///< Original resize steps in height for #BRSW_NEWGUI_LIST and #BRSW_NEWGUI_STATIONS_LIST widgets.
+ 
+ 	/**
+ 	 * Verify whether the currently selected station size is allowed after selecting a new station class/type.
+@@ -998,6 +1024,16 @@
+ public:
+ 	BuildRailStationWindow(const WindowDesc *desc, Window *parent, bool newstation) : PickerWindowBase(parent)
+ 	{
++		/* Use the improved newstations gui? */
++		_railstation.imp_newstations = _settings_client.gui.imp_newstations_gui && newstation;
++
++		if (_railstation.imp_newstations) {
++			/* Default resize vars */
++			this->station_coverage_resize = 0;
++			this->original_resize_heights.a = 0;
++			this->original_resize_heights.b = 0;
++		}
++
+ 		this->InitNested(desc, TRANSPORT_RAIL);
+ 
+ 		this->LowerWidget(_railstation.orientation + BRSW_PLATFORM_DIR_X);
+@@ -1012,6 +1048,9 @@
+ 
+ 		_railstation.newstations = newstation;
+ 
++		/* End of constructor if using improved newstations gui */
++		if (_railstation.imp_newstations) return;
++
+ 		if (newstation) {
+ 			_railstation.station_count = GetNumCustomStations(_railstation.station_class);
+ 
+@@ -1028,9 +1067,42 @@
+ 
+ 	virtual ~BuildRailStationWindow()
+ 	{
++		if (_railstation.imp_newstations) {
++			/* Store window size. Will try to restore it on next use of improved newstations gui */
++			const uint station_coverage_resize = this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATION_COVERAGE)->current_y - (this->line_height * 2);
++			_railstation.window_size.width = this->width;
++			_railstation.window_size.height = this->height - station_coverage_resize;
++			_railstation.window_size_line_height = this->line_height;
++		}
+ 		DeleteWindowById(WC_SELECT_STATION, 0);
+ 	}
+ 
++	virtual void OnInit() {
++		/* Initialize current line height. Used by more than one widget in UpdateWidgetSize() */
++		this->line_height = FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
++
++		if (_railstation.imp_newstations) {
++			/* Cache the list of custom stations classes */
++			_railstation.station_count = GetNumCustomStations(_railstation.station_class);
++			if (!_railstation.station_classes.empty()) {
++				/* If the window is being opened again refresh the station classes */
++				_railstation.station_classes.clear();
++				_railstation.station_class_count = 0;
++			}
++			uint station_classes_count = GetNumStationClasses();
++			for (uint i = 0; i < station_classes_count; i++) {
++				if (i == STAT_CLASS_WAYP) continue;
++				_railstation.station_class_count++;
++				StationClass_Testing *station_class = new StationClass_Testing();
++				station_class->result = i;
++				station_class->string = GetStationClassName((StationClassID)i);
++				_railstation.station_classes.push_back(station_class);
++			}
++
++			this->vscroll.SetCount(_railstation.station_class_count);
++		}
++	}
++
+ 	virtual void OnPaint()
+ 	{
+ 		bool newstations = _railstation.newstations;
+@@ -1064,15 +1136,47 @@
  
  		this->DrawWidgets();
  
-+		DrawString(this->widget[SNGRFS_AVAILABLE_GRF_CAPTION].left, this->widget[SNGRFS_AVAILABLE_GRF_CAPTION].right, 34, STR_NEWGRF_ADD_CAPTION, TC_WHITE,SA_CENTER);
-+		GfxFillRect(this->widget[SNGRFS_AVAILABLE_GRF_LIST].left + 1, this->widget[SNGRFS_AVAILABLE_GRF_LIST].top + 1, this->widget[SNGRFS_AVAILABLE_GRF_LIST].right, this->widget[SNGRFS_AVAILABLE_GRF_LIST].bottom, 0xD7);
-+
-+		n = 0;
-+		y = this->widget[SNGRFS_AVAILABLE_GRF_LIST].top + 2;
-+		for (c = _all_grfs; c != NULL; c = c->next) {
-+
-+			if (IsInSelectedList(c->grfid)) continue;	
-+			
-+			if (n >= this->vscroll.pos && n < this->vscroll.pos + this->vscroll.cap) {
-+				bool h = (c == this->sel_l);
-+				const char *text = (c->name != NULL && !StrEmpty(c->name) && !this->show_file_names) ? c->name : c->filename;
-+
-+				/* Draw selection background */
-+				if (h) GfxFillRect(3, y, this->widget[SNGRFS_AVAILABLE_GRF_LIST].right - 4, y + 9, 156);
-+				DrawString(4, this->widget[SNGRFS_AVAILABLE_GRF_LIST].right - 7, y, text, h ? TC_WHITE : TC_ORANGE);
-+				y += 10;
++		if (_railstation.imp_newstations && _railstation.window_size.width != 0) {
++			if (_railstation.window_size_line_height == this->line_height) {
++				if (_railstation.window_size.width != (uint)this->width || _railstation.window_size.height != (uint)this->height) {
++					/* Resize the window to the last used size */
++					const int delta_x = _railstation.window_size.width - this->width;
++					const int delta_y = _railstation.window_size.height - this->height;
++					this->ReInit(delta_x, delta_y);
++				}
 +			}
-+			n++;
++			_railstation.window_size.width = 0;
++			_railstation.window_size.height = 0;
 +		}
 +
- 		/* Draw NewGRF list */
--		int y = this->widget[SNGRFS_FILE_LIST].top;
--		int i = 0;
--		for (const GRFConfig *c = this->list; c != NULL; c = c->next, i++) {
--			if (i >= this->vscroll.pos && i < this->vscroll.pos + this->vscroll.cap) {
--				const char *text = (c->name != NULL && !StrEmpty(c->name)) ? c->name : c->filename;
-+		y = this->widget[SNGRFS_FILE_LIST].top;
-+		for (c = this->list, i = 0; c != NULL; c = c->next, i++) {
-+			if (i >= this->vscroll2.pos && i < this->vscroll2.pos + this->vscroll2.cap) {
-+				const char *text = (c->name != NULL && !StrEmpty(c->name) && !this->show_file_names) ? c->name : c->filename;
- 				SpriteID pal;
- 				byte txtoffset;
- 
-@@ -458,21 +351,106 @@
- 					}
- 				}
- 
--				DrawSprite(SPR_SQUARE, pal, 5, y + 2);
--				if (c->error != NULL) DrawSprite(SPR_WARNING_SIGN, 0, 20, y + 2);
-+				DrawSprite(SPR_SQUARE, pal, this->widget[SNGRFS_FILE_LIST].left + 9, y + 2);
-+				if (c->error != NULL) DrawSprite(SPR_WARNING_SIGN, 0, this->widget[SNGRFS_FILE_LIST].left + 21, y + 2);
- 				txtoffset = c->error != NULL ? 35 : 25;
--				DrawString(txtoffset, this->widget[SNGRFS_FILE_LIST].right - 2, y + 3, text, this->sel == c ? TC_WHITE : TC_BLACK);
--				y += 14;
-+				DrawString(this->widget[SNGRFS_FILE_LIST].left + txtoffset,
-+						this->widget[SNGRFS_FILE_LIST].right - 2 - txtoffset , y + 2,
-+						text,
-+						this->sel_r == c ? TC_WHITE : TC_BLACK);
-+				y += 13;
- 			}
- 		}
- 
--		if (this->sel != NULL) {
-+		if (this->sel_r != NULL) {
- 			/* Draw NewGRF file info */
- 			const Widget *wi = &this->widget[SNGRFS_NEWGRF_INFO];
--			ShowNewGRFInfo(this->sel, wi->left + 2, wi->top + 2, wi->right - wi->left - 2, wi->bottom, this->show_params);
-+			ShowNewGRFInfo(this->sel_r, wi->left + 2, wi->top + 2, wi->right - wi->left - 2, wi->bottom, this->show_params, this->show_file_names);
- 		}
-+
-+		if (this->sel_l != NULL) {
-+			const Widget *wi = &this->widget[SNGRFS_NEWGRF_INFO];
-+			ShowNewGRFInfo(this->sel_l, wi->left + 2, wi->top + 2, wi->right - wi->left - 2, wi->bottom, false, this->show_file_names);
-+		}
-+
- 	}
- 
-+	virtual void OnInvalidateData(int data)
-+	{
-+		switch (data) {
-+			default: NOT_REACHED();
-+			case 0:
-+				this->preset = -1;
-+				this->SetupNewGRFWindow();
-+				break;
-+		
-+			case 1:
-+				/* Search the list for items that are now found and mark them as such. */
-+				for (GRFConfig *c = this->list; c != NULL; c = c->next) {
-+					if (c->status != GCS_NOT_FOUND) continue;
-+				
-+					const GRFConfig *f = FindGRFConfig(c->grfid, c->md5sum);
-+					if (f == NULL) continue;
-+				
-+					free(c->filename);
-+					free(c->name);
-+					free(c->info);
-+				
-+					c->filename  = f->filename == NULL ? NULL : strdup(f->filename);
-+					c->name      = f->name == NULL ? NULL : strdup(f->name);;
-+					c->info      = f->info == NULL ? NULL : strdup(f->info);;
-+					c->status    = GCS_UNKNOWN;
-+				}
-+				break;
-+		}
-+		
-+	}
-+
-+	virtual void OnDragMove(Point pt, int widget)
-+	{
-+		if (widget != SNGRFS_FILE_LIST) return;
-+
-+		GRFConfig **pc, *c, *source, *target;
-+
-+		if ((source = this->sel_r) == NULL) return;
-+
-+		uint i = (pt.y - this->widget[SNGRFS_FILE_LIST].top) / 13 + this->vscroll2.pos;
-+		for (c = this->list; c != NULL && i > 0; c = c->next, i--)
-+			if (c == source) i += 1;
-+		target = c;
-+		
-+		if (target == source) return;
-+
-+		for (pc = &this->list; (c = *pc) != NULL; pc = &c->next) {
-+			if (c == source)
-+				*pc = c->next;
-+			else if (c->next == source) {
-+				c->next = c->next->next;
-+			}
-+		}
-+
-+		for (pc = &this->list; (c = *pc) != NULL; pc = &c->next) {
-+			if (c == target) {
-+				*pc = source;
-+				source->next = target;
-+			}
-+			else if (c->next == target) {
-+				c->next = source;
-+				source->next = target;
-+			}
-+		}
-+
-+		this->SetDirty();
-+	}
-+
-+	virtual void OnDoubleClick(Point pt, int widget)
-+	{
-+		if (widget == SNGRFS_AVAILABLE_GRF_LIST)
-+			this->OnClick(pt, SNGRFS_ADD_FILE);
-+		if (widget == SNGRFS_FILE_LIST && this->sel_r)
-+			this->OnClick(pt, SNGRFS_REMOVE);
-+	}
-+
- 	virtual void OnClick(Point pt, int widget)
- 	{
- 		switch (widget) {
-@@ -506,30 +484,97 @@
- 				this->SetDirty();
- 				break;
- 
--			case SNGRFS_ADD: // Add GRF
--				DeleteWindowByClass(WC_SAVELOAD);
--				new NewGRFAddWindow(&_newgrf_add_dlg_desc, &this->list);
-+			case SNGRFS_AVAILABLE_GRF_LIST: {
-+				/* Get row... */
-+				const GRFConfig *c;
-+				uint i = ((pt.y) - this->widget[SNGRFS_AVAILABLE_GRF_LIST].top) / 10 + this->vscroll.pos;
-+				
-+				c = _all_grfs;
-+				while (c && IsInSelectedList(c->grfid) && c->next) {
-+					c = c->next;
-+				}
-+				while (c != NULL && i > 0)
-+				{
-+					c = c->next;
-+					while (c != NULL && IsInSelectedList(c->grfid) && c->next) {
-+						c = c->next;
-+					}
-+					--i;
-+				}
-+				if (c && IsInSelectedList(c->grfid)) c = NULL;
-+				this->sel_l = c;
-+				this->sel_r = NULL;
-+				this->SetDirty();
- 				break;
-+			}
- 
-+			case SNGRFS_ADD_FILE: // Add selection to list
-+				if (this->sel_l != NULL && this->editable) {
-+					const GRFConfig *src = this->sel_l;
-+					GRFConfig **list;
-+
-+					/* Find last entry in the list, checking for duplicate grfid on the way */
-+					for (list = &this->list; *list != NULL; list = &(*list)->next) {
-+						if ((*list)->grfid == src->grfid) {
-+							ShowErrorMessage(INVALID_STRING_ID, STR_NEWGRF_DUPLICATE_GRFID, 0, 0);
-+							return;
-+						}
-+					}
-+
-+					/* Copy GRF details from scanned list */
-+					GRFConfig *c = CallocT<GRFConfig>(1);
-+					*c = *src;
-+					c->filename = strdup(src->filename);
-+					if (src->name      != NULL) c->name      = strdup(src->name);
-+					if (src->info      != NULL) c->info      = strdup(src->info);
-+					c->next = NULL;
-+
-+					/* Append GRF config to configuration list */
-+					*list = c;
-+					this->sel_l = NULL;
-+					this->preset = -1;
-+					this->SetupNewGRFWindow();
-+					this->SetDirty();
-+				}
-+				break;
-+
-+			case SNGRFS_RESCAN_FILES: // Rescan list
-+				this->sel_l = NULL;
-+				ScanNewGRFFiles();
-+				this->SetDirty();
-+				break;
-+				
-+			case SNGRFS_TOGGLE_SHOW_MODE: // Toggle show mode
-+				if (_ctrl_pressed) {
-+					this->show_file_names = !this->show_file_names;
-+				}
-+				else {
-+					this->show_all = !this->show_all;
-+				}
-+
-+				this->SetupNewGRFWindow(); // Adjust scroll bars
-+				this->SetDirty();
-+				break;
-+
- 			case SNGRFS_REMOVE: { // Remove GRF
- 				GRFConfig **pc, *c, *newsel;
- 
- 				/* Choose the next GRF file to be the selected file */
--				newsel = this->sel->next;
-+				newsel = this->sel_r->next;
- 
- 				for (pc = &this->list; (c = *pc) != NULL; pc = &c->next) {
- 					/* If the new selection is empty (i.e. we're deleting the last item
- 					 * in the list, pick the file just before the selected file */
--					if (newsel == NULL && c->next == this->sel) newsel = c;
-+					if (newsel == NULL && c->next == this->sel_r) newsel = c;
- 
--					if (c == this->sel) {
-+					if (c == this->sel_r) {
- 						*pc = c->next;
- 						free(c);
- 						break;
- 					}
- 				}
- 
--				this->sel = newsel;
-+				this->sel_r = newsel;
- 				this->preset = -1;
- 				this->SetupNewGRFWindow();
- 				this->SetDirty();
-@@ -538,13 +583,13 @@
- 
- 			case SNGRFS_MOVE_UP: { // Move GRF up
- 				GRFConfig **pc, *c;
--				if (this->sel == NULL) break;
-+				if (this->sel_r == NULL) break;
- 
- 				for (pc = &this->list; (c = *pc) != NULL; pc = &c->next) {
--					if (c->next == this->sel) {
--						c->next = this->sel->next;
--						this->sel->next = c;
--						*pc = this->sel;
-+					if (c->next == this->sel_r) {
-+						c->next = this->sel_r->next;
-+						this->sel_r->next = c;
-+						*pc = this->sel_r;
- 						break;
- 					}
- 				}
-@@ -555,10 +600,10 @@
- 
- 			case SNGRFS_MOVE_DOWN: { // Move GRF down
- 				GRFConfig **pc, *c;
--				if (this->sel == NULL) break;
-+				if (this->sel_r == NULL) break;
- 
- 				for (pc = &this->list; (c = *pc) != NULL; pc = &c->next) {
--					if (c == this->sel) {
-+					if (c == this->sel_r) {
- 						*pc = c->next;
- 						c->next = c->next->next;
- 						(*pc)->next = c;
-@@ -572,11 +617,15 @@
- 
- 			case SNGRFS_FILE_LIST: { // Select a GRF
- 				GRFConfig *c;
--				uint i = (pt.y - this->widget[SNGRFS_FILE_LIST].top) / 14 + this->vscroll.pos;
-+				uint i = (pt.y - this->widget[SNGRFS_FILE_LIST].top) / 13 + this->vscroll2.pos;
- 
--				for (c = this->list; c != NULL && i > 0; c = c->next, i--) {}
--				this->sel = c;
-+				for (c = this->list; c != NULL && i > 0; c = c->next, i--) ;
-+				this->sel_r = c;
-+				this->sel_l = NULL;
- 
-+				/* Activate drag and drop */
-+				SetObjectToPlaceWnd(SPR_CURSOR_MOUSE, PAL_NONE, HT_DRAG, this);
-+				
- 				this->SetDirty();
- 				break;
- 			}
-@@ -597,19 +646,19 @@
- 				break;
- 
- 			case SNGRFS_SET_PARAMETERS: { // Edit parameters
--				if (this->sel == NULL) break;
-+				if (this->sel_r == NULL) break;
- 
- 				this->query_widget = widget;
- 				static char buff[512];
--				GRFBuildParamList(buff, this->sel, lastof(buff));
-+				GRFBuildParamList(buff, this->sel_r, lastof(buff));
- 				SetDParamStr(0, buff);
- 				ShowQueryString(STR_JUST_RAW_STRING, STR_NEWGRF_SETTINGS_PARAMETER_QUERY, 63, 250, this, CS_ALPHANUMERAL, QSF_NONE);
- 				break;
- 			}
- 
--			case SNGRFS_TOGGLE_PALETTE:
--				if (this->sel != NULL) {
--					this->sel->windows_paletted ^= true;
-+			case SNGRFS_TOGGLE_PALETTE: {
-+				if (this->sel_r != NULL) {
-+					this->sel_r->windows_paletted ^= true;
- 					this->SetDirty();
- 				}
- 				break;
-@@ -637,7 +686,9 @@
- #endif
- 				}
- 				break;
--
-+			
-+				
-+			}
- 		}
- 	}
- 
-@@ -650,14 +701,14 @@
- 			GRFConfig *c = LoadGRFPresetFromConfig(_grf_preset_list[index]);
- 
- 			if (c != NULL) {
--				this->sel = NULL;
-+				this->sel_r = NULL;
- 				ClearGRFConfigList(&this->list);
- 				this->list = c;
- 				this->preset = index;
- 			}
- 		}
- 
--		this->sel = NULL;
-+		this->sel_r = NULL;
- 		this->SetupNewGRFWindow();
- 		this->SetDirty();
- 	}
-@@ -684,7 +735,7 @@
- 
- 			case SNGRFS_SET_PARAMETERS: {
- 				/* Parse our new "int list" */
--				GRFConfig *c = this->sel;
-+				GRFConfig *c = this->sel_r;
- 				c->num_params = parse_intlist(str, (int*)c->param, lengthof(c->param));
- 
- 				/* parse_intlist returns -1 on error */
-@@ -699,118 +750,123 @@
- 
- 	virtual void OnResize(Point delta)
- 	{
--		if (delta.x != 0) {
--			ResizeButtons(this, SNGRFS_ADD, SNGRFS_MOVE_DOWN);
--			ResizeButtons(this, SNGRFS_SET_PARAMETERS, SNGRFS_APPLY_CHANGES);
-+		/* ASSUME: this->width, this->height already contains the new window size */
-+
-+		int left_column_width  = (this->width - 31) / 2 + 4;
-+		int right_column_width = left_column_width - 7;
-+
-+		Widget *w = this->widget;
-+		
-+		w[SNGRFS_RESCAN_FILES].right =
-+				(left_column_width / 2) - 1;
-+
-+		w[SNGRFS_TOGGLE_SHOW_MODE].left =
-+				(left_column_width / 2);
-+
-+		w[SNGRFS_AVAILABLE_GRF_LIST].right =
-+				left_column_width - 14;
-+
-+		w[SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR].left =
-+				left_column_width - 12;
-+
-+		w[SNGRFS_AVAILABLE_GRF_CAPTION].right =
-+		w[SNGRFS_EMPTY_GRF_LIST].right =
-+		w[SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR].right =
-+		w[SNGRFS_TOGGLE_SHOW_MODE].right =
-+		w[SNGRFS_CONTENT_DOWNLOAD].right =
-+				left_column_width - 1;
-+
-+		w[SNGRFS_EMPTY_MIDDLE].left =
-+		w[SNGRFS_EMPTY_BOTTOM_MIDDLE].left =
-+				left_column_width;
-+
-+		w[SNGRFS_ADD_FILE].left =
-+		w[SNGRFS_REMOVE].left =
-+				left_column_width + 5;
-+
-+		w[SNGRFS_ADD_FILE].right =
-+		w[SNGRFS_REMOVE].right =
-+				left_column_width + 25;
-+
-+		w[SNGRFS_EMPTY_MIDDLE].right =
-+		w[SNGRFS_EMPTY_BOTTOM_MIDDLE].right =
-+				left_column_width + 29;
-+
-+		int rightwin_start = left_column_width + 30;
-+
-+		w[SNGRFS_EMPTY_TOP_RIGHT].left =
-+		w[SNGRFS_FILE_LIST].left =
-+		w[SNGRFS_TOGGLE_PALETTE].left =
-+		w[SNGRFS_APPLY_CHANGES].left =
-+				rightwin_start;
-+		
-+		int button_width = (right_column_width < 198 ? 36 : 66);
-+		int spacing = (right_column_width - 2 * button_width) / 3;
-+		int pos     = rightwin_start + spacing;
-+
-+		w[SNGRFS_MOVE_UP].left    = pos; pos += button_width;
-+		w[SNGRFS_MOVE_UP].right   = pos; pos += spacing;
-+		w[SNGRFS_MOVE_DOWN].left  = pos; pos += button_width;
-+		w[SNGRFS_MOVE_DOWN].right = pos;
-+
-+		spacing = right_column_width / 2;
-+		w[SNGRFS_TOGGLE_PALETTE].right = rightwin_start + spacing - 1;
-+		w[SNGRFS_SET_PARAMETERS].left  = rightwin_start + spacing;
-+
-+		int list_bottom;
-+
-+		if (this->height < 221) {
-+			list_bottom = 104;
+ 		/* 'Accepts' and 'Supplies' texts. */
+-		int top = this->GetWidget<NWidgetBase>(BRSW_HIGHLIGHT_ON)->pos_y + this->GetWidget<NWidgetBase>(BRSW_HIGHLIGHT_ON)->current_y + WD_PAR_VSEP_NORMAL;
++		uint left, top, right, bottom = 0;
+ 		NWidgetBase *back_nwi = this->GetWidget<NWidgetBase>(BRSW_BACKGROUND);
+-		int right = back_nwi->pos_x +  back_nwi->current_x;
+-		int bottom = back_nwi->pos_y +  back_nwi->current_y;
+-		top = DrawStationCoverageAreaText(back_nwi->pos_x + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, false) + WD_PAR_VSEP_NORMAL;
+-		top = DrawStationCoverageAreaText(back_nwi->pos_x + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, true) + WD_PAR_VSEP_NORMAL;
++		NWidgetBase *station_coverage_nwi = NULL;
++		if (_railstation.imp_newstations) {
++			/* Use the station coverage area text widget (#BRSW_NEWGUI_STATION_COVERAGE) */
++			station_coverage_nwi = this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATION_COVERAGE);
++			left = station_coverage_nwi->pos_x;
++			right = left + station_coverage_nwi->current_x;
++			top = station_coverage_nwi->pos_y;
 +		} else {
-+			list_bottom = this->height - 106;
- 		}
- 
--		this->vscroll.cap += delta.y / 14;
--		this->widget[SNGRFS_FILE_LIST].data = (this->vscroll.cap << MAT_ROW_START) + (1 << MAT_COL_START);
-+		w[SNGRFS_EMPTY_GRF_LIST].bottom =
-+		w[SNGRFS_AVAILABLE_GRF_LIST].bottom =
-+		w[SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR].bottom =
-+		w[SNGRFS_FILE_LIST].bottom =
-+		w[SNGRFS_FILE_LIST_SCROLLBAR].bottom =
-+		w[SNGRFS_EMPTY_MIDDLE].bottom =
-+			list_bottom;
- 
-+		w[SNGRFS_NEWGRF_INFO].top = list_bottom + 1;
-+
- 		this->SetupNewGRFWindow();
- 	}
-+	
-+	bool IsInSelectedList(uint32 grfid) {
-+		if (this->show_all) return false;
-+		const GRFConfig *ctemp;
-+		for (ctemp = this->list; ctemp != NULL; ctemp = ctemp->next) {
-+			if (grfid == ctemp->grfid) return true;
++			left = back_nwi->pos_x;
++			right = back_nwi->pos_x + back_nwi->current_x;
++			top = this->GetWidget<NWidgetBase>(BRSW_HIGHLIGHT_ON)->pos_y + this->GetWidget<NWidgetBase>(BRSW_HIGHLIGHT_ON)->current_y + WD_PAR_VSEP_NORMAL;
++			bottom = back_nwi->pos_y + back_nwi->current_y;
 +		}
-+		return false;
-+	}
- 
--	virtual void OnInvalidateData(int data)
-+	void SetupNewGRFWindow()
- 	{
--		switch (data) {
--			default: NOT_REACHED();
--			case 0:
--				this->preset = -1;
--				this->SetupNewGRFWindow();
--				break;
-+		const GRFConfig *c;
-+		uint16 n;
- 
--			case 1:
--				/* Search the list for items that are now found and mark them as such. */
--				for (GRFConfig *c = this->list; c != NULL; c = c->next) {
--					if (c->status != GCS_NOT_FOUND) continue;
-+		for (c = this->list, n = 0; c != NULL; c = c->next, n++) ;
- 
--					const GRFConfig *f = FindGRFConfig(c->grfid, c->md5sum);
--					if (f == NULL) continue;
-+		this->vscroll2.cap = (this->widget[SNGRFS_FILE_LIST].bottom - this->widget[SNGRFS_FILE_LIST].top) / 13;
- 
--					free(c->filename);
--					free(c->name);
--					free(c->info);
-+		this->widget[SNGRFS_FILE_LIST].data = (this->vscroll2.cap << 8) + 1;
-+		SetVScroll2Count(this, n);
-+		this->SetWidgetDisabledState(SNGRFS_APPLY_CHANGES, !this->editable);
- 
--					c->filename  = f->filename == NULL ? NULL : strdup(f->filename);
--					c->name      = f->name == NULL ? NULL : strdup(f->name);;
--					c->info      = f->info == NULL ? NULL : strdup(f->info);;
--					c->status    = GCS_UNKNOWN;
--				}
--				break;
-+		/* Count the number of GRFs */
-+		for (c = _all_grfs, n = 0; c != NULL; c = c->next)
-+		{
-+			if (this->show_all || !IsInSelectedList(c->grfid)) n++;
++		top = DrawStationCoverageAreaText(left + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, false) + WD_PAR_VSEP_NORMAL;
++		top = DrawStationCoverageAreaText(left + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, true) + WD_PAR_VSEP_NORMAL;
+ 		/* Resize background if the text is not equally long as the window. */
+-		if (top > bottom || (top < bottom && back_nwi->current_y > back_nwi->smallest_y)) {
++		if (_railstation.imp_newstations) {
++			const uint text_height = top - station_coverage_nwi->pos_y + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
++			if (text_height != station_coverage_nwi->current_y) {
++				/* Sets the additional height needed to #BRSW_NEWGUI_STATION_COVERAGE to fit 
++				   the coverage area text (UpdateWidgetSize(#BRSW_NEWGUI_STATION_COVERAGE)) */
++				this->station_coverage_resize = text_height - (this->line_height * 2);
++				this->ReInit(0, this->station_coverage_resize);
++			}
++		} else if (top > bottom || (top < bottom && back_nwi->current_y > back_nwi->smallest_y)) {
+ 			ResizeWindow(this, 0, top - bottom);
  		}
-+
-+		this->vscroll.cap = (this->widget[SNGRFS_AVAILABLE_GRF_LIST].bottom - this->widget[SNGRFS_AVAILABLE_GRF_LIST].top) / 10;
-+		SetVScrollCount(this, n);
  	}
+@@ -1103,10 +1207,49 @@
+ 				}
+ 				size->width = max(size->width, d.width + padding.width);
+ 
+-				this->line_height = FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
+ 				size->height = GB(this->GetWidget<NWidgetCore>(widget)->widget_data, MAT_ROW_START, MAT_ROW_BITS) * this->line_height;
+ 				break;
+ 			}
++			case BRSW_NEWGUI_LIST: {
++				/* Increase width to match the widest custom station class name */
++				Dimension d = {0, 0};
++				for (uint i = 0; i < _railstation.station_class_count; i++) {
++					SetDParam(0, _railstation.station_classes[i]->string);
++					d = maxdim(d, GetStringBoundingBox(STR_BLACK_STRING));
++				}
++				size->width = max(size->width, d.width + padding.width);
++
++				if (this->original_resize_heights.a == 0) {
++					/* Store the original height resize step (next invocations 
++					   receive current/modified resize info, not originals) */
++					this->original_resize_heights.a = resize->height;
++				}
++				/* Widget height depends of line height: cell height equals line height */
++				const uint line_count = (size->height - 1) / this->original_resize_heights.a;
++				size->height = this->line_height * line_count + 1;
++				resize->height = this->line_height;
++				break;
++			}
++			case BRSW_NEWGUI_STATIONS_LIST: {
++				if (this->original_resize_heights.b == 0) {
++					/* Store the original height resize step (next invocations 
++					   receive current/modified resize info, not originals) */
++					this->original_resize_heights.b = resize->height;
++				}
++				/* Widget height depends of line height: cell height equals four lines height */
++				const uint row_count = size->height / this->original_resize_heights.b;
++				const uint station_cell_height = this->line_height * 4;
++				size->height = station_cell_height * row_count;
++				resize->height = station_cell_height;
++				break;
++			}
++			case BRSW_NEWGUI_STATION_COVERAGE: {
++				/* Widget height is two lines eventually increased by the height needed 
++				   to fit the coverage text */
++				size->height = this->line_height * 2 + this->station_coverage_resize;
++				this->station_coverage_resize = 0;
++				break;
++			}
+ 		}
+ 	}
+ 
+@@ -1157,6 +1300,67 @@
+ 				}
+ 				break;
+ 			}
++
++			case BRSW_NEWGUI_LIST: {
++				/* Draw the custom stations classes names */
++				uint y = r.top;
++
++				for (uint16 i = this->vscroll.GetPosition(); i < _railstation.station_class_count && this->vscroll.IsVisible(i); i++) {
++					DrawString(r.left + WD_MATRIX_LEFT, r.right - WD_MATRIX_RIGHT, y + WD_MATRIX_TOP, _railstation.station_classes[i]->string,
++							_railstation.station_classes[i]->result == (StationClassID)_railstation.station_class ? TC_WHITE : TC_BLACK);
++					y += this->line_height;
++				}
++				break;
++			}
++			
++			case BRSW_NEWGUI_STATIONS_LIST: {
++				/* Draw station types of the current custom station class */
++				const NWidgetCore *stations_list_nwi = this->GetWidget<NWidgetCore>(widget);
++				const Dimension cell_dim = {stations_list_nwi->resize_x, stations_list_nwi->resize_y};
++				/* Topmost-leftest cell */
++				const Rect cell = {r.left, r.top, r.left + cell_dim.width, r.top + cell_dim.height};
++				const uint col_count = stations_list_nwi->current_x / cell_dim.width;
++
++				uint y = 0;
++				uint x = 0;
++				DrawPixelInfo *old_dpi;
++				
++				for (uint16 i = this->vscroll2.GetPosition(); i < this->vscroll2.GetCount() && this->vscroll2.IsVisible(i); i++) {
++					x = 0;
++					for (uint16 station = i * col_count; station < _railstation.station_count && station < (i + 1) * col_count; station++) {
++						/* Draw selected cell as lowered */
++						if (_railstation.station_type == station) {
++							/* Rightest cells don't overwrite scrollbar */
++							const int adjust_x = (x / cell_dim.width) + 1 == col_count ? -2 : -1;
++							/* Bottom cells don't overwrite coverage area text */
++							const int adjust_y = (y / cell_dim.height) + 1 == this->vscroll2.GetCapacity() ? -1 : 0;
++							DrawFrameRect(cell.left + x, cell.top + y, cell.right + adjust_x + x, cell.bottom + adjust_y + y, stations_list_nwi->colour, FR_LOWERED);
++						}
++
++						/* Draw station sprite */
++						if (FillDrawPixelInfo(&tmp_dpi, cell.left + x, cell.top + 1 + y, cell_dim.width, cell_dim.height + 1)) {
++							old_dpi = _cur_dpi;
++							_cur_dpi = &tmp_dpi;
++							if (!DrawStationTile(32, 16, _cur_railtype, _railstation.orientation, _railstation.station_class, station)) {
++								StationPickerDrawSprite(32, 16, STATION_RAIL, _cur_railtype, INVALID_ROADTYPE, 2 + _railstation.orientation);
++							}
++							_cur_dpi = old_dpi;
++						}
++
++						/* Draw unavailable station as disabled */
++						const StationSpec *statspec = GetCustomStationSpec(_railstation.station_class, station);
++						if (statspec != NULL && statspec->name != 0) {
++							if (HasBit(statspec->callback_mask, CBM_STATION_AVAIL) && GB(GetStationCallback(CBID_STATION_AVAILABILITY, 0, 0, statspec, NULL, INVALID_TILE), 0, 8) == 0) {
++								GfxFillRect(cell.left + 1 + x, cell.top + 1 + y, cell.right - 2 + x, cell.bottom - 1 + y, 0, FILLRECT_CHECKER);
++							}
++						}
++
++						x += cell_dim.width;
++					}
++					y += cell_dim.height;
++				}
++				break;
++			}
+ 		}
+ 	}
+ 
+@@ -1318,9 +1522,90 @@
+ 				DeleteWindowById(WC_SELECT_STATION, 0);
+ 				break;
+ 			}
++
++			// Improved newstation gui - Class selector
++			case BRSW_NEWGUI_LIST: {
++				int y = (pt.y - this->GetWidget<NWidgetBase>(widget)->pos_y) / this->line_height;
++				if (y >= this->vscroll.GetCapacity()) return;
++				y += this->vscroll.GetPosition();
++				if (y >= _railstation.station_class_count) return;
++
++				if (_railstation.station_class != _railstation.station_classes[y]->result) {
++					/* A new custom station class is selected */
++					_railstation.station_class = (StationClassID)(_railstation.station_classes[y]->result);
++					_railstation.station_type  = 0;
++					_railstation.station_count = GetNumCustomStations(_railstation.station_class);
++
++					this->CheckSelectedSize(GetCustomStationSpec(_railstation.station_class, _railstation.station_type));
++
++					/* Update stations types matrix scrollbar */
++					uint col_count = this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATIONS_LIST)->current_x / this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATIONS_LIST)->resize_x;
++					this->vscroll2.SetCount(_railstation.station_count / col_count  + (_railstation.station_count % col_count > 0));
++					this->vscroll2.SetPosition(0);
++				}
++
++				SndPlayFx(SND_15_BEEP);
++				this->SetDirty();
++				DeleteWindowById(WC_SELECT_STATION, 0);
++				break;
++			}
++
++			// Improved newstation gui - Station selector
++			case BRSW_NEWGUI_STATIONS_LIST: {
++				const StationSpec *statspec;
++				const NWidgetBase *stations_list_nwi = this->GetWidget<NWidgetBase>(widget);
++				int y = (pt.y - stations_list_nwi->pos_y) / stations_list_nwi->resize_y;
++				const int x = (pt.x - stations_list_nwi->pos_x) / stations_list_nwi->resize_x;
++				const int col_count = stations_list_nwi->current_x / stations_list_nwi->resize_x;
++
++				if (y >= this->vscroll2.GetCapacity()) return;
++				if (x >= col_count) return;
++				y += this->vscroll2.GetPosition();
++				if (y * col_count + x >= _railstation.station_count) return;
++
++				/* Check station availability callback */
++				statspec = GetCustomStationSpec(_railstation.station_class, y * col_count + x);
++				if (statspec != NULL &&
++					HasBit(statspec->callback_mask, CBM_STATION_AVAIL) &&
++					GB(GetStationCallback(CBID_STATION_AVAILABILITY, 0, 0, statspec, NULL, INVALID_TILE), 0, 8) == 0) return;
++
++				/* Select current station type */
++				_railstation.station_type = y * col_count + x;
++
++				this->CheckSelectedSize(statspec);
++
++				SndPlayFx(SND_15_BEEP);
++				this->SetDirty();
++				DeleteWindowById(WC_SELECT_STATION, 0);
++				break;
++			}
+ 		}
+ 	}
+ 
++	virtual void OnRightClick(Point pt, int widget)
++	{
++		if (widget == BRSW_NEWGUI_STATIONS_LIST) {
++			const StationSpec *statspec;
++			const NWidgetBase *stations_list_nwi = this->GetWidget<NWidgetBase>(widget);
++			int y = (pt.y - stations_list_nwi->pos_y) / stations_list_nwi->resize_y;
++			const int x = (pt.x - stations_list_nwi->pos_x) / stations_list_nwi->resize_x;
++			const int col_count = stations_list_nwi->current_x / stations_list_nwi->resize_x;
++
++			if (y >= this->vscroll2.GetCapacity()) return;
++			if (x >= col_count) return;
++			y += this->vscroll2.GetPosition();
++			if (y * col_count + x >= _railstation.station_count) return;
++
++			// Check station availability callback
++			statspec = GetCustomStationSpec(_railstation.station_class, y * col_count + x);
++
++			/* Show station type name as tooltip (forced in black) */
++			uint64 args[1];
++			args[0] = (uint64)(size_t)(statspec != NULL && statspec->name != 0 ? statspec->name : STR_STATION_CLASS_DFLT);
++			GuiShowTooltips(STR_BLACK_STRING, 1, args);
++		}
++	}
++
+ 	virtual void OnDropdownSelect(int widget, int index)
+ 	{
+ 		if (_railstation.station_class != index) {
+@@ -1343,6 +1628,44 @@
+ 	{
+ 		CheckRedrawStationCoverage(this);
+ 	}
++
++	virtual void OnResize()
++	{
++		if (_railstation.imp_newstations) {
++			/* Update custom stations classes scrollbar */
++			int old_capacity = this->vscroll.GetCapacity();
++			this->vscroll.SetCapacityFromWidget(this, BRSW_NEWGUI_LIST, 1);
++			this->GetWidget<NWidgetCore>(BRSW_NEWGUI_LIST)->widget_data = (this->vscroll.GetCapacity()  << MAT_ROW_START) + (1 << MAT_COL_START);
++			if (!this->vscroll.IsVisible(_railstation.station_class)) {
++				/* Ensure that the currently selected class is visible */
++				this->vscroll.UpdatePosition(max(old_capacity - this->vscroll.GetCapacity(), 0));
++			}
++
++			/* Update custom stations types scrollbar */
++			old_capacity = this->vscroll2.GetCapacity();
++			this->vscroll2.SetCapacityFromWidget(this, BRSW_NEWGUI_STATIONS_LIST, 0);
++			int capacity = this->vscroll2.GetCapacity();
++
++			NWidgetCore *stations_list_nwi = this->GetWidget<NWidgetCore>(BRSW_NEWGUI_STATIONS_LIST);
++
++			const uint col_count = stations_list_nwi->current_x / stations_list_nwi->resize_x;
++			this->vscroll2.SetCount(_railstation.station_count / col_count  + (_railstation.station_count % col_count > 0));
++
++			const uint old_col_count = GB(stations_list_nwi->widget_data, MAT_COL_START, MAT_COL_BITS);
++			stations_list_nwi->widget_data = (this->vscroll2.GetCapacity() << MAT_ROW_START) + (col_count << MAT_COL_START);
++
++			if (!this->vscroll2.IsVisible(_railstation.station_type / col_count)) {
++				/* Ensure that the currently selected type is visible */
++				if (old_capacity > capacity) {
++					/* Selected type was hidden by a vertical resize */
++					this->vscroll2.UpdatePosition(old_capacity - capacity);
++				} else if(old_col_count > col_count) {
++					/* Selected type was hidden by an horizontal resize */
++					this->vscroll2.UpdatePosition(_railstation.station_type - (capacity - 1) - this->vscroll2.GetPosition());
++				}
++			}
++		}
++	}
  };
  
--/* Widget definition of the manage newgrfs window */
--static const Widget _newgrf_widgets[] = {
--{   WWT_CLOSEBOX,  RESIZE_NONE,  COLOUR_MAUVE,    0,  10,   0,  13, STR_BLACK_CROSS,             STR_TOOLTIP_CLOSE_WINDOW },         // SNGRFS_CLOSEBOX
--{    WWT_CAPTION, RESIZE_RIGHT,  COLOUR_MAUVE,   11, 299,   0,  13, STR_NEWGRF_SETTINGS_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS }, // SNGRFS_CAPTION
--{      WWT_PANEL, RESIZE_RIGHT,  COLOUR_MAUVE,    0, 299,  14,  29, STR_NULL,                    STR_NULL },                         // SNGRFS_BACKGROUND1
--{   WWT_DROPDOWN, RESIZE_RIGHT,  COLOUR_YELLOW,  10, 103,  16,  27, STR_EMPTY,                   STR_NEWGRF_SETTINGS_PRESET_LIST_TOOLTIP },       // SNGRFS_PRESET_LIST
--{ WWT_PUSHTXTBTN,    RESIZE_LR,  COLOUR_YELLOW, 104, 196,  16,  27, STR_NEWGRF_SETTINGS_PRESET_SAVE,      STR_NEWGRF_SETTINGS_PRESET_SAVE_TOOLTIP },       // SNGRFS_PRESET_SAVE
--{ WWT_PUSHTXTBTN,    RESIZE_LR,  COLOUR_YELLOW, 197, 289,  16,  27, STR_NEWGRF_SETTINGS_PRESET_DELETE,    STR_NEWGRF_SETTINGS_PRESET_DELETE_TOOLTIP },     // SNGRFS_PRESET_DELETE
--{      WWT_PANEL, RESIZE_RIGHT,  COLOUR_MAUVE,    0, 299,  30,  45, STR_NULL,                    STR_NULL },                         // SNGRFS_BACKGROUND2
--{ WWT_PUSHTXTBTN,  RESIZE_NONE,  COLOUR_YELLOW,  10,  79,  32,  43, STR_NEWGRF_SETTINGS_ADD,              STR_NEWGRF_SETTINGS_ADD_TOOLTIP },               // SNGRFS_ADD
--{ WWT_PUSHTXTBTN,  RESIZE_NONE,  COLOUR_YELLOW,  80, 149,  32,  43, STR_NEWGRF_SETTINGS_REMOVE,           STR_NEWGRF_SETTINGS_REMOVE_TOOLTIP },            // SNGRFS_REMOVE
--{ WWT_PUSHTXTBTN,  RESIZE_NONE,  COLOUR_YELLOW, 150, 219,  32,  43, STR_NEWGRF_SETTINGS_MOVEUP,           STR_NEWGRF_SETTINGS_MOVEUP_TOOLTIP },            // SNGRFS_MOVE_UP
--{ WWT_PUSHTXTBTN, RESIZE_RIGHT,  COLOUR_YELLOW, 220, 289,  32,  43, STR_NEWGRF_SETTINGS_MOVEDOWN,         STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP },          // SNGRFS_MOVE_DOWN
--{     WWT_MATRIX,    RESIZE_RB,  COLOUR_MAUVE,    0, 287,  46, 115, 0x501,                       STR_NEWGRF_SETTINGS_FILE_TOOLTIP },              // SNGRFS_FILE_LIST
--{  WWT_SCROLLBAR,   RESIZE_LRB,  COLOUR_MAUVE,  288, 299,  46, 115, 0x0,                         STR_TOOLTIP_VSCROLL_BAR_SCROLLS_LIST }, // SNGRFS_SCROLLBAR
--{      WWT_PANEL,   RESIZE_RTB,  COLOUR_MAUVE,    0, 299, 116, 238, STR_NULL,                    STR_NULL },                         // SNGRFS_NEWGRF_INFO
--{ WWT_PUSHTXTBTN,    RESIZE_TB,  COLOUR_MAUVE,    0,  99, 239, 250, STR_NEWGRF_SETTINGS_SET_PARAMETERS,   STR_NULL },                         // SNGRFS_SET_PARAMETERS
--{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,  100, 199, 239, 250, STR_NEWGRF_SETTINGS_TOGGLE_PALETTE,   STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP },    // SNGRFS_TOGGLE_PALETTE
--{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE,  200, 299, 239, 250, STR_NEWGRF_SETTINGS_APPLY_CHANGES,    STR_NULL },                         // SNGRFS_APPLY_CHANGES
--{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,    0, 287, 251, 262, STR_INTRO_ONLINE_CONTENT,    STR_INTRO_TOOLTIP_ONLINE_CONTENT },     // SNGRFS_CONTENT_DOWNLOAD
--{  WWT_RESIZEBOX,  RESIZE_LRTB,  COLOUR_MAUVE,  288, 299, 251, 262, 0x0,                         STR_TOOLTIP_RESIZE },                // SNGRFS_RESIZE
--{ WIDGETS_END },
--};
--
--static const NWidgetPart _nested_newgrf_widgets[] = {
--	NWidget(NWID_HORIZONTAL),
--		NWidget(WWT_CLOSEBOX, COLOUR_MAUVE, SNGRFS_CLOSEBOX),
--		NWidget(WWT_CAPTION, COLOUR_MAUVE, SNGRFS_CAPTION), SetDataTip(STR_NEWGRF_SETTINGS_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
--	EndContainer(),
--	NWidget(WWT_PANEL, COLOUR_MAUVE, SNGRFS_BACKGROUND1),
--		NWidget(NWID_HORIZONTAL), SetPadding(2, 10, 2, 10),
--			NWidget(WWT_DROPDOWN, COLOUR_YELLOW, SNGRFS_PRESET_LIST), SetMinimalSize(94, 12), SetResize(1, 0), SetDataTip(STR_EMPTY, STR_NEWGRF_SETTINGS_PRESET_LIST_TOOLTIP),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_PRESET_SAVE), SetMinimalSize(93, 12), SetDataTip(STR_NEWGRF_SETTINGS_PRESET_SAVE, STR_NEWGRF_SETTINGS_PRESET_SAVE_TOOLTIP),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_PRESET_DELETE), SetMinimalSize(93, 12), SetDataTip(STR_NEWGRF_SETTINGS_PRESET_DELETE, STR_NEWGRF_SETTINGS_PRESET_DELETE_TOOLTIP),
--		EndContainer(),
--	EndContainer(),
--	NWidget(WWT_PANEL, COLOUR_MAUVE, SNGRFS_BACKGROUND2),
--		NWidget(NWID_HORIZONTAL), SetPadding(2, 10, 2, 10),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_ADD), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_SETTINGS_ADD, STR_NEWGRF_SETTINGS_ADD_TOOLTIP),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_REMOVE), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_SETTINGS_REMOVE, STR_NEWGRF_SETTINGS_REMOVE_TOOLTIP),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_MOVE_UP), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_SETTINGS_MOVEUP, STR_NEWGRF_SETTINGS_MOVEUP_TOOLTIP),
--			NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, SNGRFS_MOVE_DOWN), SetMinimalSize(70, 12), SetDataTip(STR_NEWGRF_SETTINGS_MOVEDOWN, STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP), SetResize(1, 0),
--		EndContainer(),
--	EndContainer(),
--	NWidget(NWID_HORIZONTAL),
--		NWidget(WWT_MATRIX, COLOUR_MAUVE, SNGRFS_FILE_LIST), SetMinimalSize(288, 70), SetDataTip(0x501, STR_NEWGRF_SETTINGS_FILE_TOOLTIP), SetResize(1, 14),
--		NWidget(WWT_SCROLLBAR, COLOUR_MAUVE, SNGRFS_SCROLLBAR),
--	EndContainer(),
--	NWidget(WWT_PANEL, COLOUR_MAUVE, SNGRFS_NEWGRF_INFO), SetResize(1, 0), SetMinimalSize(300, 123), EndContainer(),
--	NWidget(NWID_HORIZONTAL),
--		NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, SNGRFS_SET_PARAMETERS), SetMinimalSize(100, 12), SetDataTip(STR_NEWGRF_SETTINGS_SET_PARAMETERS, STR_NULL),
--		NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, SNGRFS_TOGGLE_PALETTE), SetMinimalSize(100, 12), SetResize(1, 0),
--													SetDataTip(STR_NEWGRF_SETTINGS_TOGGLE_PALETTE, STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP),
--		NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, SNGRFS_APPLY_CHANGES), SetMinimalSize(100, 12), SetDataTip(STR_NEWGRF_SETTINGS_APPLY_CHANGES, STR_NULL),
--	EndContainer(),
--	NWidget(NWID_HORIZONTAL),
--		NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, SNGRFS_CONTENT_DOWNLOAD), SetFill(1, 0), SetMinimalSize(288, 12), SetResize(1, 0),
--													SetDataTip(STR_INTRO_ONLINE_CONTENT, STR_INTRO_TOOLTIP_ONLINE_CONTENT),
--		NWidget(WWT_RESIZEBOX, COLOUR_MAUVE, SNGRFS_RESIZE),
--	EndContainer(),
--};
--
--/* Window definition of the manage newgrfs window */
--static const WindowDesc _newgrf_desc(
--	WDP_CENTER, WDP_CENTER, 300, 263, 300, 263,
--	WC_GAME_OPTIONS, WC_NONE,
--	WDF_STD_TOOLTIPS | WDF_STD_BTN | WDF_DEF_WIDGET | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE,
--	_newgrf_widgets, _nested_newgrf_widgets, lengthof(_nested_newgrf_widgets)
--);
--
- /** Callback function for the newgrf 'apply changes' confirmation window
-  * @param w Window which is calling this callback
-  * @param confirmed boolean value, true when yes was clicked, false otherwise
-@@ -822,23 +878,64 @@
- 		GRFConfig *c;
- 		int i = 0;
+ static const NWidgetPart _nested_station_builder_widgets[] = {
+@@ -1467,6 +1790,93 @@
+ 	EndContainer(),
+ };
  
--		GamelogStartAction(GLAT_GRF);
--		GamelogGRFUpdate(_grfconfig, nw->list); // log GRF changes
- 		CopyGRFConfigList(nw->orig_list, nw->list, false);
- 		ReloadNewGRFData();
--		GamelogStopAction();
- 
- 		/* Show new, updated list */
--		for (c = nw->list; c != NULL && c != nw->sel; c = c->next, i++) {}
-+		for (c = nw->list; c != NULL && c != nw->sel_r; c = c->next, i++) ;
- 		CopyGRFConfigList(&nw->list, *nw->orig_list, false);
--		for (c = nw->list; c != NULL && i > 0; c = c->next, i--) {}
--		nw->sel = c;
-+		for (c = nw->list; c != NULL && i > 0; c = c->next, i--) ;
-+		nw->sel_r = c;
- 
- 		w->SetDirty();
- 	}
- }
- 
-+static const Widget _newgrf_widgets[] = {
-+{   WWT_CLOSEBOX,  RESIZE_NONE,  COLOUR_MAUVE,   0,  10,   0,  13, STR_BLACK_CROSS,             STR_TOOLTIP_CLOSE_WINDOW },            // SNGRFS_CLOSE
-+{    WWT_CAPTION, RESIZE_RIGHT,  COLOUR_MAUVE,  11, 599,   0,  13, STR_NEWGRF_SETTINGS_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS },  // SNGRFS_CAPTION
-+/* NewGRF Presets */
-+{      WWT_PANEL, RESIZE_RIGHT,  COLOUR_MAUVE,   0, 599,  14,  29, STR_NULL,                    STR_NULL },                            // SNGRFS_EMPTY_PRESET
-+{   WWT_DROPDOWN, RESIZE_RIGHT, COLOUR_YELLOW,  10, 403,  16,  27, STR_EMPTY,                   STR_NEWGRF_SETTINGS_PRESET_LIST_TOOLTIP },          // SNGRFS_PRESET_LIST
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 404, 496,  16,  27, STR_NEWGRF_SETTINGS_PRESET_SAVE,      STR_NEWGRF_SETTINGS_PRESET_SAVE_TOOLTIP },          // SNGRFS_PRESET_SAVE
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 497, 587,  16,  27, STR_NEWGRF_SETTINGS_PRESET_DELETE,    STR_NEWGRF_SETTINGS_PRESET_DELETE_TOOLTIP },        // SNGRFS_PRESET_DELETE
-+/* List of files */
-+{      WWT_PANEL, RESIZE_RIGHT,  COLOUR_MAUVE,   0, 291,  30,  45, STR_NULL,                    STR_NULL },                            // SNGRFS_AVAILABLE_GRF_CAPTION
-+{      WWT_PANEL,    RESIZE_RB,  COLOUR_MAUVE,   0, 279,  46, 137, STR_NULL,                    STR_NULL },                            // SNGRFS_EMPTY_GRF_LIST
-+{      WWT_INSET,    RESIZE_RB,  COLOUR_MAUVE,   2, 277,  46, 137, STR_NULL,                    STR_NULL },                            // SNGRFS_AVAILABLE_GRF_LIST
-+{  WWT_SCROLLBAR,   RESIZE_LRB,  COLOUR_MAUVE, 280, 291,  46, 137, STR_NULL,                    STR_TOOLTIP_VSCROLL_BAR_SCROLLS_LIST },// SNGRFS_AVAILABLE_GRF_LIST_SCROLLBAR
-+/* NewGRF file info */
-+{      WWT_PANEL,   RESIZE_RTB,  COLOUR_MAUVE,   0, 599, 138, 237, STR_NULL,                    STR_NULL },                            // SNGRFS_NEWGRF_INFO
-+/* NewGRF file list buttons */
-+{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,   0, 145, 238, 249, STR_NEWGRF_ADD_RESCAN_FILES,     STR_NEWGRF_ADD_RESCAN_FILES_TOOLTIP },         // SNGRFS_RESCAN_FILES
-+{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 146, 291, 238, 249, STR_NEWGRF_SETTINGS_TOGGLE_SHOW,      STR_NEWGRF_SETTINGS_TOGGLE_SHOW_TIP },          // SNGRFS_TOGGLE_SHOW_MODE
-+{ WWT_PUSHTXTBTN,   RESIZE_RTB,  COLOUR_MAUVE,   0, 291, 250, 261, STR_INTRO_ONLINE_CONTENT,    STR_INTRO_TOOLTIP_ONLINE_CONTENT },        // SNGRFS_DOWNLOAD_CONTENT
-+/* Middle Panel */
-+{      WWT_PANEL,   RESIZE_LRB,  COLOUR_MAUVE, 292, 321,  30, 137, STR_NULL,                    STR_NULL },                             // SNGRFS_EMPTY_MIDDLE
-+{      WWT_PANEL,  RESIZE_LRTB,  COLOUR_MAUVE, 292, 321, 238, 261, STR_NULL,                    STR_NULL },                             // SNGRFS_EMPTY_BOTTOM_MIDDLE
-+/* NewGRF file Add, Remove, Move up, Move down */
-+{      WWT_PANEL,    RESIZE_LR,  COLOUR_MAUVE, 322, 599,  30,  45, STR_NULL,                    STR_NULL },                             // SNGRFS_EMPTY_TOP_RIGHT
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 297, 316,  36,  58, STR_NEWGRF_SETTINGS_JOINT_ADD,        STR_NEWGRF_SETTINGS_ADD_TOOLTIP },          // SNGRFS_ADD_FILE
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 297, 316,  66,  88, STR_NEWGRF_SETTINGS_JOINT_REMOVE,     STR_NEWGRF_SETTINGS_REMOVE_TOOLTIP },       // SNGRFS_REMOVE
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 379, 445,  32,  43, STR_NEWGRF_SETTINGS_MOVEUP,           STR_NEWGRF_SETTINGS_MOVEUP_TOOLTIP },                // SNGRFS_MOVE_UP
-+{ WWT_PUSHTXTBTN,    RESIZE_LR, COLOUR_YELLOW, 484, 550,  32,  43, STR_NEWGRF_SETTINGS_MOVEDOWN,         STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP },              // SNGRFS_MOVE_DOWN
-+/* NewGRF file list */
-+{     WWT_MATRIX,   RESIZE_LRB,  COLOUR_MAUVE, 322, 588,  46, 137, 0x501,                       STR_NEWGRF_SETTINGS_FILE_TOOLTIP },                  // SNGRFS_FILE_LIST
-+{ WWT_SCROLL2BAR,   RESIZE_LRB,  COLOUR_MAUVE, 588, 599,  46, 137, STR_NULL,                    STR_TOOLTIP_VSCROLL_BAR_SCROLLS_LIST }, // SNGRFS_FILE_LIST_SCROLLBAR
-+/* Edit parameter and apply changes button... */
-+{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 322, 458, 238, 249, STR_NEWGRF_SETTINGS_TOGGLE_PALETTE,   STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP },        // SNGRFS_TOGGLE_PALETTE
-+{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 459, 599, 238, 249, STR_NEWGRF_SETTINGS_SET_PARAMETERS,   STR_NULL },                             // SNGRFS_SET_PARAMETERS
-+{ WWT_PUSHTXTBTN,  RESIZE_LRTB,  COLOUR_MAUVE, 322, 587, 250, 261, STR_NEWGRF_SETTINGS_APPLY_CHANGES,    STR_NULL },                             // SNGRFS_APPLY_CHANGES
-+{  WWT_RESIZEBOX,  RESIZE_LRTB,  COLOUR_MAUVE, 588, 599, 250, 261, STR_NULL,                    STR_TOOLTIP_RESIZE },
-+{   WIDGETS_END },
++static const NWidgetPart _nested_imp_newstation_builder_widgets[] = {
++	NWidget(NWID_HORIZONTAL),
++		NWidget(WWT_CLOSEBOX, COLOUR_DARK_GREEN),
++		NWidget(WWT_CAPTION, COLOUR_DARK_GREEN), SetDataTip(STR_STATION_BUILD_RAIL_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS), SetResize(1, 0),
++	EndContainer(),
++	
++	NWidget(WWT_PANEL, COLOUR_DARK_GREEN),
++		NWidget(NWID_SPACER), SetMinimalSize(0, 3), SetResize(1, 0),
++		NWidget(NWID_HORIZONTAL),
++			NWidget(NWID_VERTICAL),
++				NWidget(NWID_HORIZONTAL), SetPIP(5, 0, 5), /* Custom stations classes selector */
++					NWidget(WWT_MATRIX, COLOUR_GREY, BRSW_NEWGUI_LIST), SetMinimalSize(122, 14 * 5 + 1), SetDataTip(0x301, STR_STATION_BUILD_STATION_CLASS_TOOLTIP), SetResize(0, 14),
++					NWidget(WWT_SCROLLBAR, COLOUR_GREY, BRSW_NEWGUI_CLASS_SCROLL),
++				EndContainer(),
++
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_ORIENTATION, STR_NULL), SetPadding(1, 2, 0, 2),
++				NWidget(NWID_HORIZONTAL),
++					NWidget(NWID_SPACER), SetMinimalSize(5, 0), SetFill(1, 0),
++					NWidget(WWT_PANEL, COLOUR_GREY, BRSW_PLATFORM_DIR_X), SetMinimalSize(66, 48), SetFill(0, 0), SetDataTip(0x0, STR_STATION_BUILD_RAILROAD_ORIENTATION_TOOLTIP), EndContainer(),
++					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
++					NWidget(WWT_PANEL, COLOUR_GREY, BRSW_PLATFORM_DIR_Y), SetMinimalSize(66, 48), SetFill(0, 0), SetDataTip(0x0, STR_STATION_BUILD_RAILROAD_ORIENTATION_TOOLTIP), EndContainer(),
++					NWidget(NWID_SPACER), SetMinimalSize(5, 0), SetFill(1, 0),
++				EndContainer(),
++				
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_NUMBER_OF_TRACKS, STR_NULL), SetPadding(2, 2, 0, 2),
++				NWidget(NWID_HORIZONTAL),
++					NWidget(NWID_SPACER), SetFill(1, 0),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_1), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_1, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_2), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_2, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_3), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_3, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_4), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_4, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_5), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_5, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_6), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_6, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_7), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_7, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(NWID_SPACER), SetFill(1, 0),
++				EndContainer(),
++
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_PLATFORM_LENGTH, STR_NULL), SetPadding(2, 2, 0, 2),
++				NWidget(NWID_HORIZONTAL),
++					NWidget(NWID_SPACER), SetFill(1, 0),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_1), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_1, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_2), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_2, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_3), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_3, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_4), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_4, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_5), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_5, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_6), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_6, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_7), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_7, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(NWID_SPACER), SetFill(1, 0),
++				EndContainer(),
++				
++				NWidget(NWID_SPACER), SetMinimalSize(0, 2),
++				NWidget(NWID_HORIZONTAL),
++					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_DRAG_N_DROP), SetMinimalSize(75, 12), SetDataTip(STR_STATION_BUILD_DRAG_DROP, STR_STATION_BUILD_DRAG_DROP_TOOLTIP),
++					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
++				EndContainer(),
++				
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_COVERAGE_AREA_TITLE, STR_NULL), SetPadding(3, 2, 0, 2),
++				NWidget(NWID_HORIZONTAL),
++					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_HIGHLIGHT_OFF), SetMinimalSize(60, 12),
++												SetDataTip(STR_STATION_BUILD_COVERAGE_OFF, STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_HIGHLIGHT_ON), SetMinimalSize(60, 12),
++												SetDataTip(STR_STATION_BUILD_COVERAGE_ON, STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP),
++					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
++				EndContainer(),
++			EndContainer(),
++
++			/* Custom stations type selector */
++			NWidget(WWT_MATRIX, COLOUR_GREY, BRSW_NEWGUI_STATIONS_LIST), SetMinimalSize(66, 14 * 4 * 4), SetDataTip(0x501, STR_NULL), SetResize(66, 14 * 4),
++			NWidget(WWT_SCROLL2BAR, COLOUR_GREY, BRSW_NEWGUI_STATION_SCROLL),
++		EndContainer(),
++
++		NWidget(NWID_SPACER), SetMinimalSize(0, 2), SetFill(1, 0), SetResize(1, 0),
++		/* Station coverage area text */
++		NWidget(WWT_TEXT, COLOUR_DARK_GREEN, BRSW_NEWGUI_STATION_COVERAGE), SetMinimalSize(221, 28), SetResize(1, 0), SetFill(1, 0),
++	EndContainer(),
++
++	/* Bottom bar with resize button */
++	NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetFill(1, 1),
++		NWidget(NWID_HORIZONTAL),
++			NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetFill(1, 1), SetResize(1, 0), EndContainer(),
++			NWidget(WWT_RESIZEBOX, COLOUR_DARK_GREEN, BRSW_NEWGUI_RESIZE),
++		EndContainer(),
++	EndContainer(),
 +};
++
+ /** High level window description of the default station-build window */
+ static const WindowDesc _station_builder_desc(
+ 	WDP_AUTO, 0, 0,
+@@ -1483,11 +1893,22 @@
+ 	_nested_newstation_builder_widgets, lengthof(_nested_newstation_builder_widgets)
+ );
  
-+static const WindowDesc _newgrf_desc(
-+	WDP_CENTER, WDP_CENTER, 600, 262, 600, 262,
-+	WC_GAME_OPTIONS, WC_NONE,
-+	WDF_STD_TOOLTIPS | WDF_DEF_WIDGET | WDF_STD_BTN | WDF_UNCLICK_BUTTONS | WDF_RESIZABLE,
-+	_newgrf_widgets
++/** High level window description of the improved newGRF station-build window */
++static const WindowDesc _imp_newstation_builder_desc(
++	WDP_AUTO, 350, 266,
++	WC_BUILD_STATION, WC_BUILD_TOOLBAR,
++	WDF_CONSTRUCTION,
++	_nested_imp_newstation_builder_widgets, lengthof(_nested_imp_newstation_builder_widgets)
 +);
- 
- /** Setup the NewGRF gui
-  * @param editable allow the user to make changes to the grfconfig in the window
-@@ -849,5 +946,7 @@
- void ShowNewGRFSettings(bool editable, bool show_params, bool exec_changes, GRFConfig **config)
++
+ /** Open station build window */
+ static void ShowStationBuilder(Window *parent)
  {
- 	DeleteWindowByClass(WC_GAME_OPTIONS);
-+
- 	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
- }
-+
-Index: src/window_gui.h
+ 	if (GetNumStationClasses() <= 2 && GetNumCustomStations(STAT_CLASS_DFLT) == 1) {
+ 		new BuildRailStationWindow(&_station_builder_desc, parent, false);
++	} else if (_settings_client.gui.imp_newstations_gui) {
++		/* Use improved newstations gui */
++		new BuildRailStationWindow(&_imp_newstation_builder_desc, parent, true);
+ 	} else {
+ 		new BuildRailStationWindow(&_newstation_builder_desc, parent, true);
+ 	}
+Index: src/company_base.h
 ===================================================================
---- src/window_gui.h	(Revision 17134)
-+++ src/window_gui.h	(Arbeitskopie)
-@@ -609,6 +609,13 @@
- 	virtual void OnDragDrop(Point pt, int widget) {}
+--- src/company_base.h	(revision 19145)
++++ src/company_base.h	(working copy)
+@@ -74,6 +74,8 @@
  
- 	/**
-+	 * An 'object' is being dragged.
-+	 * @param pt     the point inside the window where the cursor points to.
-+	 * @param widget the widget where the cursor points to.
+ 	bool is_ai;
+ 
++	int window;
++
+ 	class AIInstance *ai_instance;
+ 	class AIInfo *ai_info;
+ 
+Index: src/settings_type.h
+===================================================================
+--- src/settings_type.h	(revision 19145)
++++ src/settings_type.h	(working copy)
+@@ -98,6 +98,7 @@
+ 	bool   station_show_coverage;            ///< whether to highlight coverage area
+ 	bool   persistent_buildingtools;         ///< keep the building tools active after usage
+ 	uint8  expenses_layout;                  ///< layout of expenses window
++	bool   imp_newstations_gui;              ///< use the new newstations selection ui
+ 
+ 	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
+ 	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
+Index: src/company_gui.cpp
+===================================================================
+--- src/company_gui.cpp	(revision 19145)
++++ src/company_gui.cpp	(working copy)
+@@ -13,6 +13,7 @@
+ #include "gui.h"
+ #include "window_gui.h"
+ #include "textbuf_gui.h"
++#include "window_func.h"
+ #include "viewport_func.h"
+ #include "company_func.h"
+ #include "command_func.h"
+@@ -27,6 +28,7 @@
+ #include "date_func.h"
+ #include "widgets/dropdown_type.h"
+ #include "tilehighlight_func.h"
++#include "map_func.h"
+ #include "sprite.h"
+ #include "company_base.h"
+ #include "core/geometry_func.hpp"
+@@ -1592,6 +1594,9 @@
+ 	CW_WIDGET_SELECT_RELOCATE,    ///< View/hide the 'Relocate HQ' button.
+ 	CW_WIDGET_RELOCATE_HQ,
+ 
++	CW_WIDGET_CENTER,
++	CW_WIDGET_OPEN,
++
+ 	CW_WIDGET_HAS_PASSWORD,       ///< Draw a lock when the company has a password
+ 	CW_WIDGET_SELECT_MULTIPLAYER, ///< Multiplayer selection panel.
+ 	CW_WIDGET_COMPANY_PASSWORD,
+@@ -1638,6 +1643,8 @@
+ 							NWidget(WWT_TEXTBTN, COLOUR_GREY, CW_WIDGET_RELOCATE_HQ), SetFill(1, 0), SetDataTip(STR_COMPANY_VIEW_RELOCATE_HQ, STR_COMPANY_VIEW_RELOCATE_COMPANY_HEADQUARTERS),
+ 							NWidget(NWID_SPACER), SetMinimalSize(90, 0),
+ 						EndContainer(),
++						NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, CW_WIDGET_CENTER), SetFill(1, 0), SetDataTip(STR_COMPANY_VIEW_CENTER, STR_COMPANY_VIEW_CENTER_VIEWPORT),
++						NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, CW_WIDGET_OPEN), SetFill(1, 0), SetDataTip(STR_COMPANY_VIEW_OPEN, STR_COMPANY_VIEW_OPEN_VIEWPORT),
+ 						NWidget(NWID_SPACER), SetFill(0, 1),
+ 					EndContainer(),
+ 				EndContainer(),
+@@ -1967,6 +1974,21 @@
+ 				DoCommandP(0, this->window_number, 0, CMD_BUY_SHARE_IN_COMPANY | CMD_MSG(STR_ERROR_CAN_T_BUY_25_SHARE_IN_THIS));
+ 				break;
+ 
++			case CW_WIDGET_CENTER:
++				ScrollMainWindowToTile(Company::Get((CompanyID)this->window_number)->last_build_coordinate);
++				break;
++
++			case CW_WIDGET_OPEN: {
++				int window = ShowExtraViewPortWindow();
++				Company *c = Company::Get((CompanyID)this->window_number);
++				TileIndex tile = c->last_build_coordinate;
++
++				c->window = window;
++				ScrollWindowTo(TileX(tile) * TILE_SIZE + TILE_SIZE / 2, TileY(tile) * TILE_SIZE + TILE_SIZE / 2, -1, FindWindowById(WC_EXTRA_VIEW_PORT, window), true);
++				break;
++			}
++
++
+ 			case CW_WIDGET_SELL_SHARE:
+ 				DoCommandP(0, this->window_number, 0, CMD_SELL_SHARE_IN_COMPANY | CMD_MSG(STR_ERROR_CAN_T_SELL_25_SHARE_IN));
+ 				break;
+Index: src/viewport_gui.cpp
+===================================================================
+--- src/viewport_gui.cpp	(revision 19145)
++++ src/viewport_gui.cpp	(working copy)
+@@ -167,7 +167,7 @@
+ 	_nested_extra_view_port_widgets, lengthof(_nested_extra_view_port_widgets)
+ );
+ 
+-void ShowExtraViewPortWindow(TileIndex tile)
++int ShowExtraViewPortWindow(TileIndex tile)
+ {
+ 	int i = 0;
+ 
+@@ -175,4 +175,6 @@
+ 	while (FindWindowById(WC_EXTRA_VIEW_PORT, i) != NULL) i++;
+ 
+ 	new ExtraViewportWindow(&_extra_view_port_desc, i, tile);
++
++	return i;
+ }
+Index: src/gui.h
+===================================================================
+--- src/gui.h	(revision 19145)
++++ src/gui.h	(working copy)
+@@ -54,7 +54,7 @@
+ void ShowEstimatedCostOrIncome(Money cost, int x, int y);
+ void ShowErrorMessage(StringID summary_msg, StringID detailed_msg, int x, int y, bool no_timeout = false);
+ 
+-void ShowExtraViewPortWindow(TileIndex tile = INVALID_TILE);
++int ShowExtraViewPortWindow(TileIndex tile = INVALID_TILE);
+ 
+ void BuildFileList();
+ void SetFiosType(const byte fiostype);
+Index: src/signs_gui.cpp
+===================================================================
+--- src/signs_gui.cpp	(revision 19145)
++++ src/signs_gui.cpp	(working copy)
+@@ -29,12 +29,30 @@
+ #include "table/strings.h"
+ #include "table/sprites.h"
+ 
++/**
++ * Struct containing the necessary information to decide if a sign should
++ * be filtered out or not.
++ */
++struct FilterInfo {
++	const char *string;
++	bool case_sensitive;
++};
++
+ struct SignList {
+-	typedef GUIList<const Sign *> GUISignList;
++	typedef GUIList<const Sign *, FilterInfo> GUISignList;
+ 
+ 	static const Sign *last_sign;
+ 	GUISignList signs;
+ 
++	char filter_string[MAX_LENGTH_SIGN_NAME_BYTES];
++	bool match_case;
++
++	SignList()
++	{
++		filter_string[0] = '\0';
++		this->match_case = false;
++	}
++
+ 	void BuildSignsList()
+ 	{
+ 		if (!this->signs.NeedRebuild()) return;
+@@ -46,6 +64,7 @@
+ 		const Sign *si;
+ 		FOR_ALL_SIGNS(si) *this->signs.Append() = si;
+ 
++		this->FilterSignList();
+ 		this->signs.Compact();
+ 		this->signs.RebuildDone();
+ 	}
+@@ -75,6 +94,24 @@
+ 		/* Reset the name sorter sort cache */
+ 		this->last_sign = NULL;
+ 	}
++
++	/** Filter sign list by sign name (case sensitive setting in FilterInfo) */
++	static bool CDECL SignNameFilter(const Sign * const *a, FilterInfo filter_info)
++	{
++		/* Get sign string */
++		char buf1[MAX_LENGTH_SIGN_NAME_BYTES];
++		SetDParam(0, (*a)->index);
++		GetString(buf1, STR_SIGN_NAME, lastof(buf1));
++
++		return (filter_info.case_sensitive ? strstr(buf1, filter_info.string) : strcasestr(buf1, filter_info.string)) != NULL;
++	}
++
++	/** Filter out signs from the sign list that does not match the name filter */
++	void FilterSignList()
++	{
++		FilterInfo filter_info = {this->filter_string, this->match_case};
++		this->signs.Filter(&SignNameFilter, filter_info);
++	}
+ };
+ 
+ const Sign *SignList::last_sign = NULL;
+@@ -84,15 +121,31 @@
+ 	SLW_CAPTION,
+ 	SLW_LIST,
+ 	SLW_SCROLLBAR,
++	SLW_FILTER_TEXT,
++	SLW_FILTER_MATCH_CASE_BTN,
++	SLW_FILTER_CLEAR_BTN,
+ };
+ 
+-struct SignListWindow : Window, SignList {
++struct SignListWindow : QueryStringBaseWindow, SignList {
++private:
++	int selected_sign;
++
++public:
+ 	int text_offset; // Offset of the sign text relative to the left edge of the SLW_LIST widget.
+ 
+-	SignListWindow(const WindowDesc *desc, WindowNumber window_number) : Window()
++	SignListWindow(const WindowDesc *desc, WindowNumber window_number) : QueryStringBaseWindow(MAX_LENGTH_SIGN_NAME_BYTES)
+ 	{
+ 		this->InitNested(desc, window_number);
+ 
++		/* Initialize the text edit widget */
++		this->afilter = CS_ALPHANUMERAL;
++		InitializeTextBuffer(&this->text, this->edit_str_buf, MAX_LENGTH_SIGN_NAME_BYTES, MAX_LENGTH_SIGN_NAME_PIXELS); // Allow MAX_LENGTH_SIGN_NAME_BYTES characters (including \0)
++		ClearFilterTextWidget();
++
++		/* Initialize the filtering variables */
++		this->SetFilterString("");
++		this->selected_sign = -1;
++
+ 		/* Create initial list. */
+ 		this->signs.ForceRebuild();
+ 		this->signs.ForceResort();
+@@ -101,9 +154,65 @@
+ 		this->vscroll.SetCount(this->signs.Length());
+ 	}
+ 
++	/**
++	 * Empties the string buffer that is edited by the filter text edit widget.
++	 * It also triggers the redraw of the widget so it become visible that the string has been made empty.
 +	 */
-+	virtual void OnDragMove(Point pt, int widget) {}
++	void ClearFilterTextWidget()
++	{
++		this->edit_str_buf[0] = '\0';
++		UpdateTextBufferSize(&this->text);
++
++		this->SetWidgetDirty(SLW_FILTER_TEXT);
++	}
 +
 +	/**
- 	 * Handle the request for (viewport) scrolling.
- 	 * @param delta the amount the viewport must be scrolled.
- 	 */
-Index: src/window.cpp
-===================================================================
---- src/window.cpp	(Revision 17134)
-+++ src/window.cpp	(Arbeitskopie)
-@@ -1451,7 +1451,6 @@
- static bool HandleDragDrop()
- {
- 	if (_special_mouse_mode != WSM_DRAGDROP) return true;
--	if (_left_button_down) return false;
- 
- 	Window *w = GetCallbackWnd();
- 
-@@ -1460,7 +1459,13 @@
- 		Point pt;
- 		pt.x = _cursor.pos.x - w->left;
- 		pt.y = _cursor.pos.y - w->top;
--		w->OnDragDrop(pt, GetWidgetFromPos(w, pt.x, pt.y));
++	 * This function sets the filter string of the sign list. The contents of
++	 * the edit widget is not updated by this function. Depending on if the
++	 * new string is zero-length or not the clear button is made
++	 * disabled/enabled. The sign list is updated according to the new filter.
++	 */
++	void SetFilterString(const char *new_filter_string)
++	{
++		/* check if there is a new filter string */
++		if (!StrEmpty(new_filter_string)) {
++			/* Copy new filter string */
++			strecpy(this->filter_string, new_filter_string, lastof(this->filter_string));
++			this->filter_string[strlen(new_filter_string)] = '\0';
 +
-+		if (_left_button_down) {
-+			w->OnDragMove(pt, GetWidgetFromPos(w, pt.x, pt.y));
-+			return false;
++			this->signs.SetFilterState(true);
++
++			this->EnableWidget(SLW_FILTER_CLEAR_BTN);
 +		} else {
-+			w->OnDragDrop(pt, GetWidgetFromPos(w, pt.x, pt.y));
++			/* There is no new string -> clear this->filter_string */
++			this->filter_string[0] = '\0';
++
++			this->signs.SetFilterState(false);
++			this->DisableWidget(SLW_FILTER_CLEAR_BTN);
++			this->RaiseWidget(SLW_FILTER_CLEAR_BTN); // If a button is made disabled when it is lowered, it will not be raised by itself.			
 +		}
++
++		/* Repaint the clear button since its disabled state may have changed */
++		this->SetWidgetDirty(SLW_FILTER_CLEAR_BTN);
++
++		this->selected_sign = Clamp(this->selected_sign, -1, this->signs.Length() - 1); // Can happen when a new filter is used.
++
++		/* Rebuild the list of signs */
++		this->InvalidateData();
++	}
++
++	/** Make sure that the currently selected sign is within the visible part of the sign list */
++	void ScrollToSelected()
++	{
++		if (this->selected_sign == -1 || (uint)this->selected_sign >= this->signs.Length() ) return;
++
++		this->vscroll.ScrollTowards(this->selected_sign);
++ 	}
++
+ 	virtual void OnPaint()
+ 	{
+ 		this->DrawWidgets();
++		if (!this->IsShaded()) this->DrawEditBox(SLW_FILTER_TEXT);
  	}
  
- 	ResetObjectToPlace();
+ 	virtual void DrawWidget(const Rect &r, int widget) const
+@@ -130,7 +239,7 @@
+ 					if (si->owner != OWNER_NONE) DrawCompanyIcon(si->owner, icon_left, y + sprite_offset_y);
+ 
+ 					SetDParam(0, si->index);
+-					DrawString(text_left, text_right, y, STR_SIGN_NAME, TC_YELLOW);
++					DrawString(text_left, text_right, y, STR_SIGN_NAME, this->selected_sign == i ? TC_BLUE : TC_YELLOW);
+ 					y += this->resize.step_height;
+ 				}
+ 				break;
+@@ -145,18 +254,152 @@
+ 
+ 	virtual void OnClick(Point pt, int widget, int click_count)
+ 	{
+-		if (widget == SLW_LIST) {
+-			uint id_v = (pt.y - this->GetWidget<NWidgetBase>(SLW_LIST)->pos_y - WD_FRAMERECT_TOP) / this->resize.step_height;
++		switch (widget) {
++			case SLW_LIST: { // <- needed or the compiler will complain
++				uint id_v = (pt.y - this->GetWidget<NWidgetBase>(SLW_LIST)->pos_y - WD_FRAMERECT_TOP) / this->resize.step_height;
+ 
+-			if (id_v >= this->vscroll.GetCapacity()) return;
+-			id_v += this->vscroll.GetPosition();
+-			if (id_v >= this->vscroll.GetCount()) return;
++				if (id_v >= this->vscroll.GetCapacity()) return;
++				id_v += this->vscroll.GetPosition();
++				if (id_v >= this->vscroll.GetCount()) return;
+ 
+-			const Sign *si = this->signs[id_v];
+-			ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++				const Sign *si = this->signs[id_v];
++				ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++				break;
++			}
++			case SLW_FILTER_CLEAR_BTN:
++				this->ClearFilterTextWidget();
++				this->SetFilterString(0);
++				this->selected_sign = -1;
++				break;
++
++			case SLW_FILTER_MATCH_CASE_BTN:
++				this->match_case = !this->match_case;
++				if (this->match_case) {
++					this->LowerWidget(SLW_FILTER_MATCH_CASE_BTN);
++				} else {
++					this->RaiseWidget(SLW_FILTER_MATCH_CASE_BTN);
++				}
++				/* Rebuild the list of signs */
++				this->InvalidateData();
++				break;
+ 		}
+ 	}
+ 
++	virtual void OnTimeout()
++	{
++		if (!this->IsWidgetDisabled(SLW_FILTER_CLEAR_BTN)) {
++			this->RaiseWidget(SLW_FILTER_CLEAR_BTN);
++			this->SetWidgetDirty(SLW_FILTER_CLEAR_BTN);
++		}
++	}
++
++	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
++	{
++		EventState state = ES_NOT_HANDLED;
++		switch (this->HandleEditBoxKey(SLW_FILTER_TEXT, key, keycode, state)) {
++			case HEBR_EDITING:
++				this->SetFilterString(this->text.buf);
++				break;
++
++			case HEBR_CONFIRM: { // Enter pressed -> goto selected sign in list (or first if no selected sign)
++				uint n_signs = this->signs.Length();
++				if (n_signs >= 1) {
++					uint sign_id = this->selected_sign == -1 || (uint)this->selected_sign >= n_signs ? 0 : this->selected_sign;
++					if (n_signs > sign_id) {
++						const Sign *si = this->signs[sign_id];
++						ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++					}
++				}
++				return state;
++			}
++
++			case HEBR_CANCEL: // ESC pressed, clear filter
++				this->ClearFilterTextWidget(); // Empty the text in the EditBox widget
++				this->SetFilterString(0);      // Use empty text as filter text (= view all signs)
++				this->UnfocusFocusedWidget();  // Unfocus the text box
++				this->selected_sign = -1;      // Deselect sign in sign list
++				return state;
++
++			case HEBR_NOT_FOCUSED: // The filter text box is not globaly focused
++				if (keycode == 'F') { // Hotkey to enable filter box
++					this->SetFocusedWidget(SLW_FILTER_TEXT);
++					SetFocusedWindow(this); // The user has asked to give focus to the text box, so make sure this window is focused.
++					state = ES_HANDLED;
++				}
++				break;
++
++			default:
++				NOT_REACHED();
++		}
++
++		if (state == ES_HANDLED) OnOSKInput(SLW_FILTER_TEXT);
++
++		/* Selection of signs using arrow up/down , page up/down and ctrl + home/end keys. 
++		 * This only happens if the edit box is globaly focused.
++		 */
++		if (state != ES_HANDLED && this->IsWidgetGloballyFocused(SLW_FILTER_TEXT)) {
++			switch (keycode) {
++				case WKC_UP:
++					/* scroll up by one */
++					this->selected_sign--;
++					if (this->selected_sign < 0) this->selected_sign = 0;
++					state = ES_HANDLED;
++					break;
++
++				case WKC_DOWN:
++					/* scroll down by one */
++					this->selected_sign++;
++					if (this->selected_sign < 0) this->selected_sign = 0;
++					state = ES_HANDLED;
++					break;
++
++				case WKC_PAGEUP:
++					/* scroll up a page */
++					this->selected_sign = max(0, this->selected_sign - (int)this->vscroll.GetCapacity());
++					state = ES_HANDLED;
++					break;
++
++				case WKC_PAGEDOWN:
++					/* scroll down a page */
++					this->selected_sign = min(this->selected_sign + this->vscroll.GetCapacity(), (int)this->signs.Length() - 1);
++					state = ES_HANDLED;
++					break;
++
++				case WKC_CTRL | WKC_HOME: // Home key without ctrl is processed by the edit box
++					/* jump to beginning */
++					this->selected_sign = 0;
++					state = ES_HANDLED;
++					break;
++
++				case WKC_CTRL | WKC_END: // End key without ctrl is processed by the edit box
++					/* jump to end */
++					this->selected_sign = (int)this->signs.Length() - 1;
++					state = ES_HANDLED;
++					break;
++			}
++
++			if (state == ES_HANDLED) {
++				/* Make sure the selected sign is visible */
++				this->ScrollToSelected();
++
++				/* Repaint the window */
++				this->SetDirty();
++			}
++		}
++
++		return state;
++	}
++
++	virtual void OnOSKInput(int widget)
++	{
++		if (widget == SLW_FILTER_TEXT) this->SetFilterString(this->text.buf);
++	}
++
++	virtual void OnMouseLoop()
++	{
++		this->HandleEditBox(SLW_FILTER_TEXT);
++ 	}
++
+ 	virtual void OnResize()
+ 	{
+ 		this->vscroll.SetCapacityFromWidget(this, SLW_LIST, WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM);
+@@ -209,9 +452,14 @@
+ 							SetResize(1, 10), SetFill(1, 0), EndContainer(),
+ 		NWidget(NWID_VERTICAL),
+ 			NWidget(WWT_SCROLLBAR, COLOUR_GREY, SLW_SCROLLBAR),
+-			NWidget(WWT_RESIZEBOX, COLOUR_GREY),
+ 		EndContainer(),
+ 	EndContainer(),
++	NWidget(NWID_HORIZONTAL),
++		NWidget(WWT_EDITBOX, COLOUR_GREY, SLW_FILTER_TEXT), SetMinimalSize(80, 12), SetResize(1, 0), SetFill(1, 0),
++		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, SLW_FILTER_MATCH_CASE_BTN), SetDataTip(STR_FILTER_MATCH_CASE, STR_NULL),
++		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, SLW_FILTER_CLEAR_BTN), SetDataTip(STR_FILTER_CLEAR, STR_NULL),
++		NWidget(WWT_RESIZEBOX, COLOUR_GREY),
++	EndContainer(),
+ };
+ 
+ static const WindowDesc _sign_list_desc(
+Index: src/rail_map.h
+===================================================================
+--- src/rail_map.h	(revision 19145)
++++ src/rail_map.h	(working copy)
+@@ -563,4 +563,27 @@
+ 	_me[t].m7 = 0;
+ }
+ 
++
++static inline void IncreaseStuckCounter(TileIndex t)
++{
++	if (!IsTileType(t, MP_RAILWAY)) return;
++	if (_me[t].m7 == 255) return;
++	_me[t].m7++;
++}
++
++
++static inline void ReduceStuckCounter(TileIndex t)
++{
++	if (!IsTileType(t, MP_RAILWAY)) return;
++	_me[t].m7 -= _me[t].m7/4;
++}
++
++
++static inline byte GetStuckCounter(TileIndex t)
++{
++	if (!IsTileType(t, MP_RAILWAY)) return 0;
++	return _me[t].m7;
++
++}
++
+ #endif /* RAIL_MAP_H */
 Index: findversion.sh
 ===================================================================
---- findversion.sh	(Revision 17134)
-+++ findversion.sh	(Arbeitskopie)
-@@ -115,4 +115,4 @@
+--- findversion.sh	(revision 19145)
++++ findversion.sh	(working copy)
+@@ -121,4 +121,4 @@
  	REV="${REV}-$BRANCH"
  fi
  
