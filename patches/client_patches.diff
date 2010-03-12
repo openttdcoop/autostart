@@ -1,6 +1,6 @@
 Index: src/toolbar_gui.cpp
 ===================================================================
---- src/toolbar_gui.cpp	(revision 19145)
+--- src/toolbar_gui.cpp	(revision 19386)
 +++ src/toolbar_gui.cpp	(working copy)
 @@ -1281,6 +1281,7 @@
  			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
@@ -12,17 +12,17 @@ Index: src/toolbar_gui.cpp
  			case 'Q': case 'W': case 'E': case 'D': ShowTerraformToolbarWithTool(key, keycode); break;
 Index: src/lang/english.txt
 ===================================================================
---- src/lang/english.txt	(revision 19145)
+--- src/lang/english.txt	(revision 19386)
 +++ src/lang/english.txt	(working copy)
-@@ -1259,6 +1259,7 @@
- STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
- STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
- STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :All
-+STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI                          :{LTBLUE}Enable previews for station building: {ORANGE}{STRING1}
+@@ -1861,6 +1861,7 @@
+ STR_TRANSPARENT_STRUCTURES_TOOLTIP                              :{BLACK}Toggle transparency for structures like lighthouses and antennas. Ctrl+Click to lock.
+ STR_TRANSPARENT_CATENARY_TOOLTIP                                :{BLACK}Toggle transparency for catenary. Ctrl+Click to lock.
+ STR_TRANSPARENT_LOADING_TOOLTIP                                 :{BLACK}Toggle transparency for loading indicators. Ctrl+Click to lock.
++STR_TRANSPARENT_TUNNELS_TOOLTIP                                 :{BLACK}Toggle transparency for vehicles in tunnels. Ctrl+Click to lock.
+ STR_TRANSPARENT_INVISIBLE_TOOLTIP                               :{BLACK}Set objects invisible instead of transparent
  
- STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
- STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
-@@ -2579,6 +2580,10 @@
+ # Base for station construction window(s)
+@@ -2585,6 +2586,10 @@
  STR_COMPANY_VIEW_VIEW_HQ_TOOLTIP                                :{BLACK}View company headquarters
  STR_COMPANY_VIEW_RELOCATE_HQ                                    :{BLACK}Relocate HQ
  STR_COMPANY_VIEW_RELOCATE_COMPANY_HEADQUARTERS                  :{BLACK}Rebuild company headquarters elsewhere for 1% cost of company value
@@ -33,7 +33,7 @@ Index: src/lang/english.txt
  
  STR_COMPANY_VIEW_NEW_FACE_BUTTON                                :{BLACK}New Face
  STR_COMPANY_VIEW_NEW_FACE_TOOLTIP                               :{BLACK}Select new face for manager
-@@ -3626,6 +3631,12 @@
+@@ -3638,6 +3643,12 @@
  STR_ERROR_CAN_T_CHANGE_SIGN_NAME                                :{WHITE}Can't change sign name...
  STR_ERROR_CAN_T_DELETE_SIGN                                     :{WHITE}Can't delete sign...
  
@@ -46,21 +46,22 @@ Index: src/lang/english.txt
  ##id 0x2000
  # Town building names
  STR_TOWN_BUILDING_NAME_TALL_OFFICE_BLOCK_1                      :Tall office block
-Index: src/settings_gui.cpp
+Index: src/rail_cmd.cpp
 ===================================================================
---- src/settings_gui.cpp	(revision 19145)
-+++ src/settings_gui.cpp	(working copy)
-@@ -1301,6 +1301,7 @@
- 	SettingEntry("gui.always_build_infrastructure"),
- 	SettingEntry("gui.persistent_buildingtools"),
- 	SettingEntry("gui.coloured_news_year"),
-+	SettingEntry("gui.imp_newstations_gui"),
- };
- /** Interface subpage */
- static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
+--- src/rail_cmd.cpp	(revision 19386)
++++ src/rail_cmd.cpp	(working copy)
+@@ -2318,6 +2318,8 @@
+ 	RailGroundType old_ground = GetRailGroundType(tile);
+ 	RailGroundType new_ground;
+ 
++	ReduceStuckCounter(tile);
++
+ 	if (old_ground == RAIL_GROUND_WATER) {
+ 		TileLoop_Water(tile);
+ 		return;
 Index: src/smallmap_gui.cpp
 ===================================================================
---- src/smallmap_gui.cpp	(revision 19145)
+--- src/smallmap_gui.cpp	(revision 19386)
 +++ src/smallmap_gui.cpp	(working copy)
 @@ -277,6 +277,21 @@
  	_legend_land_contours[4].colour = _heightmap_schemes[_settings_client.gui.smallmap_land_colour].height_colours[14];
@@ -84,8 +85,8 @@ Index: src/smallmap_gui.cpp
  struct AndOr {
  	uint32 mor;
  	uint32 mand;
-@@ -421,6 +436,12 @@
- 		}
+@@ -429,6 +444,12 @@
+ 		return ApplyMask(cs->default_colour, &andor);
  	}
  
 +	byte c = GetStuckCounter(tile);
@@ -97,34 +98,24 @@ Index: src/smallmap_gui.cpp
  	/* Ground colour */
  	const SmallMapColourScheme *cs = &_heightmap_schemes[_settings_client.gui.smallmap_land_colour];
  	return ApplyMask(cs->default_colour, &_smallmap_contours_andor[t]);
-Index: src/rail_cmd.cpp
-===================================================================
---- src/rail_cmd.cpp	(revision 19145)
-+++ src/rail_cmd.cpp	(working copy)
-@@ -2274,6 +2274,8 @@
- 	RailGroundType old_ground = GetRailGroundType(tile);
- 	RailGroundType new_ground;
- 
-+	ReduceStuckCounter(tile);
-+
- 	if (old_ground == RAIL_GROUND_WATER) {
- 		TileLoop_Water(tile);
- 		return;
 Index: src/table/settings.h
 ===================================================================
---- src/table/settings.h	(revision 19145)
+--- src/table/settings.h	(revision 19386)
 +++ src/table/settings.h	(working copy)
-@@ -592,6 +592,7 @@
- 	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
- 	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0,  true,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
- 	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
-+	 SDTC_BOOL(gui.imp_newstations_gui,                  S,  0, false,                        STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI,         RedrawScreen),
- 
- /* For the dedicated build we'll enable dates in logs by default. */
- #ifdef DEDICATED
+@@ -273,8 +273,8 @@
+ #endif
+ 	  SDTG_VAR("sprite_cache_size",SLE_UINT, S, 0, _sprite_cache_size,     4, 1, 64, 0, STR_NULL, NULL),
+ 	  SDTG_VAR("player_face",    SLE_UINT32, S, 0, _company_manager_face,0,0,0xFFFFFFFF,0, STR_NULL, NULL),
+-	  SDTG_VAR("transparency_options", SLE_UINT, S, 0, _transparency_opt,  0,0,0x1FF,0, STR_NULL, NULL),
+-	  SDTG_VAR("transparency_locks", SLE_UINT, S, 0, _transparency_lock,   0,0,0x1FF,0, STR_NULL, NULL),
++	  SDTG_VAR("transparency_options", SLE_UINT, S, 0, _transparency_opt,  0,0,0x3FF,0, STR_NULL, NULL),
++	  SDTG_VAR("transparency_locks", SLE_UINT, S, 0, _transparency_lock,   0,0,0x3FF,0, STR_NULL, NULL),
+ 	  SDTG_VAR("invisibility_options", SLE_UINT, S, 0, _invisibility_opt,  0,0, 0xFF,0, STR_NULL, NULL),
+ 	  SDTG_STR("keyboard",         SLE_STRB, S, 0, _keyboard_opt[0],       NULL,    STR_NULL, NULL),
+ 	  SDTG_STR("keyboard_caps",    SLE_STRB, S, 0, _keyboard_opt[1],       NULL,    STR_NULL, NULL),
 Index: src/company_cmd.cpp
 ===================================================================
---- src/company_cmd.cpp	(revision 19145)
+--- src/company_cmd.cpp	(revision 19386)
 +++ src/company_cmd.cpp	(working copy)
 @@ -52,7 +52,8 @@
  Company::Company(uint16 name_1, bool is_ai) :
@@ -138,9 +129,9 @@ Index: src/company_cmd.cpp
  	InvalidateWindowData(WC_PERFORMANCE_DETAIL, 0, INVALID_COMPANY);
 Index: src/train_cmd.cpp
 ===================================================================
---- src/train_cmd.cpp	(revision 19145)
+--- src/train_cmd.cpp	(revision 19386)
 +++ src/train_cmd.cpp	(working copy)
-@@ -3342,6 +3342,9 @@
+@@ -3184,6 +3184,9 @@
  
  						/* Don't handle stuck trains here. */
  						if (HasBit(v->flags, VRF_TRAIN_STUCK)) return;
@@ -150,7 +141,16 @@ Index: src/train_cmd.cpp
  
  						if (!HasSignalOnTrackdir(gp.new_tile, ReverseTrackdir(i))) {
  							v->cur_speed = 0;
-@@ -3954,6 +3957,7 @@
+@@ -3339,7 +3342,7 @@
+ 			} else {
+ 				v->x_pos = gp.x;
+ 				v->y_pos = gp.y;
+-				VehicleMove(v, !(v->vehstatus & VS_HIDDEN));
++				VehicleMove(v, v->IsDrawn());
+ 				continue;
+ 			}
+ 		}
+@@ -3799,6 +3802,7 @@
  	/* Handle stuck trains. */
  	if (!mode && HasBit(v->flags, VRF_TRAIN_STUCK)) {
  		++v->wait_counter;
@@ -158,9 +158,18 @@ Index: src/train_cmd.cpp
  
  		/* Should we try reversing this tick if still stuck? */
  		bool turn_around = v->wait_counter % (_settings_game.pf.wait_for_pbs_path * DAY_TICKS) == 0 && _settings_game.pf.wait_for_pbs_path < 255;
+@@ -3874,7 +3878,7 @@
+ 	}
+ 
+ 	for (Train *u = v; u != NULL; u = u->Next()) {
+-		if ((u->vehstatus & VS_HIDDEN) != 0) continue;
++		if (!u->IsDrawn()) continue;
+ 
+ 		u->UpdateViewport(false, false);
+ 	}
 Index: src/command.cpp
 ===================================================================
---- src/command.cpp	(revision 19145)
+--- src/command.cpp	(revision 19386)
 +++ src/command.cpp	(working copy)
 @@ -23,6 +23,9 @@
  #include "town.h"
@@ -193,7 +202,7 @@ Index: src/command.cpp
  	SubtractMoneyFromCompany(res2);
 Index: src/rail_gui.cpp
 ===================================================================
---- src/rail_gui.cpp	(revision 19145)
+--- src/rail_gui.cpp	(revision 19386)
 +++ src/rail_gui.cpp	(working copy)
 @@ -37,6 +37,8 @@
  #include "table/sprites.h"
@@ -204,7 +213,7 @@ Index: src/rail_gui.cpp
  static RailType _cur_railtype;               ///< Rail type of the current build-rail toolbar.
  static bool _remove_button_clicked;          ///< Flag whether 'remove' toggle-button is currently enabled
  static DiagDirection _build_depot_direction; ///< Currently selected depot direction
-@@ -49,13 +51,25 @@
+@@ -49,6 +51,13 @@
  /* Map the setting: default_signal_type to the corresponding signal type */
  static const SignalType _default_signal_type[] = {SIGTYPE_NORMAL, SIGTYPE_PBS, SIGTYPE_PBS_ONEWAY};
  
@@ -218,78 +227,134 @@ Index: src/rail_gui.cpp
  struct RailStationGUISettings {
  	Axis orientation;                 ///< Currently selected rail station orientation
  
- 	bool newstations;                 ///< Are custom station definitions available?
-+	bool imp_newstations;             ///< Use the improved newstations gui?
+@@ -56,6 +65,10 @@
  	StationClassIDByte station_class; ///< Currently selected custom station class (if newstations is \c true )
  	byte station_type;                ///< Station type within the currently selected custom station class (if newstations is \c true )
  	byte station_count;               ///< Number of custom stations (if newstations is \c true )
-+	byte station_class_count;         ///< Number of custom stations classes (if imp_newstations is \c true)
-+	StationClasses station_classes;   ///< Cache of custom stations classes (if imp_newstations is \c true)
-+	Dimension window_size;            ///< Last used size of the window (if imp_newstations is \c true)
-+	uint window_size_line_height;     ///< Last used line_height (if imp_newstations is \c true)
++	byte station_class_count;         ///< Number of custom stations classes (if newstations is \c true)
++	StationClasses station_classes;   ///< Cache of custom stations classes (if newstations is \c true)
++	Dimension window_size;            ///< Last used size of the window (if newstations is \c true)
++	uint window_size_line_height;     ///< Last used line_height (if newstations is \c true)
  };
  static RailStationGUISettings _railstation; ///< Settings of the station builder GUI
  
-@@ -945,6 +959,16 @@
- 	BRSW_NEWST_LIST,
- 	BRSW_NEWST_SCROLL,
+@@ -917,6 +930,12 @@
+ enum BuildRailStationWidgets {
+ 	BRSW_BACKGROUND,
  
-+	BRSW_NEWGUI_LIST,             ///< Matrix of custom stations names (if imp_newstations is \c true)
-+	BRSW_NEWGUI_CLASS_SCROLL,     ///< (if imp_newstations is \c true)
++	BRSW_SHOW_DEFAULT_CENTER_ALIGN_LEFT,
 +
-+	BRSW_NEWGUI_STATIONS_LIST,    ///< Matrix of stations types within the currently selected station class (if imp_newstations is \c true)
-+	BRSW_NEWGUI_STATION_SCROLL,   ///< (if imp_newstations is \c true)
++	BRSW_SHOW_NEWST_STATION_CLASSES,
++	BRSW_NEWST_STATION_CLASSES_LIST,             ///< Matrix of custom stations names
++	BRSW_NEWST_STATION_CLASSES_SCROLL,
 +
-+	BRSW_NEWGUI_STATION_COVERAGE, ///< Text area used to draw 'Accepts' and 'Supplies' texts (if imp_newstations is \c true)
+ 	BRSW_PLATFORM_DIR_X,
+ 	BRSW_PLATFORM_DIR_Y,
+ 
+@@ -941,18 +960,29 @@
+ 	BRSW_HIGHLIGHT_OFF,
+ 	BRSW_HIGHLIGHT_ON,
+ 
+-	BRSW_SHOW_NEWST_ADDITIONS,
+-	BRSW_NEWST_DROPDOWN,
+-	BRSW_NEWST_LIST,
+-	BRSW_NEWST_SCROLL,
++	BRSW_SHOW_DEFAULT_STATION_COVERAGE,
+ 
++	BRSW_SHOW_NEWST_STATION_TYPES,
++	BRSW_NEWST_STATION_TYPES_LIST,    ///< Matrix of stations types within the currently selected station class
++	BRSW_NEWST_STATION_TYPES_SCROLL,
 +
-+	BRSW_NEWGUI_RESIZE,           ///< Resize button (if imp_newstations is \c true)
++	BRSW_SHOW_DEFAULT_CENTER_ALIGN_RIGHT,
++
++	BRSW_SHOW_NEWST_STATION_COVERAGE,
++	BRSW_NEWST_STATION_COVERAGE, ///< Text area used to draw 'Accepts' and 'Supplies' texts
++
++	BRSW_SHOW_NEWST_BOTTOM_BAR,
++	BRSW_NEWST_RESIZE,           ///< Resize button
 +
  	BRSW_PLATFORM_NUM_BEGIN = BRSW_PLATFORM_NUM_1 - 1,
  	BRSW_PLATFORM_LEN_BEGIN = BRSW_PLATFORM_LEN_1 - 1,
  };
-@@ -952,6 +976,8 @@
+ 
  struct BuildRailStationWindow : public PickerWindowBase {
  private:
- 	uint line_height; ///< Height of a single line in the newstation selection matrix (#BRSW_NEWST_LIST widget).
-+	int station_coverage_resize;  ///< Of how many pixels should the station coverage area text be resized (#BRSW_NEWGUI_STATION_COVERAGE widget).
-+	Pair original_resize_heights; ///< Original resize steps in height for #BRSW_NEWGUI_LIST and #BRSW_NEWGUI_STATIONS_LIST widgets.
+-	uint line_height; ///< Height of a single line in the newstation selection matrix (#BRSW_NEWST_LIST widget).
++	uint line_height; ///< Height of a single line in the newstation selection matrix (#BRSW_NEWST_STATION_CLASSES_LIST widget).
++	int station_coverage_resize;  ///< Of how many pixels should the station coverage area text be resized (#BRSW_NEWST_STATION_COVERAGE widget).
++	Pair original_resize_heights; ///< Original resize steps in height for #BRSW_NEWST_STATION_CLASSES_LIST and #BRSW_NEWST_STATION_TYPES_LIST widgets.
  
  	/**
  	 * Verify whether the currently selected station size is allowed after selecting a new station class/type.
-@@ -998,6 +1024,16 @@
+@@ -983,25 +1013,32 @@
+ 		}
+ 	}
+ 
+-	/** Build a dropdown list of available station classes */
+-	static DropDownList *BuildStationClassDropDown()
++	void DisplayPlane(int widget, bool display)
+ 	{
+-		DropDownList *list = new DropDownList();
+-
+-		for (uint i = 0; i < GetNumStationClasses(); i++) {
+-			if (i == STAT_CLASS_WAYP) continue;
+-			list->push_back(new DropDownListStringItem(GetStationClassName((StationClassID)i), i, false));
+-		}
+-
+-		return list;
++		this->GetWidget<NWidgetStacked>(widget)->SetDisplayedPlane(display ? 0 : SZSP_NONE);
+ 	}
+ 
  public:
  	BuildRailStationWindow(const WindowDesc *desc, Window *parent, bool newstation) : PickerWindowBase(parent)
  	{
-+		/* Use the improved newstations gui? */
-+		_railstation.imp_newstations = _settings_client.gui.imp_newstations_gui && newstation;
++		_railstation.newstations = newstation;
 +
-+		if (_railstation.imp_newstations) {
++		if (newstation) {
 +			/* Default resize vars */
-+			this->station_coverage_resize = 0;
++			this->station_coverage_resize = -1;
 +			this->original_resize_heights.a = 0;
 +			this->original_resize_heights.b = 0;
 +		}
 +
- 		this->InitNested(desc, TRANSPORT_RAIL);
+ 		this->CreateNestedTree(desc);
+-		NWidgetStacked *newst_additions = this->GetWidget<NWidgetStacked>(BRSW_SHOW_NEWST_ADDITIONS);
+-		newst_additions->SetDisplayedPlane(newstation ? 0 : SZSP_NONE);
++		/* Sets the planes to display depending of the gui type */
++		this->DisplayPlane(BRSW_SHOW_DEFAULT_CENTER_ALIGN_LEFT, !newstation);
++		this->DisplayPlane(BRSW_SHOW_NEWST_STATION_CLASSES, newstation);
++		this->DisplayPlane(BRSW_SHOW_NEWST_STATION_TYPES, newstation);
++		this->DisplayPlane(BRSW_SHOW_DEFAULT_STATION_COVERAGE, !newstation);
++		this->DisplayPlane(BRSW_SHOW_NEWST_STATION_COVERAGE, newstation);
++		this->DisplayPlane(BRSW_SHOW_DEFAULT_CENTER_ALIGN_RIGHT, !newstation);
++		this->DisplayPlane(BRSW_SHOW_NEWST_BOTTOM_BAR, newstation);
+ 		this->FinishInitNested(desc, TRANSPORT_RAIL);
  
  		this->LowerWidget(_railstation.orientation + BRSW_PLATFORM_DIR_X);
-@@ -1012,6 +1048,9 @@
+@@ -1014,15 +1051,7 @@
+ 		this->SetWidgetLoweredState(BRSW_HIGHLIGHT_OFF, !_settings_client.gui.station_show_coverage);
+ 		this->SetWidgetLoweredState(BRSW_HIGHLIGHT_ON, _settings_client.gui.station_show_coverage);
  
- 		_railstation.newstations = newstation;
- 
-+		/* End of constructor if using improved newstations gui */
-+		if (_railstation.imp_newstations) return;
-+
- 		if (newstation) {
- 			_railstation.station_count = GetNumCustomStations(_railstation.station_class);
- 
-@@ -1028,9 +1067,42 @@
+-		_railstation.newstations = newstation;
+-
+-		if (newstation) {
+-			_railstation.station_count = GetNumCustomStations(_railstation.station_class);
+-
+-			this->vscroll.SetCount(_railstation.station_count);
+-			this->vscroll.SetCapacity(GB(this->GetWidget<NWidgetCore>(BRSW_NEWST_LIST)->widget_data, MAT_ROW_START, MAT_ROW_BITS));
+-			this->vscroll.SetPosition(Clamp(_railstation.station_type - 2, 0, max(this->vscroll.GetCount() - this->vscroll.GetCapacity(), 0)));
+-		} else {
++		if (!newstation) {
+ 			/* New stations are not available, so ensure the default station
+ 			 * type is 'selected'. */
+ 			_railstation.station_class = STAT_CLASS_DFLT;
+@@ -1032,9 +1061,58 @@
  
  	virtual ~BuildRailStationWindow()
  	{
-+		if (_railstation.imp_newstations) {
++		if (_railstation.newstations) {
 +			/* Store window size. Will try to restore it on next use of improved newstations gui */
-+			const uint station_coverage_resize = this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATION_COVERAGE)->current_y - (this->line_height * 2);
++			const uint station_coverage_resize = this->GetWidget<NWidgetBase>(BRSW_NEWST_STATION_COVERAGE)->current_y - (this->line_height * 2);
 +			_railstation.window_size.width = this->width;
 +			_railstation.window_size.height = this->height - station_coverage_resize;
 +			_railstation.window_size_line_height = this->line_height;
@@ -298,10 +363,10 @@ Index: src/rail_gui.cpp
  	}
  
 +	virtual void OnInit() {
-+		/* Initialize current line height. Used by more than one widget in UpdateWidgetSize() */
-+		this->line_height = FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
++		if (_railstation.newstations) {
++			/* Initialize current line height. Used by more than one widget in UpdateWidgetSize() */
++			this->line_height = FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
 +
-+		if (_railstation.imp_newstations) {
 +			/* Cache the list of custom stations classes */
 +			_railstation.station_count = GetNumCustomStations(_railstation.station_class);
 +			if (!_railstation.station_classes.empty()) {
@@ -319,18 +384,34 @@ Index: src/rail_gui.cpp
 +				_railstation.station_classes.push_back(station_class);
 +			}
 +
++			/* Setup the station classes scrollbar */
 +			this->vscroll.SetCount(_railstation.station_class_count);
++			if (this->station_coverage_resize == -1) {
++				/* If we aren't resizing the station coverage area, restore the station class position */
++				this->vscroll.SetPosition(Clamp(_railstation.station_class - 2, 0, max(this->vscroll.GetCount() - this->vscroll.GetCapacity(), 0)));
++			}
++
++			/* Setup the station types scrollbar */
++			_railstation.station_count = GetNumCustomStations(_railstation.station_class);
++			uint16 widget_data = this->GetWidget<NWidgetCore>(BRSW_NEWST_STATION_TYPES_LIST)->widget_data;
++			this->vscroll2.SetCapacity(GB(widget_data, MAT_ROW_START, MAT_ROW_BITS));
++			uint col_count = GB(widget_data, MAT_COL_START, MAT_COL_BITS);
++			this->vscroll2.SetCount(_railstation.station_count / col_count  + (_railstation.station_count % col_count > 0));
++			if (this->station_coverage_resize == -1) {
++				/* If we aren't resizing the station coverage area, restore the station type position */
++				this->vscroll2.SetPosition(Clamp((_railstation.station_type / col_count), 0, max(this->vscroll2.GetCount() - this->vscroll2.GetCapacity(), 0)));
++			}
 +		}
 +	}
 +
  	virtual void OnPaint()
  	{
  		bool newstations = _railstation.newstations;
-@@ -1064,15 +1136,47 @@
+@@ -1068,15 +1146,48 @@
  
  		this->DrawWidgets();
  
-+		if (_railstation.imp_newstations && _railstation.window_size.width != 0) {
++		if (newstations && _railstation.window_size.width != 0) {
 +			if (_railstation.window_size_line_height == this->line_height) {
 +				if (_railstation.window_size.width != (uint)this->width || _railstation.window_size.height != (uint)this->height) {
 +					/* Resize the window to the last used size */
@@ -352,13 +433,14 @@ Index: src/rail_gui.cpp
 -		top = DrawStationCoverageAreaText(back_nwi->pos_x + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, false) + WD_PAR_VSEP_NORMAL;
 -		top = DrawStationCoverageAreaText(back_nwi->pos_x + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, true) + WD_PAR_VSEP_NORMAL;
 +		NWidgetBase *station_coverage_nwi = NULL;
-+		if (_railstation.imp_newstations) {
-+			/* Use the station coverage area text widget (#BRSW_NEWGUI_STATION_COVERAGE) */
-+			station_coverage_nwi = this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATION_COVERAGE);
++		if (newstations) {
++			/* Use the station coverage area text widget (#BRSW_NEWST_STATION_COVERAGE) */
++			station_coverage_nwi = this->GetWidget<NWidgetBase>(BRSW_NEWST_STATION_COVERAGE);
 +			left = station_coverage_nwi->pos_x;
 +			right = left + station_coverage_nwi->current_x;
 +			top = station_coverage_nwi->pos_y;
 +		} else {
++			/* Use the station coverage area spacer */
 +			left = back_nwi->pos_x;
 +			right = back_nwi->pos_x + back_nwi->current_x;
 +			top = this->GetWidget<NWidgetBase>(BRSW_HIGHLIGHT_ON)->pos_y + this->GetWidget<NWidgetBase>(BRSW_HIGHLIGHT_ON)->current_y + WD_PAR_VSEP_NORMAL;
@@ -368,11 +450,11 @@ Index: src/rail_gui.cpp
 +		top = DrawStationCoverageAreaText(left + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, true) + WD_PAR_VSEP_NORMAL;
  		/* Resize background if the text is not equally long as the window. */
 -		if (top > bottom || (top < bottom && back_nwi->current_y > back_nwi->smallest_y)) {
-+		if (_railstation.imp_newstations) {
++		if (newstations) {
 +			const uint text_height = top - station_coverage_nwi->pos_y + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
 +			if (text_height != station_coverage_nwi->current_y) {
-+				/* Sets the additional height needed to #BRSW_NEWGUI_STATION_COVERAGE to fit 
-+				   the coverage area text (UpdateWidgetSize(#BRSW_NEWGUI_STATION_COVERAGE)) */
++				/* Sets the additional height needed to #BRSW_NEWST_STATION_COVERAGE to fit 
++				   the coverage area text (UpdateWidgetSize(#BRSW_NEWST_STATION_COVERAGE)) */
 +				this->station_coverage_resize = text_height - (this->line_height * 2);
 +				this->ReInit(0, this->station_coverage_resize);
 +			}
@@ -380,21 +462,24 @@ Index: src/rail_gui.cpp
  			ResizeWindow(this, 0, top - bottom);
  		}
  	}
-@@ -1103,10 +1207,49 @@
- 				}
- 				size->width = max(size->width, d.width + padding.width);
- 
--				this->line_height = FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
- 				size->height = GB(this->GetWidget<NWidgetCore>(widget)->widget_data, MAT_ROW_START, MAT_ROW_BITS) * this->line_height;
- 				break;
- 			}
-+			case BRSW_NEWGUI_LIST: {
+@@ -1084,33 +1195,57 @@
+ 	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
+ 	{
+ 		switch (widget) {
+-			case BRSW_NEWST_DROPDOWN: {
++			case BRSW_NEWST_STATION_CLASSES_LIST: {
 +				/* Increase width to match the widest custom station class name */
-+				Dimension d = {0, 0};
+ 				Dimension d = {0, 0};
+-				for (uint i = 0; i < GetNumStationClasses(); i++) {
+-					if (i == STAT_CLASS_WAYP) continue;
+-					SetDParam(0, GetStationClassName((StationClassID)i));
 +				for (uint i = 0; i < _railstation.station_class_count; i++) {
 +					SetDParam(0, _railstation.station_classes[i]->string);
-+					d = maxdim(d, GetStringBoundingBox(STR_BLACK_STRING));
-+				}
+ 					d = maxdim(d, GetStringBoundingBox(STR_BLACK_STRING));
+ 				}
+-				d.width += padding.width;
+-				d.height += padding.height;
+-				*size = maxdim(*size, d);
 +				size->width = max(size->width, d.width + padding.width);
 +
 +				if (this->original_resize_heights.a == 0) {
@@ -406,40 +491,69 @@ Index: src/rail_gui.cpp
 +				const uint line_count = (size->height - 1) / this->original_resize_heights.a;
 +				size->height = this->line_height * line_count + 1;
 +				resize->height = this->line_height;
-+				break;
-+			}
-+			case BRSW_NEWGUI_STATIONS_LIST: {
+ 				break;
+ 			}
+-			case BRSW_NEWST_LIST: {
+-				Dimension d = GetStringBoundingBox(STR_STATION_CLASS_DFLT);
+-				for (StationClassID statclass = STAT_CLASS_BEGIN; statclass < (StationClassID)GetNumStationClasses(); statclass++) {
+-					if (statclass == STAT_CLASS_WAYP) continue;
+-					for (uint16 j = 0; j < GetNumCustomStations(statclass); j++) {
+-						const StationSpec *statspec = GetCustomStationSpec(statclass, j);
+-						if (statspec != NULL && statspec->name != 0) d = maxdim(d, GetStringBoundingBox(statspec->name));
+-					}
++			case BRSW_NEWST_STATION_TYPES_LIST: {
 +				if (this->original_resize_heights.b == 0) {
 +					/* Store the original height resize step (next invocations 
 +					   receive current/modified resize info, not originals) */
 +					this->original_resize_heights.b = resize->height;
-+				}
+ 				}
+-				size->width = max(size->width, d.width + padding.width);
+-
+-				this->line_height = FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
+-				size->height = GB(this->GetWidget<NWidgetCore>(widget)->widget_data, MAT_ROW_START, MAT_ROW_BITS) * this->line_height;
 +				/* Widget height depends of line height: cell height equals four lines height */
 +				const uint row_count = size->height / this->original_resize_heights.b;
 +				const uint station_cell_height = this->line_height * 4;
 +				size->height = station_cell_height * row_count;
 +				resize->height = station_cell_height;
-+				break;
-+			}
-+			case BRSW_NEWGUI_STATION_COVERAGE: {
+ 				break;
+ 			}
++			case BRSW_NEWST_STATION_COVERAGE: {
 +				/* Widget height is two lines eventually increased by the height needed 
 +				   to fit the coverage text */
-+				size->height = this->line_height * 2 + this->station_coverage_resize;
-+				this->station_coverage_resize = 0;
++				size->height = this->line_height * 2 + max(0, this->station_coverage_resize);
++				this->station_coverage_resize = -1;
++				break;
++			}
++			case BRSW_SHOW_NEWST_STATION_COVERAGE: {
++				/* Force height resizing when using default gui */
++				if (!_railstation.newstations) resize->height = 1;
++				break;
++			}
++			case BRSW_SHOW_DEFAULT_CENTER_ALIGN_LEFT:
++			case BRSW_SHOW_DEFAULT_CENTER_ALIGN_RIGHT: {
++				/* Force height resizing when using newstations gui */
++				if (_railstation.newstations) resize->height = 1;
 +				break;
 +			}
  		}
  	}
  
-@@ -1157,6 +1300,67 @@
+@@ -1143,32 +1278,69 @@
  				}
  				break;
- 			}
-+
-+			case BRSW_NEWGUI_LIST: {
+ 
+-			case BRSW_NEWST_LIST: {
++			case BRSW_NEWST_STATION_CLASSES_LIST: {
 +				/* Draw the custom stations classes names */
-+				uint y = r.top;
-+
+ 				uint y = r.top;
+-				for (uint16 i = this->vscroll.GetPosition(); i < _railstation.station_count && this->vscroll.IsVisible(i); i++) {
+-					const StationSpec *statspec = GetCustomStationSpec(_railstation.station_class, i);
+ 
+-					StringID str = STR_STATION_CLASS_DFLT;
+-					if (statspec != NULL && statspec->name != 0) {
+-						if (HasBit(statspec->callback_mask, CBM_STATION_AVAIL) && GB(GetStationCallback(CBID_STATION_AVAILABILITY, 0, 0, statspec, NULL, INVALID_TILE), 0, 8) == 0) {
+-							GfxFillRect(r.left + 1, y + 1, r.right - 1, y + this->line_height - 2, 0, FILLRECT_CHECKER);
 +				for (uint16 i = this->vscroll.GetPosition(); i < _railstation.station_class_count && this->vscroll.IsVisible(i); i++) {
 +					DrawString(r.left + WD_MATRIX_LEFT, r.right - WD_MATRIX_RIGHT, y + WD_MATRIX_TOP, _railstation.station_classes[i]->string,
 +							_railstation.station_classes[i]->result == (StationClassID)_railstation.station_class ? TC_WHITE : TC_BLACK);
@@ -447,8 +561,8 @@ Index: src/rail_gui.cpp
 +				}
 +				break;
 +			}
-+			
-+			case BRSW_NEWGUI_STATIONS_LIST: {
++
++			case BRSW_NEWST_STATION_TYPES_LIST: {
 +				/* Draw station types of the current custom station class */
 +				const NWidgetCore *stations_list_nwi = this->GetWidget<NWidgetCore>(widget);
 +				const Dimension cell_dim = {stations_list_nwi->resize_x, stations_list_nwi->resize_y};
@@ -459,7 +573,7 @@ Index: src/rail_gui.cpp
 +				uint y = 0;
 +				uint x = 0;
 +				DrawPixelInfo *old_dpi;
-+				
++
 +				for (uint16 i = this->vscroll2.GetPosition(); i < this->vscroll2.GetCount() && this->vscroll2.IsVisible(i); i++) {
 +					x = 0;
 +					for (uint16 station = i * col_count; station < _railstation.station_count && station < (i + 1) * col_count; station++) {
@@ -470,7 +584,8 @@ Index: src/rail_gui.cpp
 +							/* Bottom cells don't overwrite coverage area text */
 +							const int adjust_y = (y / cell_dim.height) + 1 == this->vscroll2.GetCapacity() ? -1 : 0;
 +							DrawFrameRect(cell.left + x, cell.top + y, cell.right + adjust_x + x, cell.bottom + adjust_y + y, stations_list_nwi->colour, FR_LOWERED);
-+						}
+ 						}
+-						str = statspec->name;
 +
 +						/* Draw station sprite */
 +						if (FillDrawPixelInfo(&tmp_dpi, cell.left + x, cell.top + 1 + y, cell_dim.width, cell_dim.height + 1)) {
@@ -491,21 +606,33 @@ Index: src/rail_gui.cpp
 +						}
 +
 +						x += cell_dim.width;
-+					}
+ 					}
+-					DrawString(r.left + WD_MATRIX_LEFT, r.right - WD_MATRIX_RIGHT, y + WD_MATRIX_TOP, str, i == _railstation.station_type ? TC_WHITE : TC_BLACK);
+-
+-					y += this->line_height;
 +					y += cell_dim.height;
-+				}
-+				break;
-+			}
+ 				}
+ 				break;
+ 			}
  		}
  	}
  
-@@ -1318,9 +1522,90 @@
- 				DeleteWindowById(WC_SELECT_STATION, 0);
+-	virtual void SetStringParameters(int widget) const
+-	{
+-		if (widget == BRSW_NEWST_DROPDOWN) SetDParam(0, GetStationClassName(_railstation.station_class));
+-	}
+-
+ 	virtual void OnClick(Point pt, int widget, int click_count)
+ 	{
+ 		switch (widget) {
+@@ -1295,25 +1467,54 @@
+ 				this->SetDirty();
  				break;
- 			}
-+
-+			// Improved newstation gui - Class selector
-+			case BRSW_NEWGUI_LIST: {
+ 
+-			case BRSW_NEWST_DROPDOWN:
+-				ShowDropDownList(this, BuildStationClassDropDown(), _railstation.station_class, BRSW_NEWST_DROPDOWN);
++			// Newstation gui - Class selector
++			case BRSW_NEWST_STATION_CLASSES_LIST: {
 +				int y = (pt.y - this->GetWidget<NWidgetBase>(widget)->pos_y) / this->line_height;
 +				if (y >= this->vscroll.GetCapacity()) return;
 +				y += this->vscroll.GetPosition();
@@ -520,7 +647,7 @@ Index: src/rail_gui.cpp
 +					this->CheckSelectedSize(GetCustomStationSpec(_railstation.station_class, _railstation.station_type));
 +
 +					/* Update stations types matrix scrollbar */
-+					uint col_count = this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATIONS_LIST)->current_x / this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATIONS_LIST)->resize_x;
++					uint col_count = this->GetWidget<NWidgetBase>(BRSW_NEWST_STATION_TYPES_LIST)->current_x / this->GetWidget<NWidgetBase>(BRSW_NEWST_STATION_TYPES_LIST)->resize_x;
 +					this->vscroll2.SetCount(_railstation.station_count / col_count  + (_railstation.station_count % col_count > 0));
 +					this->vscroll2.SetPosition(0);
 +				}
@@ -528,55 +655,66 @@ Index: src/rail_gui.cpp
 +				SndPlayFx(SND_15_BEEP);
 +				this->SetDirty();
 +				DeleteWindowById(WC_SELECT_STATION, 0);
-+				break;
+ 				break;
 +			}
-+
-+			// Improved newstation gui - Station selector
-+			case BRSW_NEWGUI_STATIONS_LIST: {
-+				const StationSpec *statspec;
+ 
+-			case BRSW_NEWST_LIST: {
++			// Newstation gui - Station selector
++			case BRSW_NEWST_STATION_TYPES_LIST: {
+ 				const StationSpec *statspec;
+-				int y = (pt.y - this->GetWidget<NWidgetBase>(BRSW_NEWST_LIST)->pos_y) / this->line_height;
 +				const NWidgetBase *stations_list_nwi = this->GetWidget<NWidgetBase>(widget);
 +				int y = (pt.y - stations_list_nwi->pos_y) / stations_list_nwi->resize_y;
 +				const int x = (pt.x - stations_list_nwi->pos_x) / stations_list_nwi->resize_x;
 +				const int col_count = stations_list_nwi->current_x / stations_list_nwi->resize_x;
-+
+ 
+-				if (y >= this->vscroll.GetCapacity()) return;
+-				y += this->vscroll.GetPosition();
+-				if (y >= _railstation.station_count) return;
 +				if (y >= this->vscroll2.GetCapacity()) return;
 +				if (x >= col_count) return;
 +				y += this->vscroll2.GetPosition();
 +				if (y * col_count + x >= _railstation.station_count) return;
-+
-+				/* Check station availability callback */
+ 
+ 				/* Check station availability callback */
+-				statspec = GetCustomStationSpec(_railstation.station_class, y);
 +				statspec = GetCustomStationSpec(_railstation.station_class, y * col_count + x);
-+				if (statspec != NULL &&
-+					HasBit(statspec->callback_mask, CBM_STATION_AVAIL) &&
-+					GB(GetStationCallback(CBID_STATION_AVAILABILITY, 0, 0, statspec, NULL, INVALID_TILE), 0, 8) == 0) return;
-+
+ 				if (statspec != NULL &&
+ 					HasBit(statspec->callback_mask, CBM_STATION_AVAIL) &&
+ 					GB(GetStationCallback(CBID_STATION_AVAILABILITY, 0, 0, statspec, NULL, INVALID_TILE), 0, 8) == 0) return;
+ 
+-				_railstation.station_type = y;
 +				/* Select current station type */
 +				_railstation.station_type = y * col_count + x;
-+
-+				this->CheckSelectedSize(statspec);
-+
-+				SndPlayFx(SND_15_BEEP);
-+				this->SetDirty();
-+				DeleteWindowById(WC_SELECT_STATION, 0);
-+				break;
-+			}
+ 
+ 				this->CheckSelectedSize(statspec);
+ 
+@@ -1325,96 +1526,177 @@
  		}
  	}
  
+-	virtual void OnDropdownSelect(int widget, int index)
 +	virtual void OnRightClick(Point pt, int widget)
-+	{
-+		if (widget == BRSW_NEWGUI_STATIONS_LIST) {
+ 	{
+-		if (_railstation.station_class != index) {
+-			_railstation.station_class = (StationClassID)index;
+-			_railstation.station_type  = 0;
+-			_railstation.station_count = GetNumCustomStations(_railstation.station_class);
++		if (widget == BRSW_NEWST_STATION_TYPES_LIST) {
 +			const StationSpec *statspec;
 +			const NWidgetBase *stations_list_nwi = this->GetWidget<NWidgetBase>(widget);
 +			int y = (pt.y - stations_list_nwi->pos_y) / stations_list_nwi->resize_y;
 +			const int x = (pt.x - stations_list_nwi->pos_x) / stations_list_nwi->resize_x;
 +			const int col_count = stations_list_nwi->current_x / stations_list_nwi->resize_x;
-+
+ 
+-			this->CheckSelectedSize(GetCustomStationSpec(_railstation.station_class, _railstation.station_type));
 +			if (y >= this->vscroll2.GetCapacity()) return;
 +			if (x >= col_count) return;
 +			y += this->vscroll2.GetPosition();
 +			if (y * col_count + x >= _railstation.station_count) return;
-+
+ 
+-			this->vscroll.SetCount(_railstation.station_count);
+-			this->vscroll.SetPosition(_railstation.station_type);
 +			// Check station availability callback
 +			statspec = GetCustomStationSpec(_railstation.station_class, y * col_count + x);
 +
@@ -584,24 +722,25 @@ Index: src/rail_gui.cpp
 +			uint64 args[1];
 +			args[0] = (uint64)(size_t)(statspec != NULL && statspec->name != 0 ? statspec->name : STR_STATION_CLASS_DFLT);
 +			GuiShowTooltips(STR_BLACK_STRING, 1, args);
-+		}
-+	}
-+
- 	virtual void OnDropdownSelect(int widget, int index)
- 	{
- 		if (_railstation.station_class != index) {
-@@ -1343,6 +1628,44 @@
+ 		}
+-
+-		SndPlayFx(SND_15_BEEP);
+-		this->SetDirty();
+-		DeleteWindowById(WC_SELECT_STATION, 0);
+ 	}
+ 
+ 	virtual void OnTick()
  	{
  		CheckRedrawStationCoverage(this);
  	}
 +
 +	virtual void OnResize()
 +	{
-+		if (_railstation.imp_newstations) {
++		if (_railstation.newstations) {
 +			/* Update custom stations classes scrollbar */
 +			int old_capacity = this->vscroll.GetCapacity();
-+			this->vscroll.SetCapacityFromWidget(this, BRSW_NEWGUI_LIST, 1);
-+			this->GetWidget<NWidgetCore>(BRSW_NEWGUI_LIST)->widget_data = (this->vscroll.GetCapacity()  << MAT_ROW_START) + (1 << MAT_COL_START);
++			this->vscroll.SetCapacityFromWidget(this, BRSW_NEWST_STATION_CLASSES_LIST, 1);
++			this->GetWidget<NWidgetCore>(BRSW_NEWST_STATION_CLASSES_LIST)->widget_data = (this->vscroll.GetCapacity()  << MAT_ROW_START) + (1 << MAT_COL_START);
 +			if (!this->vscroll.IsVisible(_railstation.station_class)) {
 +				/* Ensure that the currently selected class is visible */
 +				this->vscroll.UpdatePosition(max(old_capacity - this->vscroll.GetCapacity(), 0));
@@ -609,10 +748,10 @@ Index: src/rail_gui.cpp
 +
 +			/* Update custom stations types scrollbar */
 +			old_capacity = this->vscroll2.GetCapacity();
-+			this->vscroll2.SetCapacityFromWidget(this, BRSW_NEWGUI_STATIONS_LIST, 0);
++			this->vscroll2.SetCapacityFromWidget(this, BRSW_NEWST_STATION_TYPES_LIST, 0);
 +			int capacity = this->vscroll2.GetCapacity();
 +
-+			NWidgetCore *stations_list_nwi = this->GetWidget<NWidgetCore>(BRSW_NEWGUI_STATIONS_LIST);
++			NWidgetCore *stations_list_nwi = this->GetWidget<NWidgetCore>(BRSW_NEWST_STATION_TYPES_LIST);
 +
 +			const uint col_count = stations_list_nwi->current_x / stations_list_nwi->resize_x;
 +			this->vscroll2.SetCount(_railstation.station_count / col_count  + (_railstation.station_count % col_count > 0));
@@ -634,36 +773,49 @@ Index: src/rail_gui.cpp
 +	}
  };
  
++/* 
++ * A stacked widget that display no plane (SZSP_NONE) has {0, 0} as size and resize. To allow a proper centering of the
++ * widgets in the default gui, two spacers (BRSW_SHOW_DEFAULT_CENTER_ALIGN_{LEFT,RIGHT}) are inserted at the inner bounds
++ * of the NWID_HORIZONTAL container that contains them.
++ */
  static const NWidgetPart _nested_station_builder_widgets[] = {
-@@ -1467,6 +1790,93 @@
- 	EndContainer(),
- };
- 
-+static const NWidgetPart _nested_imp_newstation_builder_widgets[] = {
-+	NWidget(NWID_HORIZONTAL),
-+		NWidget(WWT_CLOSEBOX, COLOUR_DARK_GREEN),
+ 	NWidget(NWID_HORIZONTAL),
+ 		NWidget(WWT_CLOSEBOX, COLOUR_DARK_GREEN),
+-		NWidget(WWT_CAPTION, COLOUR_DARK_GREEN), SetDataTip(STR_STATION_BUILD_RAIL_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 +		NWidget(WWT_CAPTION, COLOUR_DARK_GREEN), SetDataTip(STR_STATION_BUILD_RAIL_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS), SetResize(1, 0),
-+	EndContainer(),
-+	
-+	NWidget(WWT_PANEL, COLOUR_DARK_GREEN),
-+		NWidget(NWID_SPACER), SetMinimalSize(0, 3), SetResize(1, 0),
+ 	EndContainer(),
+ 	NWidget(WWT_PANEL, COLOUR_DARK_GREEN, BRSW_BACKGROUND),
+-		/* begin newstations gui additions. */
+-		NWidget(NWID_SELECTION, INVALID_COLOUR, BRSW_SHOW_NEWST_ADDITIONS),
 +		NWidget(NWID_HORIZONTAL),
-+			NWidget(NWID_VERTICAL),
-+				NWidget(NWID_HORIZONTAL), SetPIP(5, 0, 5), /* Custom stations classes selector */
-+					NWidget(WWT_MATRIX, COLOUR_GREY, BRSW_NEWGUI_LIST), SetMinimalSize(122, 14 * 5 + 1), SetDataTip(0x301, STR_STATION_BUILD_STATION_CLASS_TOOLTIP), SetResize(0, 14),
-+					NWidget(WWT_SCROLLBAR, COLOUR_GREY, BRSW_NEWGUI_CLASS_SCROLL),
-+				EndContainer(),
-+
-+				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_ORIENTATION, STR_NULL), SetPadding(1, 2, 0, 2),
++			NWidget(NWID_SELECTION, INVALID_COLOUR, BRSW_SHOW_DEFAULT_CENTER_ALIGN_LEFT), // default gui 'left spacer'
++				NWidget(NWID_SPACER), SetFill(1, 1), SetResize(1, 0),
++			EndContainer(),
+ 			NWidget(NWID_VERTICAL),
+-				NWidget(WWT_DROPDOWN, COLOUR_GREY, BRSW_NEWST_DROPDOWN), SetMinimalSize(134, 12), SetFill(1, 0), SetPadding(3, 7, 3, 7), SetDataTip(STR_BLACK_STRING, STR_STATION_BUILD_STATION_CLASS_TOOLTIP),
+-				NWidget(NWID_HORIZONTAL), SetPIP(7, 0, 7),
+-					NWidget(WWT_MATRIX, COLOUR_GREY, BRSW_NEWST_LIST), SetMinimalSize(122, 71), SetFill(1, 0), SetDataTip(0x501, STR_STATION_BUILD_STATION_TYPE_TOOLTIP),
+-					NWidget(WWT_SCROLLBAR, COLOUR_GREY, BRSW_NEWST_SCROLL),
++				NWidget(NWID_SELECTION, INVALID_COLOUR, BRSW_SHOW_NEWST_STATION_CLASSES), //newstations gui 'station classes selector'
++					NWidget(NWID_VERTICAL),
++						NWidget(NWID_SPACER), SetMinimalSize(0, 3), SetResize(1, 0),
++						NWidget(NWID_HORIZONTAL), SetPIP(7, 0, 7),
++							NWidget(WWT_MATRIX, COLOUR_GREY, BRSW_NEWST_STATION_CLASSES_LIST), SetMinimalSize(122, 14 * 5 + 1), SetDataTip(0x501, STR_STATION_BUILD_STATION_CLASS_TOOLTIP), SetResize(0, 14),
++							NWidget(WWT_SCROLLBAR, COLOUR_GREY, BRSW_NEWST_STATION_CLASSES_SCROLL),
++						EndContainer(),
++					EndContainer(),
+ 				EndContainer(),
+-				NWidget(NWID_SPACER), SetMinimalSize(0, 1),
++				/* begin common widgets definition. */
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(144, 11), SetDataTip(STR_STATION_BUILD_ORIENTATION, STR_NULL), SetPadding(1, 2, 0, 2),
 +				NWidget(NWID_HORIZONTAL),
-+					NWidget(NWID_SPACER), SetMinimalSize(5, 0), SetFill(1, 0),
++					NWidget(NWID_SPACER), SetMinimalSize(7, 0), SetFill(1, 0),
 +					NWidget(WWT_PANEL, COLOUR_GREY, BRSW_PLATFORM_DIR_X), SetMinimalSize(66, 48), SetFill(0, 0), SetDataTip(0x0, STR_STATION_BUILD_RAILROAD_ORIENTATION_TOOLTIP), EndContainer(),
 +					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
 +					NWidget(WWT_PANEL, COLOUR_GREY, BRSW_PLATFORM_DIR_Y), SetMinimalSize(66, 48), SetFill(0, 0), SetDataTip(0x0, STR_STATION_BUILD_RAILROAD_ORIENTATION_TOOLTIP), EndContainer(),
-+					NWidget(NWID_SPACER), SetMinimalSize(5, 0), SetFill(1, 0),
++					NWidget(NWID_SPACER), SetMinimalSize(7, 0), SetFill(1, 0),
 +				EndContainer(),
-+				
-+				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_NUMBER_OF_TRACKS, STR_NULL), SetPadding(2, 2, 0, 2),
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(144, 11), SetDataTip(STR_STATION_BUILD_NUMBER_OF_TRACKS, STR_NULL), SetPadding(2, 2, 0, 2),
 +				NWidget(NWID_HORIZONTAL),
 +					NWidget(NWID_SPACER), SetFill(1, 0),
 +					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_1), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_1, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
@@ -675,8 +827,7 @@ Index: src/rail_gui.cpp
 +					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_7), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_7, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
 +					NWidget(NWID_SPACER), SetFill(1, 0),
 +				EndContainer(),
-+
-+				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_PLATFORM_LENGTH, STR_NULL), SetPadding(2, 2, 0, 2),
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(144, 11), SetDataTip(STR_STATION_BUILD_PLATFORM_LENGTH, STR_NULL), SetPadding(2, 2, 0, 2),
 +				NWidget(NWID_HORIZONTAL),
 +					NWidget(NWID_SPACER), SetFill(1, 0),
 +					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_1), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_1, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
@@ -688,15 +839,13 @@ Index: src/rail_gui.cpp
 +					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_7), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_7, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
 +					NWidget(NWID_SPACER), SetFill(1, 0),
 +				EndContainer(),
-+				
 +				NWidget(NWID_SPACER), SetMinimalSize(0, 2),
 +				NWidget(NWID_HORIZONTAL),
 +					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
 +					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_DRAG_N_DROP), SetMinimalSize(75, 12), SetDataTip(STR_STATION_BUILD_DRAG_DROP, STR_STATION_BUILD_DRAG_DROP_TOOLTIP),
 +					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
 +				EndContainer(),
-+				
-+				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_COVERAGE_AREA_TITLE, STR_NULL), SetPadding(3, 2, 0, 2),
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(144, 11), SetDataTip(STR_STATION_BUILD_COVERAGE_AREA_TITLE, STR_NULL), SetPadding(3, 2, 0, 2),
 +				NWidget(NWID_HORIZONTAL),
 +					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
 +					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_HIGHLIGHT_OFF), SetMinimalSize(60, 12),
@@ -705,56 +854,88 @@ Index: src/rail_gui.cpp
 +												SetDataTip(STR_STATION_BUILD_COVERAGE_ON, STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP),
 +					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
 +				EndContainer(),
++				/* end common widgets definition. */
++				NWidget(NWID_SELECTION, INVALID_COLOUR, BRSW_SHOW_DEFAULT_STATION_COVERAGE), // default gui 'station coverage area'
++					NWidget(NWID_SPACER), SetMinimalSize(0, 20), SetResize(0, 1),
++				EndContainer(),
+ 			EndContainer(),
++			NWidget(NWID_SELECTION, INVALID_COLOUR, BRSW_SHOW_NEWST_STATION_TYPES), // newstations gui 'station's type selector'
++				NWidget(NWID_VERTICAL),
++					NWidget(NWID_SPACER), SetMinimalSize(0, 3), SetResize(1, 0),
++					NWidget(NWID_HORIZONTAL),
++						NWidget(WWT_MATRIX, COLOUR_GREY, BRSW_NEWST_STATION_TYPES_LIST), SetMinimalSize(66, 14 * 4 * 4), SetDataTip(0x401, STR_NULL), SetResize(66, 14 * 4),
++						NWidget(WWT_SCROLL2BAR, COLOUR_GREY, BRSW_NEWST_STATION_TYPES_SCROLL),
++					EndContainer(),
++				EndContainer(),
 +			EndContainer(),
-+
-+			/* Custom stations type selector */
-+			NWidget(WWT_MATRIX, COLOUR_GREY, BRSW_NEWGUI_STATIONS_LIST), SetMinimalSize(66, 14 * 4 * 4), SetDataTip(0x501, STR_NULL), SetResize(66, 14 * 4),
-+			NWidget(WWT_SCROLL2BAR, COLOUR_GREY, BRSW_NEWGUI_STATION_SCROLL),
-+		EndContainer(),
-+
-+		NWidget(NWID_SPACER), SetMinimalSize(0, 2), SetFill(1, 0), SetResize(1, 0),
-+		/* Station coverage area text */
-+		NWidget(WWT_TEXT, COLOUR_DARK_GREEN, BRSW_NEWGUI_STATION_COVERAGE), SetMinimalSize(221, 28), SetResize(1, 0), SetFill(1, 0),
++			NWidget(NWID_SELECTION, INVALID_COLOUR, BRSW_SHOW_DEFAULT_CENTER_ALIGN_RIGHT), // default gui 'right spacer'
++				NWidget(NWID_SPACER), SetFill(1, 1), SetResize(1, 0),
++			EndContainer(),
+ 		EndContainer(),
+-		/* end newstations gui additions. */
+-		NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(144, 11), SetDataTip(STR_STATION_BUILD_ORIENTATION, STR_NULL), SetPadding(1, 2, 0, 2),
+-		NWidget(NWID_HORIZONTAL),
+-			NWidget(NWID_SPACER), SetMinimalSize(7, 0), SetFill(1, 0),
+-			NWidget(WWT_PANEL, COLOUR_GREY, BRSW_PLATFORM_DIR_X), SetMinimalSize(66, 48), SetFill(0, 0), SetDataTip(0x0, STR_STATION_BUILD_RAILROAD_ORIENTATION_TOOLTIP), EndContainer(),
+-			NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
+-			NWidget(WWT_PANEL, COLOUR_GREY, BRSW_PLATFORM_DIR_Y), SetMinimalSize(66, 48), SetFill(0, 0), SetDataTip(0x0, STR_STATION_BUILD_RAILROAD_ORIENTATION_TOOLTIP), EndContainer(),
+-			NWidget(NWID_SPACER), SetMinimalSize(7, 0), SetFill(1, 0),
++		NWidget(NWID_SELECTION, INVALID_COLOUR, BRSW_SHOW_NEWST_STATION_COVERAGE), // newstations gui 'station coverage text area'
++			NWidget(NWID_VERTICAL),
++				NWidget(NWID_SPACER), SetMinimalSize(0, 2), SetFill(1, 0), SetResize(1, 0),
++				NWidget(WWT_TEXT, COLOUR_DARK_GREEN, BRSW_NEWST_STATION_COVERAGE), SetMinimalSize(1, 28), SetResize(1, 0), SetFill(1, 0),
++			EndContainer(),
+ 		EndContainer(),
+-		NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(144, 11), SetDataTip(STR_STATION_BUILD_NUMBER_OF_TRACKS, STR_NULL), SetPadding(2, 2, 0, 2),
 +	EndContainer(),
-+
-+	/* Bottom bar with resize button */
-+	NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetFill(1, 1),
-+		NWidget(NWID_HORIZONTAL),
++	NWidget(NWID_SELECTION, INVALID_COLOUR, BRSW_SHOW_NEWST_BOTTOM_BAR), // newstations gui 'bottom bar with resize button'
+ 		NWidget(NWID_HORIZONTAL),
+-			NWidget(NWID_SPACER), SetFill(1, 0),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_1), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_1, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_2), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_2, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_3), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_3, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_4), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_4, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_5), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_5, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_6), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_6, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_7), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_7, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
+-			NWidget(NWID_SPACER), SetFill(1, 0),
 +			NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetFill(1, 1), SetResize(1, 0), EndContainer(),
-+			NWidget(WWT_RESIZEBOX, COLOUR_DARK_GREEN, BRSW_NEWGUI_RESIZE),
-+		EndContainer(),
-+	EndContainer(),
-+};
-+
- /** High level window description of the default station-build window */
- static const WindowDesc _station_builder_desc(
- 	WDP_AUTO, 0, 0,
-@@ -1483,11 +1893,22 @@
- 	_nested_newstation_builder_widgets, lengthof(_nested_newstation_builder_widgets)
- );
++			NWidget(WWT_RESIZEBOX, COLOUR_DARK_GREEN, BRSW_NEWST_RESIZE),
+ 		EndContainer(),
+-		NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(144, 11), SetDataTip(STR_STATION_BUILD_PLATFORM_LENGTH, STR_NULL), SetPadding(2, 2, 0, 2),
+-		NWidget(NWID_HORIZONTAL),
+-			NWidget(NWID_SPACER), SetFill(1, 0),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_1), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_1, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_2), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_2, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_3), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_3, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_4), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_4, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_5), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_5, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_6), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_6, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_7), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_7, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
+-			NWidget(NWID_SPACER), SetFill(1, 0),
+-		EndContainer(),
+-		NWidget(NWID_SPACER), SetMinimalSize(0, 2),
+-		NWidget(NWID_HORIZONTAL),
+-			NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_DRAG_N_DROP), SetMinimalSize(75, 12), SetDataTip(STR_STATION_BUILD_DRAG_DROP, STR_STATION_BUILD_DRAG_DROP_TOOLTIP),
+-			NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
+-		EndContainer(),
+-		NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(144, 11), SetDataTip(STR_STATION_BUILD_COVERAGE_AREA_TITLE, STR_NULL), SetPadding(3, 2, 0, 2),
+-		NWidget(NWID_HORIZONTAL),
+-			NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_HIGHLIGHT_OFF), SetMinimalSize(60, 12),
+-										SetDataTip(STR_STATION_BUILD_COVERAGE_OFF, STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP),
+-			NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_HIGHLIGHT_ON), SetMinimalSize(60, 12),
+-										SetDataTip(STR_STATION_BUILD_COVERAGE_ON, STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP),
+-			NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
+-		EndContainer(),
+-		NWidget(NWID_SPACER), SetMinimalSize(0, 20), SetResize(0, 1),
+ 	EndContainer(),
+ };
  
-+/** High level window description of the improved newGRF station-build window */
-+static const WindowDesc _imp_newstation_builder_desc(
-+	WDP_AUTO, 350, 266,
-+	WC_BUILD_STATION, WC_BUILD_TOOLBAR,
-+	WDF_CONSTRUCTION,
-+	_nested_imp_newstation_builder_widgets, lengthof(_nested_imp_newstation_builder_widgets)
-+);
-+
- /** Open station build window */
- static void ShowStationBuilder(Window *parent)
- {
- 	if (GetNumStationClasses() <= 2 && GetNumCustomStations(STAT_CLASS_DFLT) == 1) {
- 		new BuildRailStationWindow(&_station_builder_desc, parent, false);
-+	} else if (_settings_client.gui.imp_newstations_gui) {
-+		/* Use improved newstations gui */
-+		new BuildRailStationWindow(&_imp_newstation_builder_desc, parent, true);
- 	} else {
- 		new BuildRailStationWindow(&_newstation_builder_desc, parent, true);
- 	}
 Index: src/company_base.h
 ===================================================================
---- src/company_base.h	(revision 19145)
+--- src/company_base.h	(revision 19386)
 +++ src/company_base.h	(working copy)
 @@ -74,6 +74,8 @@
  
@@ -765,21 +946,21 @@ Index: src/company_base.h
  	class AIInstance *ai_instance;
  	class AIInfo *ai_info;
  
-Index: src/settings_type.h
+Index: src/transparency.h
 ===================================================================
---- src/settings_type.h	(revision 19145)
-+++ src/settings_type.h	(working copy)
-@@ -98,6 +98,7 @@
- 	bool   station_show_coverage;            ///< whether to highlight coverage area
- 	bool   persistent_buildingtools;         ///< keep the building tools active after usage
- 	uint8  expenses_layout;                  ///< layout of expenses window
-+	bool   imp_newstations_gui;              ///< use the new newstations selection ui
+--- src/transparency.h	(revision 19386)
++++ src/transparency.h	(working copy)
+@@ -31,6 +31,7 @@
+ 	TO_STRUCTURES, ///< unmovable structures
+ 	TO_CATENARY,   ///< catenary
+ 	TO_LOADING,    ///< loading indicators
++	TO_TUNNELS,    ///< vehicles in tunnels
+ 	TO_END,
+ };
  
- 	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
- 	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
 Index: src/company_gui.cpp
 ===================================================================
---- src/company_gui.cpp	(revision 19145)
+--- src/company_gui.cpp	(revision 19386)
 +++ src/company_gui.cpp	(working copy)
 @@ -13,6 +13,7 @@
  #include "gui.h"
@@ -840,7 +1021,7 @@ Index: src/company_gui.cpp
  				break;
 Index: src/viewport_gui.cpp
 ===================================================================
---- src/viewport_gui.cpp	(revision 19145)
+--- src/viewport_gui.cpp	(revision 19386)
 +++ src/viewport_gui.cpp	(working copy)
 @@ -167,7 +167,7 @@
  	_nested_extra_view_port_widgets, lengthof(_nested_extra_view_port_widgets)
@@ -860,20 +1041,156 @@ Index: src/viewport_gui.cpp
  }
 Index: src/gui.h
 ===================================================================
---- src/gui.h	(revision 19145)
+--- src/gui.h	(revision 19386)
 +++ src/gui.h	(working copy)
-@@ -54,7 +54,7 @@
- void ShowEstimatedCostOrIncome(Money cost, int x, int y);
- void ShowErrorMessage(StringID summary_msg, StringID detailed_msg, int x, int y, bool no_timeout = false);
+@@ -63,7 +63,7 @@
+ 
+ void ShowErrorMessage(StringID summary_msg, StringID detailed_msg, WarningLevel wl, int x = 0, int y = 0);
  
 -void ShowExtraViewPortWindow(TileIndex tile = INVALID_TILE);
 +int ShowExtraViewPortWindow(TileIndex tile = INVALID_TILE);
  
  void BuildFileList();
  void SetFiosType(const byte fiostype);
+Index: src/transparency_gui.cpp
+===================================================================
+--- src/transparency_gui.cpp	(revision 19386)
++++ src/transparency_gui.cpp	(working copy)
+@@ -34,14 +34,14 @@
+ 	TTW_WIDGET_STRUCTURES,               ///< Unmovable structures transparency toggle button.
+ 	TTW_WIDGET_CATENARY,                 ///< Catenary transparency toggle button.
+ 	TTW_WIDGET_LOADING,                  ///< Loading indicators transparency toggle button.
++	TTW_WIDGET_TUNNELS,                  ///< Vehicles in tunnels toggle button.
+ 	TTW_WIDGET_END,                      ///< End of toggle buttons.
+ 
+ 	/* Panel with buttons for invisibility */
+ 	TTW_WIDGET_BUTTONS,                  ///< Panel with 'invisibility' buttons.
+ };
+ 
+-class TransparenciesWindow : public Window
+-{
++class TransparenciesWindow : public Window {
+ public:
+ 	TransparenciesWindow(const WindowDesc *desc, int window_number) : Window()
+ 	{
+@@ -50,7 +50,7 @@
+ 
+ 	virtual void OnPaint()
+ 	{
+-		OnInvalidateData(0); // Must be sure that the widgets show the transparency variable changes, also when we use shortcuts.
++		this->OnInvalidateData(0); // Must be sure that the widgets show the transparency variable changes, also when we use shortcuts.
+ 		this->DrawWidgets();
+ 	}
+ 
+@@ -65,14 +65,15 @@
+ 			case TTW_WIDGET_BRIDGES:
+ 			case TTW_WIDGET_STRUCTURES:
+ 			case TTW_WIDGET_CATENARY:
+-			case TTW_WIDGET_LOADING: {
++			case TTW_WIDGET_LOADING:
++			case TTW_WIDGET_TUNNELS: {
+ 				uint i = widget - TTW_WIDGET_BEGIN;
+ 				if (HasBit(_transparency_lock, i)) DrawSprite(SPR_LOCK, PAL_NONE, r.left + 1, r.top + 1);
+ 				break;
+ 			}
+ 			case TTW_WIDGET_BUTTONS:
+ 				for (uint i = TTW_WIDGET_BEGIN; i < TTW_WIDGET_END; i++) {
+-					if (i == TTW_WIDGET_LOADING) continue; // Do not draw button for invisible loading indicators.
++					if (i >= TTW_WIDGET_LOADING) continue; // Do not draw button for invisible loading indicators.
+ 
+ 					const NWidgetBase *wi = this->GetWidget<NWidgetBase>(i);
+ 					DrawFrameRect(wi->pos_x + 1, r.top + 2, wi->pos_x + wi->current_x - 2, r.bottom - 2, COLOUR_PALE_GREEN,
+@@ -84,7 +85,7 @@
+ 
+ 	virtual void OnClick(Point pt, int widget, int click_count)
+ 	{
+-		if (widget >= TTW_WIDGET_BEGIN && widget < TTW_WIDGET_END) {
++		if (IsInsideMM(widget, TTW_WIDGET_BEGIN, TTW_WIDGET_END)) {
+ 			if (_ctrl_pressed) {
+ 				/* toggle the bit of the transparencies lock variable */
+ 				ToggleTransparencyLock((TransparencyOption)(widget - TTW_WIDGET_BEGIN));
+@@ -147,7 +148,8 @@
+ 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, TTW_WIDGET_STRUCTURES), SetMinimalSize(22, 22), SetFill(0, 1), SetDataTip(SPR_IMG_TRANSMITTER, STR_TRANSPARENT_STRUCTURES_TOOLTIP),
+ 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, TTW_WIDGET_CATENARY), SetMinimalSize(22, 22), SetFill(0, 1), SetDataTip(SPR_BUILD_X_ELRAIL, STR_TRANSPARENT_CATENARY_TOOLTIP),
+ 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, TTW_WIDGET_LOADING), SetMinimalSize(22, 22), SetFill(0, 1), SetDataTip(SPR_IMG_TRAINLIST, STR_TRANSPARENT_LOADING_TOOLTIP),
+-		NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetFill(1, 1), EndContainer(),
++		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, TTW_WIDGET_TUNNELS), SetMinimalSize(22, 22), SetFill(0, 1), SetDataTip(SPR_IMG_ROAD_TUNNEL, STR_TRANSPARENT_TUNNELS_TOOLTIP),
++	NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetFill(1, 1), EndContainer(),
+ 	EndContainer(),
+ 	/* Panel with 'inivisibility' buttons. */
+ 	NWidget(WWT_PANEL, COLOUR_DARK_GREEN, TTW_WIDGET_BUTTONS), SetMinimalSize(219, 13), SetDataTip(0x0, STR_TRANSPARENT_INVISIBLE_TOOLTIP),
+Index: src/roadveh_cmd.cpp
+===================================================================
+--- src/roadveh_cmd.cpp	(revision 19386)
++++ src/roadveh_cmd.cpp	(working copy)
+@@ -1204,7 +1204,7 @@
+ 
+ 		v->x_pos = gp.x;
+ 		v->y_pos = gp.y;
+-		VehicleMove(v, !(v->vehstatus & VS_HIDDEN));
++		VehicleMove(v, v->IsDrawn());
+ 		return true;
+ 	}
+ 
+Index: src/vehicle.cpp
+===================================================================
+--- src/vehicle.cpp	(revision 19386)
++++ src/vehicle.cpp	(working copy)
+@@ -183,7 +183,15 @@
+ 	return pass;
+ }
+ 
++bool Vehicle::IsDrawn() const
++{
++	return !(this->vehstatus & VS_HIDDEN) ||
++			(!IsTransparencySet(TO_TUNNELS) &&
++				((this->type == VEH_TRAIN && Train::From(this)->track == TRACK_BIT_WORMHOLE) ||
++				(this->type == VEH_ROAD && RoadVehicle::From(this)->state == RVSB_WORMHOLE)));
++}
+ 
++
+ /**
+  * Displays a "NewGrf Bug" error message for a engine, and pauses the game if not networking.
+  * @param engine The engine that caused the problem
+@@ -672,7 +680,7 @@
+ 
+ 	/* sometimes, eg. for disaster vehicles, when company bankrupts, when removing crashed/flooded vehicles,
+ 	 * it may happen that vehicle chain is deleted when visible */
+-	if (!(this->vehstatus & VS_HIDDEN)) MarkSingleVehicleDirty(this);
++	if (this->IsDrawn()) MarkSingleVehicleDirty(this);
+ 
+ 	Vehicle *v = this->Next();
+ 	this->SetNext(NULL);
+@@ -825,7 +833,7 @@
+ 	if (v->vehstatus & VS_DEFPAL) pal = (v->vehstatus & VS_CRASHED) ? PALETTE_CRASH : GetVehiclePalette(v);
+ 
+ 	AddSortableSpriteToDraw(image, pal, v->x_pos + v->x_offs, v->y_pos + v->y_offs,
+-		v->x_extent, v->y_extent, v->z_extent, v->z_pos, (v->vehstatus & VS_SHADOW) != 0);
++		v->x_extent, v->y_extent, v->z_extent, v->z_pos, (v->vehstatus & (VS_SHADOW | VS_HIDDEN)));
+ }
+ 
+ void ViewportAddVehicles(DrawPixelInfo *dpi)
+@@ -862,7 +870,7 @@
+ 			const Vehicle *v = _vehicle_position_hash[x + y]; // already masked & 0xFFF
+ 
+ 			while (v != NULL) {
+-				if (!(v->vehstatus & VS_HIDDEN) &&
++				if (v->IsDrawn() &&
+ 						l <= v->coord.right &&
+ 						t <= v->coord.bottom &&
+ 						r >= v->coord.left &&
+@@ -890,7 +898,7 @@
+ 	y = ScaleByZoom(y, vp->zoom) + vp->virtual_top;
+ 
+ 	FOR_ALL_VEHICLES(v) {
+-		if ((v->vehstatus & (VS_HIDDEN | VS_UNCLICKABLE)) == 0 &&
++		if (v->IsDrawn() && !(v->vehstatus & VS_UNCLICKABLE) &&
+ 				x >= v->coord.left && x <= v->coord.right &&
+ 				y >= v->coord.top && y <= v->coord.bottom) {
+ 
 Index: src/signs_gui.cpp
 ===================================================================
---- src/signs_gui.cpp	(revision 19145)
+--- src/signs_gui.cpp	(revision 19386)
 +++ src/signs_gui.cpp	(working copy)
 @@ -29,12 +29,30 @@
  #include "table/strings.h"
@@ -1225,9 +1542,26 @@ Index: src/signs_gui.cpp
  };
  
  static const WindowDesc _sign_list_desc(
+Index: src/vehicle_base.h
+===================================================================
+--- src/vehicle_base.h	(revision 19386)
++++ src/vehicle_base.h	(working copy)
+@@ -210,6 +210,12 @@
+ 	virtual const char *GetTypeString() const { return "base vehicle"; }
+ 
+ 	/**
++	 * Is this vehicle drawn?
++	 * @return true if it is drawn
++	 */
++	bool IsDrawn() const;
++
++	/**
+ 	 * Marks the vehicles to be redrawn and updates cached variables
+ 	 *
+ 	 * This method marks the area of the vehicle on the screen as dirty.
 Index: src/rail_map.h
 ===================================================================
---- src/rail_map.h	(revision 19145)
+--- src/rail_map.h	(revision 19386)
 +++ src/rail_map.h	(working copy)
 @@ -563,4 +563,27 @@
  	_me[t].m7 = 0;
@@ -1259,7 +1593,7 @@ Index: src/rail_map.h
  #endif /* RAIL_MAP_H */
 Index: findversion.sh
 ===================================================================
---- findversion.sh	(revision 19145)
+--- findversion.sh	(revision 19386)
 +++ findversion.sh	(working copy)
 @@ -121,4 +121,4 @@
  	REV="${REV}-$BRANCH"
