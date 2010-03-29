@@ -1,8 +1,8 @@
 Index: src/lang/english.txt
 ===================================================================
---- src/lang/english.txt	(revision 19262)
+--- src/lang/english.txt	(revision 19523)
 +++ src/lang/english.txt	(working copy)
-@@ -1857,6 +1857,7 @@
+@@ -1861,6 +1861,7 @@
  STR_TRANSPARENT_STRUCTURES_TOOLTIP                              :{BLACK}Toggle transparency for structures like lighthouses and antennas. Ctrl+Click to lock.
  STR_TRANSPARENT_CATENARY_TOOLTIP                                :{BLACK}Toggle transparency for catenary. Ctrl+Click to lock.
  STR_TRANSPARENT_LOADING_TOOLTIP                                 :{BLACK}Toggle transparency for loading indicators. Ctrl+Click to lock.
@@ -12,9 +12,9 @@ Index: src/lang/english.txt
  # Base for station construction window(s)
 Index: src/table/settings.h
 ===================================================================
---- src/table/settings.h	(revision 19262)
+--- src/table/settings.h	(revision 19523)
 +++ src/table/settings.h	(working copy)
-@@ -271,8 +271,8 @@
+@@ -274,8 +274,8 @@
  #endif
  	  SDTG_VAR("sprite_cache_size",SLE_UINT, S, 0, _sprite_cache_size,     4, 1, 64, 0, STR_NULL, NULL),
  	  SDTG_VAR("player_face",    SLE_UINT32, S, 0, _company_manager_face,0,0,0xFFFFFFFF,0, STR_NULL, NULL),
@@ -27,9 +27,9 @@ Index: src/table/settings.h
  	  SDTG_STR("keyboard_caps",    SLE_STRB, S, 0, _keyboard_opt[1],       NULL,    STR_NULL, NULL),
 Index: src/train_cmd.cpp
 ===================================================================
---- src/train_cmd.cpp	(revision 19262)
+--- src/train_cmd.cpp	(revision 19523)
 +++ src/train_cmd.cpp	(working copy)
-@@ -3494,7 +3494,7 @@
+@@ -3358,7 +3358,7 @@
  			} else {
  				v->x_pos = gp.x;
  				v->y_pos = gp.y;
@@ -38,7 +38,7 @@ Index: src/train_cmd.cpp
  				continue;
  			}
  		}
-@@ -4029,7 +4029,7 @@
+@@ -3893,7 +3893,7 @@
  	}
  
  	for (Train *u = v; u != NULL; u = u->Next()) {
@@ -49,7 +49,7 @@ Index: src/train_cmd.cpp
  	}
 Index: src/transparency.h
 ===================================================================
---- src/transparency.h	(revision 19262)
+--- src/transparency.h	(revision 19523)
 +++ src/transparency.h	(working copy)
 @@ -31,6 +31,7 @@
  	TO_STRUCTURES, ///< unmovable structures
@@ -61,7 +61,7 @@ Index: src/transparency.h
  
 Index: src/transparency_gui.cpp
 ===================================================================
---- src/transparency_gui.cpp	(revision 19262)
+--- src/transparency_gui.cpp	(revision 19523)
 +++ src/transparency_gui.cpp	(working copy)
 @@ -34,14 +34,14 @@
  	TTW_WIDGET_STRUCTURES,               ///< Unmovable structures transparency toggle button.
@@ -128,9 +128,9 @@ Index: src/transparency_gui.cpp
  	NWidget(WWT_PANEL, COLOUR_DARK_GREEN, TTW_WIDGET_BUTTONS), SetMinimalSize(219, 13), SetDataTip(0x0, STR_TRANSPARENT_INVISIBLE_TOOLTIP),
 Index: src/roadveh_cmd.cpp
 ===================================================================
---- src/roadveh_cmd.cpp	(revision 19262)
+--- src/roadveh_cmd.cpp	(revision 19523)
 +++ src/roadveh_cmd.cpp	(working copy)
-@@ -1187,7 +1187,7 @@
+@@ -1210,7 +1210,7 @@
  
  		v->x_pos = gp.x;
  		v->y_pos = gp.y;
@@ -141,7 +141,7 @@ Index: src/roadveh_cmd.cpp
  
 Index: src/vehicle.cpp
 ===================================================================
---- src/vehicle.cpp	(revision 19262)
+--- src/vehicle.cpp	(revision 19523)
 +++ src/vehicle.cpp	(working copy)
 @@ -183,7 +183,15 @@
  	return pass;
@@ -159,7 +159,7 @@ Index: src/vehicle.cpp
  /**
   * Displays a "NewGrf Bug" error message for a engine, and pauses the game if not networking.
   * @param engine The engine that caused the problem
-@@ -618,7 +626,7 @@
+@@ -672,7 +680,7 @@
  
  	/* sometimes, eg. for disaster vehicles, when company bankrupts, when removing crashed/flooded vehicles,
  	 * it may happen that vehicle chain is deleted when visible */
@@ -168,7 +168,7 @@ Index: src/vehicle.cpp
  
  	Vehicle *v = this->Next();
  	this->SetNext(NULL);
-@@ -771,7 +779,7 @@
+@@ -825,7 +833,7 @@
  	if (v->vehstatus & VS_DEFPAL) pal = (v->vehstatus & VS_CRASHED) ? PALETTE_CRASH : GetVehiclePalette(v);
  
  	AddSortableSpriteToDraw(image, pal, v->x_pos + v->x_offs, v->y_pos + v->y_offs,
@@ -177,7 +177,7 @@ Index: src/vehicle.cpp
  }
  
  void ViewportAddVehicles(DrawPixelInfo *dpi)
-@@ -808,7 +816,7 @@
+@@ -862,7 +870,7 @@
  			const Vehicle *v = _vehicle_position_hash[x + y]; // already masked & 0xFFF
  
  			while (v != NULL) {
@@ -186,7 +186,7 @@ Index: src/vehicle.cpp
  						l <= v->coord.right &&
  						t <= v->coord.bottom &&
  						r >= v->coord.left &&
-@@ -836,7 +844,7 @@
+@@ -890,7 +898,7 @@
  	y = ScaleByZoom(y, vp->zoom) + vp->virtual_top;
  
  	FOR_ALL_VEHICLES(v) {
@@ -197,7 +197,7 @@ Index: src/vehicle.cpp
  
 Index: src/vehicle_base.h
 ===================================================================
---- src/vehicle_base.h	(revision 19262)
+--- src/vehicle_base.h	(revision 19523)
 +++ src/vehicle_base.h	(working copy)
 @@ -210,6 +210,12 @@
  	virtual const char *GetTypeString() const { return "base vehicle"; }

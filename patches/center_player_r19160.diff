@@ -1,8 +1,8 @@
 Index: src/lang/english.txt
 ===================================================================
---- src/lang/english.txt	(revision 19160)
+--- src/lang/english.txt	(revision 19523)
 +++ src/lang/english.txt	(working copy)
-@@ -2579,6 +2579,10 @@
+@@ -2586,6 +2586,10 @@
  STR_COMPANY_VIEW_VIEW_HQ_TOOLTIP                                :{BLACK}View company headquarters
  STR_COMPANY_VIEW_RELOCATE_HQ                                    :{BLACK}Relocate HQ
  STR_COMPANY_VIEW_RELOCATE_COMPANY_HEADQUARTERS                  :{BLACK}Rebuild company headquarters elsewhere for 1% cost of company value
@@ -15,7 +15,7 @@ Index: src/lang/english.txt
  STR_COMPANY_VIEW_NEW_FACE_TOOLTIP                               :{BLACK}Select new face for manager
 Index: src/company_cmd.cpp
 ===================================================================
---- src/company_cmd.cpp	(revision 19160)
+--- src/company_cmd.cpp	(revision 19523)
 +++ src/company_cmd.cpp	(working copy)
 @@ -52,7 +52,8 @@
  Company::Company(uint16 name_1, bool is_ai) :
@@ -29,7 +29,7 @@ Index: src/company_cmd.cpp
  	InvalidateWindowData(WC_PERFORMANCE_DETAIL, 0, INVALID_COMPANY);
 Index: src/command.cpp
 ===================================================================
---- src/command.cpp	(revision 19160)
+--- src/command.cpp	(revision 19523)
 +++ src/command.cpp	(working copy)
 @@ -23,6 +23,9 @@
  #include "town.h"
@@ -41,7 +41,7 @@ Index: src/command.cpp
  #include "company_func.h"
  #include "company_base.h"
  #include "signal_func.h"
-@@ -669,7 +672,17 @@
+@@ -661,7 +664,17 @@
  	/* update last build coordinate of company. */
  	if (tile != 0) {
  		Company *c = Company::GetIfValid(_current_company);
@@ -62,7 +62,7 @@ Index: src/command.cpp
  	SubtractMoneyFromCompany(res2);
 Index: src/company_base.h
 ===================================================================
---- src/company_base.h	(revision 19160)
+--- src/company_base.h	(revision 19523)
 +++ src/company_base.h	(working copy)
 @@ -74,6 +74,8 @@
  
@@ -75,7 +75,7 @@ Index: src/company_base.h
  
 Index: src/company_gui.cpp
 ===================================================================
---- src/company_gui.cpp	(revision 19160)
+--- src/company_gui.cpp	(revision 19523)
 +++ src/company_gui.cpp	(working copy)
 @@ -13,6 +13,7 @@
  #include "gui.h"
@@ -136,7 +136,7 @@ Index: src/company_gui.cpp
  				break;
 Index: src/viewport_gui.cpp
 ===================================================================
---- src/viewport_gui.cpp	(revision 19160)
+--- src/viewport_gui.cpp	(revision 19523)
 +++ src/viewport_gui.cpp	(working copy)
 @@ -167,7 +167,7 @@
  	_nested_extra_view_port_widgets, lengthof(_nested_extra_view_port_widgets)
@@ -156,11 +156,11 @@ Index: src/viewport_gui.cpp
  }
 Index: src/gui.h
 ===================================================================
---- src/gui.h	(revision 19160)
+--- src/gui.h	(revision 19523)
 +++ src/gui.h	(working copy)
-@@ -54,7 +54,7 @@
- void ShowEstimatedCostOrIncome(Money cost, int x, int y);
- void ShowErrorMessage(StringID summary_msg, StringID detailed_msg, int x, int y, bool no_timeout = false);
+@@ -63,7 +63,7 @@
+ 
+ void ShowErrorMessage(StringID summary_msg, StringID detailed_msg, WarningLevel wl, int x = 0, int y = 0);
  
 -void ShowExtraViewPortWindow(TileIndex tile = INVALID_TILE);
 +int ShowExtraViewPortWindow(TileIndex tile = INVALID_TILE);

@@ -1,8 +1,8 @@
 Index: src/lang/english.txt
 ===================================================================
---- src/lang/english.txt	(revision 18696)
+--- src/lang/english.txt	(revision 19307)
 +++ src/lang/english.txt	(working copy)
-@@ -3611,6 +3611,12 @@
+@@ -3633,6 +3633,12 @@
  STR_ERROR_CAN_T_CHANGE_SIGN_NAME                                :{WHITE}Can't change sign name...
  STR_ERROR_CAN_T_DELETE_SIGN                                     :{WHITE}Can't delete sign...
  
@@ -17,9 +17,9 @@ Index: src/lang/english.txt
  STR_TOWN_BUILDING_NAME_TALL_OFFICE_BLOCK_1                      :Tall office block
 Index: src/signs_gui.cpp
 ===================================================================
---- src/signs_gui.cpp	(revision 18696)
+--- src/signs_gui.cpp	(revision 19307)
 +++ src/signs_gui.cpp	(working copy)
-@@ -28,12 +28,30 @@
+@@ -29,12 +29,29 @@
  #include "table/strings.h"
  #include "table/sprites.h"
  
@@ -40,18 +40,17 @@ Index: src/signs_gui.cpp
  	GUISignList signs;
  
 +	char filter_string[MAX_LENGTH_SIGN_NAME_BYTES];
-+	bool match_case;
++	static bool match_case;
 +
 +	SignList()
 +	{
 +		filter_string[0] = '\0';
-+		this->match_case = false;
 +	}
 +
  	void BuildSignsList()
  	{
  		if (!this->signs.NeedRebuild()) return;
-@@ -45,6 +63,7 @@
+@@ -46,6 +63,7 @@
  		const Sign *si;
  		FOR_ALL_SIGNS(si) *this->signs.Append() = si;
  
@@ -59,7 +58,7 @@ Index: src/signs_gui.cpp
  		this->signs.Compact();
  		this->signs.RebuildDone();
  	}
-@@ -74,6 +93,24 @@
+@@ -75,24 +93,60 @@
  		/* Reset the name sorter sort cache */
  		this->last_sign = NULL;
  	}
@@ -84,7 +83,10 @@ Index: src/signs_gui.cpp
  };
  
  const Sign *SignList::last_sign = NULL;
-@@ -83,15 +120,31 @@
++bool SignList::match_case = false;
+ 
+ /** Enum referring to the widgets of the sign list window */
+ enum SignListWidgets {
  	SLW_CAPTION,
  	SLW_LIST,
  	SLW_SCROLLBAR,
@@ -105,6 +107,7 @@ Index: src/signs_gui.cpp
 +	SignListWindow(const WindowDesc *desc, WindowNumber window_number) : QueryStringBaseWindow(MAX_LENGTH_SIGN_NAME_BYTES)
  	{
  		this->InitNested(desc, window_number);
++		this->SetWidgetLoweredState(SLW_FILTER_MATCH_CASE_BTN, SignList::match_case);
  
 +		/* Initialize the text edit widget */
 +		this->afilter = CS_ALPHANUMERAL;
@@ -118,7 +121,7 @@ Index: src/signs_gui.cpp
  		/* Create initial list. */
  		this->signs.ForceRebuild();
  		this->signs.ForceResort();
-@@ -100,9 +153,65 @@
+@@ -101,9 +155,65 @@
  		this->vscroll.SetCount(this->signs.Length());
  	}
  
@@ -157,7 +160,7 @@ Index: src/signs_gui.cpp
 +
 +			this->signs.SetFilterState(false);
 +			this->DisableWidget(SLW_FILTER_CLEAR_BTN);
-+			this->RaiseWidget(SLW_FILTER_CLEAR_BTN); // If a button is made disabled when it is lowered, it will not be raised by itself.			
++			this->RaiseWidget(SLW_FILTER_CLEAR_BTN); // If a button is made disabled when it is lowered, it will not be raised by itself.
 +		}
 +
 +		/* Repaint the clear button since its disabled state may have changed */
@@ -184,7 +187,7 @@ Index: src/signs_gui.cpp
  	}
  
  	virtual void DrawWidget(const Rect &r, int widget) const
-@@ -129,7 +238,7 @@
+@@ -130,7 +240,7 @@
  					if (si->owner != OWNER_NONE) DrawCompanyIcon(si->owner, icon_left, y + sprite_offset_y);
  
  					SetDParam(0, si->index);
@@ -193,9 +196,9 @@ Index: src/signs_gui.cpp
  					y += this->resize.step_height;
  				}
  				break;
-@@ -144,18 +253,152 @@
+@@ -145,18 +255,152 @@
  
- 	virtual void OnClick(Point pt, int widget)
+ 	virtual void OnClick(Point pt, int widget, int click_count)
  	{
 -		if (widget == SLW_LIST) {
 -			uint id_v = (pt.y - this->GetWidget<NWidgetBase>(SLW_LIST)->pos_y - WD_FRAMERECT_TOP) / this->resize.step_height;
@@ -223,8 +226,8 @@ Index: src/signs_gui.cpp
 +				break;
 +
 +			case SLW_FILTER_MATCH_CASE_BTN:
-+				this->match_case = !this->match_case;
-+				if (this->match_case) {
++				SignList::match_case = !SignList::match_case;
++				if (SignList::match_case) {
 +					this->LowerWidget(SLW_FILTER_MATCH_CASE_BTN);
 +				} else {
 +					this->RaiseWidget(SLW_FILTER_MATCH_CASE_BTN);
@@ -353,7 +356,7 @@ Index: src/signs_gui.cpp
  	virtual void OnResize()
  	{
  		this->vscroll.SetCapacityFromWidget(this, SLW_LIST, WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM);
-@@ -208,9 +451,14 @@
+@@ -209,9 +453,14 @@
  							SetResize(1, 10), SetFill(1, 0), EndContainer(),
  		NWidget(NWID_VERTICAL),
  			NWidget(WWT_SCROLLBAR, COLOUR_GREY, SLW_SCROLLBAR),
@@ -371,9 +374,9 @@ Index: src/signs_gui.cpp
  static const WindowDesc _sign_list_desc(
 Index: src/toolbar_gui.cpp
 ===================================================================
---- src/toolbar_gui.cpp	(revision 18696)
+--- src/toolbar_gui.cpp	(revision 19307)
 +++ src/toolbar_gui.cpp	(working copy)
-@@ -1279,6 +1279,7 @@
+@@ -1281,6 +1281,7 @@
  			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
  			case WKC_CTRL  | 'G': MenuClickWorldScreenshot(); break;
  			case WKC_CTRL | WKC_ALT | 'C': if (!_networking) ShowCheatWindow(); break;

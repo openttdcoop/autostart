@@ -1,8 +1,8 @@
 Index: src/rail_cmd.cpp
 ===================================================================
---- src/rail_cmd.cpp	(Revision 19045)
+--- src/rail_cmd.cpp	(Revision 19525)
 +++ src/rail_cmd.cpp	(Arbeitskopie)
-@@ -2051,6 +2051,8 @@
+@@ -2320,6 +2320,8 @@
  	RailGroundType old_ground = GetRailGroundType(tile);
  	RailGroundType new_ground;
  
@@ -13,11 +13,11 @@ Index: src/rail_cmd.cpp
  		return;
 Index: src/smallmap_gui.cpp
 ===================================================================
---- src/smallmap_gui.cpp	(Revision 19045)
+--- src/smallmap_gui.cpp	(Revision 19525)
 +++ src/smallmap_gui.cpp	(Arbeitskopie)
-@@ -211,6 +211,21 @@
+@@ -214,6 +214,21 @@
  };
- assert_compile(lengthof(_map_height_bits) == MAX_TILE_HEIGHT + 1);
+ assert_compile(lengthof(_green_map_heights) == MAX_TILE_HEIGHT + 1);
  
 +/**
 + * Colour Coding for Stuck Counter
@@ -34,27 +34,31 @@ Index: src/smallmap_gui.cpp
 +};
 +assert_compile(lengthof(_stuck_counter_colours) == 8);
 +
- struct AndOr {
- 	uint32 mor;
- 	uint32 mand;
-@@ -363,6 +378,12 @@
+ /** Height map colours for the dark green colour scheme, ordered by height. */
+ static const uint32 _dark_green_map_heights[] = {
+ 	MKCOLOUR(0x60606060),
+@@ -421,13 +436,9 @@
+ 			default:              return MKCOLOUR(0xFFFFFFFF);
  		}
- 	}
- 
-+	byte c = GetStuckCounter(tile);
-+	if (t == MP_RAILWAY) {
+ 	} else if (t == MP_RAILWAY) {
+-		AndOr andor = {
+-			GetRailTypeInfo(GetRailType(tile))->map_colour * MKCOLOUR(0x00010100),
+-			_smallmap_contours_andor[t].mand
+-		};
+-
+-		const SmallMapColourScheme *cs = &_heightmap_schemes[_settings_client.gui.smallmap_land_colour];
+-		return ApplyMask(cs->default_colour, &andor);
++		byte c = GetStuckCounter(tile);
 +		if (c==0) return 0;
 +		return _stuck_counter_colours[c/32];
-+	}
-+
+ 	}
+ 
  	/* Ground colour */
- 	return ApplyMask(MKCOLOUR(0x54545454), &_smallmap_contours_andor[t]);
- }
 Index: src/train_cmd.cpp
 ===================================================================
---- src/train_cmd.cpp	(Revision 19045)
+--- src/train_cmd.cpp	(Revision 19525)
 +++ src/train_cmd.cpp	(Arbeitskopie)
-@@ -3352,6 +3352,9 @@
+@@ -3203,6 +3203,9 @@
  
  						/* Don't handle stuck trains here. */
  						if (HasBit(v->flags, VRF_TRAIN_STUCK)) return;
@@ -64,7 +68,7 @@ Index: src/train_cmd.cpp
  
  						if (!HasSignalOnTrackdir(gp.new_tile, ReverseTrackdir(i))) {
  							v->cur_speed = 0;
-@@ -3964,6 +3967,7 @@
+@@ -3818,6 +3821,7 @@
  	/* Handle stuck trains. */
  	if (!mode && HasBit(v->flags, VRF_TRAIN_STUCK)) {
  		++v->wait_counter;
@@ -74,7 +78,7 @@ Index: src/train_cmd.cpp
  		bool turn_around = v->wait_counter % (_settings_game.pf.wait_for_pbs_path * DAY_TICKS) == 0 && _settings_game.pf.wait_for_pbs_path < 255;
 Index: src/rail_map.h
 ===================================================================
---- src/rail_map.h	(Revision 19045)
+--- src/rail_map.h	(Revision 19525)
 +++ src/rail_map.h	(Arbeitskopie)
 @@ -563,4 +563,27 @@
  	_me[t].m7 = 0;
