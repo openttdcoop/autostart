@@ -14,6 +14,15 @@ Index: src/lang/english.txt
 ===================================================================
 --- src/lang/english.txt	(revision 19523)
 +++ src/lang/english.txt	(working copy)
+@@ -1142,7 +1142,7 @@
+ STR_CONFIG_SETTING_AUTORENEW_MONTHS                             :{LTBLUE}Autorenew when vehicle is {ORANGE}{STRING1}{LTBLUE} months before/after max age
+ STR_CONFIG_SETTING_AUTORENEW_MONEY                              :{LTBLUE}Autorenew minimum needed money for renew: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_ERRMSG_DURATION                              :{LTBLUE}Duration of error message: {ORANGE}{STRING1}
+-STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :{LTBLUE}Show town population in the town name label: {ORANGE}{STRING1}
++STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :{LTBLUE}Show extra information in the town name label: {ORANGE}{STRING1}
+ 
+ STR_CONFIG_SETTING_LAND_GENERATOR                               :{LTBLUE}Land generator: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_LAND_GENERATOR_ORIGINAL                      :Original
 @@ -1861,6 +1861,7 @@
  STR_TRANSPARENT_STRUCTURES_TOOLTIP                              :{BLACK}Toggle transparency for structures like lighthouses and antennas. Ctrl+Click to lock.
  STR_TRANSPARENT_CATENARY_TOOLTIP                                :{BLACK}Toggle transparency for catenary. Ctrl+Click to lock.
@@ -46,6 +55,78 @@ Index: src/lang/english.txt
  ##id 0x2000
  # Town building names
  STR_TOWN_BUILDING_NAME_TALL_OFFICE_BLOCK_1                      :Tall office block
+@@ -4037,10 +4048,18 @@
+ STR_SAVEGAME_NAME_SPECTATOR                                     :Spectator, {1:STRING1}
+ 
+ # Viewport strings
++STR_VIEWPORT_TOWN_POP_VERY_POOR_RATING                          :{WHITE}{TOWN} {RED}({COMMA})
++STR_VIEWPORT_TOWN_POP_MEDIOCRE_RATING                           :{WHITE}{TOWN} {ORANGE}({COMMA})
++STR_VIEWPORT_TOWN_POP_GOOD_RATING                               :{WHITE}{TOWN} {YELLOW}({COMMA})
+ STR_VIEWPORT_TOWN_POP                                           :{WHITE}{TOWN} ({COMMA})
++STR_VIEWPORT_TOWN_POP_EXCELLENT_RATING                          :{WHITE}{TOWN} {GREEN}({COMMA})
+ STR_VIEWPORT_TOWN                                               :{WHITE}{TOWN}
+ STR_VIEWPORT_TOWN_TINY_BLACK                                    :{TINYFONT}{BLACK}{TOWN}
++STR_VIEWPORT_TOWN_TINY_VERY_POOR_RATING                         :{TINYFONT}{RED}{TOWN}
++STR_VIEWPORT_TOWN_TINY_MEDIOCRE_RATING                          :{TINYFONT}{ORANGE}{TOWN}
++STR_VIEWPORT_TOWN_TINY_GOOD_RATING                              :{TINYFONT}{YELLOW}{TOWN}
+ STR_VIEWPORT_TOWN_TINY_WHITE                                    :{TINYFONT}{WHITE}{TOWN}
++STR_VIEWPORT_TOWN_TINY_EXCELLENT_RATING                         :{TINYFONT}{GREEN}{TOWN}
+ 
+ STR_VIEWPORT_SIGN_SMALL_BLACK                                   :{TINYFONT}{BLACK}{SIGN}
+ STR_VIEWPORT_SIGN_SMALL_WHITE                                   :{TINYFONT}{WHITE}{SIGN}
+Index: src/town.h
+===================================================================
+--- src/town.h	(revision 19523)
++++ src/town.h	(working copy)
+@@ -17,6 +17,9 @@
+ #include "command_type.h"
+ #include "town_map.h"
+ #include "subsidy_type.h"
++#include "openttd.h"
++#include "table/strings.h"
++#include "company_func.h"
+ 
+ template <typename T>
+ struct BuildingCounts {
+@@ -66,6 +69,7 @@
+ 	CompanyByte exclusivity;       ///< which company has exclusivity
+ 	uint8 exclusive_counter;       ///< months till the exclusivity expires
+ 	int16 ratings[MAX_COMPANIES];
++	StringID town_label;           ///< Label dependent on _local_company rating.
+ 
+ 	/* Maximum amount of passengers and mail that can be transported. */
+ 	uint32 max_pass;
+@@ -122,6 +126,30 @@
+ 
+ 	void InitializeLayout(TownLayout layout);
+ 
++	void UpdateLabel();
++
++	/**
++	 * Returns the correct town label, based on rating.
++	 */
++	FORCEINLINE StringID Label() const{
++		if (!(_game_mode == GM_EDITOR) && (_local_company < MAX_COMPANIES)) {
++			return STR_VIEWPORT_TOWN_POP_VERY_POOR_RATING + this->town_label;
++		} else {
++			return _settings_client.gui.population_in_label ? STR_VIEWPORT_TOWN_POP : STR_VIEWPORT_TOWN;
++		}
++	}
++
++	/**
++	 * Returns the correct town small label, based on rating.
++	 */
++	FORCEINLINE StringID SmallLabel() const{
++		if (!(_game_mode == GM_EDITOR) && (_local_company < MAX_COMPANIES)) {
++			return STR_VIEWPORT_TOWN_TINY_VERY_POOR_RATING + this->town_label;
++		} else {
++			return STR_VIEWPORT_TOWN_TINY_WHITE;
++		}
++	}
++
+ 	/** Calculate the max town noise
+ 	 * The value is counted using the population divided by the content of the
+ 	 * entry in town_noise_population corespondig to the town's tolerance.
 Index: src/rail_cmd.cpp
 ===================================================================
 --- src/rail_cmd.cpp	(revision 19523)
@@ -117,6 +198,75 @@ Index: src/table/settings.h
  	  SDTG_VAR("invisibility_options", SLE_UINT, S, 0, _invisibility_opt,  0,0, 0xFF,0, STR_NULL, NULL),
  	  SDTG_STR("keyboard",         SLE_STRB, S, 0, _keyboard_opt[0],       NULL,    STR_NULL, NULL),
  	  SDTG_STR("keyboard_caps",    SLE_STRB, S, 0, _keyboard_opt[1],       NULL,    STR_NULL, NULL),
+Index: src/town_cmd.cpp
+===================================================================
+--- src/town_cmd.cpp	(revision 19523)
++++ src/town_cmd.cpp	(working copy)
+@@ -150,6 +150,26 @@
+ 	return Town::Get(index);
+ }
+ 
++/**
++ * Updates the town label of the town after changes in rating. The colour scheme is:
++ * Red: Appalling and Very poor ratings.
++ * Orange: Poor and mediocre ratings.
++ * Yellow: Good rating.
++ * White: Very good rating (standard).
++ * Green: Excellent and outstanding ratings.
++ */
++void Town::UpdateLabel()
++{
++	if (!(_game_mode == GM_EDITOR) && (_local_company < MAX_COMPANIES)) {
++		int r = this->ratings[_local_company];
++		(this->town_label = 0, r <= RATING_VERYPOOR)  || // Appalling and Very Poor
++		(this->town_label++,   r <= RATING_MEDIOCRE)  || // Poor and Mediocre
++		(this->town_label++,   r <= RATING_GOOD)      || // Good
++		(this->town_label++,   r <= RATING_VERYGOOD)  || // Very Good
++		(this->town_label++,   true);                    // Excellent and Outstanding
++	}
++}
++
+ Money HouseSpec::GetRemovalCost() const
+ {
+ 	return (_price[PR_CLEAR_HOUSE] * this->removal_cost) >> 8;
+@@ -339,11 +359,11 @@
+  */
+ void Town::UpdateVirtCoord()
+ {
++	this->UpdateLabel();
+ 	Point pt = RemapCoords2(TileX(this->xy) * TILE_SIZE, TileY(this->xy) * TILE_SIZE);
+ 	SetDParam(0, this->index);
+ 	SetDParam(1, this->population);
+-	this->sign.UpdatePosition(pt.x, pt.y - 24,
+-		_settings_client.gui.population_in_label ? STR_VIEWPORT_TOWN_POP : STR_VIEWPORT_TOWN);
++	this->sign.UpdatePosition(pt.x, pt.y - 24, this->Label());
+ 
+ 	SetWindowDirty(WC_TOWN_VIEW, this->index);
+ }
+@@ -2461,6 +2481,7 @@
+ 		 */
+ 		if (t->ratings[_current_company] > RATING_BRIBE_DOWN_TO) {
+ 			t->ratings[_current_company] = RATING_BRIBE_DOWN_TO;
++			t->UpdateVirtCoord();
+ 			SetWindowDirty(WC_TOWN_AUTHORITY, t->index);
+ 		}
+ 	} else {
+@@ -2587,6 +2608,7 @@
+ 		t->ratings[i] = Clamp(t->ratings[i], RATING_MINIMUM, RATING_MAXIMUM);
+ 	}
+ 
++	t->UpdateVirtCoord();
+ 	SetWindowDirty(WC_TOWN_AUTHORITY, t->index);
+ 
+ 	ClrBit(t->flags, TOWN_IS_FUNDED);
+@@ -2797,6 +2819,7 @@
+ 	} else {
+ 		SetBit(t->have_ratings, _current_company);
+ 		t->ratings[_current_company] = rating;
++		t->UpdateVirtCoord();
+ 		SetWindowDirty(WC_TOWN_AUTHORITY, t->index);
+ 	}
+ }
 Index: src/company_cmd.cpp
 ===================================================================
 --- src/company_cmd.cpp	(revision 19523)
@@ -131,6 +281,15 @@ Index: src/company_cmd.cpp
  {
  	for (uint j = 0; j < 4; j++) this->share_owners[j] = COMPANY_SPECTATOR;
  	InvalidateWindowData(WC_PERFORMANCE_DETAIL, 0, INVALID_COMPANY);
+@@ -505,6 +506,8 @@
+ 
+ 	c->num_engines = CallocT<uint16>(Engine::GetPoolSize());
+ 
++	if (!is_ai) UpdateAllTownVirtCoords();
++
+ 	return c;
+ }
+ 
 Index: src/train_cmd.cpp
 ===================================================================
 --- src/train_cmd.cpp	(revision 19523)
@@ -1150,6 +1309,20 @@ Index: src/vehicle.cpp
  				x >= v->coord.left && x <= v->coord.right &&
  				y >= v->coord.top && y <= v->coord.bottom) {
  
+Index: src/viewport.cpp
+===================================================================
+--- src/viewport.cpp	(revision 19523)
++++ src/viewport.cpp	(working copy)
+@@ -1127,8 +1127,7 @@
+ 	const Town *t;
+ 	FOR_ALL_TOWNS(t) {
+ 		ViewportAddString(dpi, ZOOM_LVL_OUT_4X, &t->sign,
+-				_settings_client.gui.population_in_label ? STR_VIEWPORT_TOWN_POP : STR_VIEWPORT_TOWN,
+-				STR_VIEWPORT_TOWN_TINY_WHITE, STR_VIEWPORT_TOWN_TINY_BLACK,
++				t->Label(), t->SmallLabel(), STR_VIEWPORT_TOWN_TINY_BLACK,
+ 				t->index, t->population);
+ 	}
+ }
 Index: src/signs_gui.cpp
 ===================================================================
 --- src/signs_gui.cpp	(revision 19523)
