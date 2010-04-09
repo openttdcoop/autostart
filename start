@@ -205,11 +205,19 @@ function installation {
         fi
 }
 
+function cleanup() {
+# add cleanup commands
+  echo "Caught Signal ... exit."
+  exit 1
+}
 ###################################################################
 #
 # MAIN
 #
 ###################################################################
+
+# exit the script on ctrl-c, not just the current running command
+trap cleanup 1 2 3 6
 
 # Arguments:
 # 1. argument is the conf file, if it isn't a option.
