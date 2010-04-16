@@ -1,0 +1,2107 @@
+Index: src/toolbar_gui.cpp
+===================================================================
+--- src/toolbar_gui.cpp	(revision 19642)
++++ src/toolbar_gui.cpp	(working copy)
+@@ -41,6 +41,7 @@
+ #include "rail.h"
+ #include "widgets/dropdown_type.h"
+ #include "company_base.h"
++#include "watch_gui.h"
+ #include "smallmap_gui.h"
+ #include "graph_gui.h"
+ 
+@@ -390,9 +391,10 @@
+ 	MME_SHOW_SMALLMAP        = 0,
+ 	MME_SHOW_EXTRAVIEWPORTS,
+ 	MME_SHOW_SIGNLISTS,
++	MME_WATCH_COMPANY,
+ 	MME_SHOW_TOWNDIRECTORY,    ///< This entry is only used in Editor mode
+-	MME_MENUCOUNT_NORMAL     = 3,
+-	MME_MENUCOUNT_EDITOR     = 4,
++	MME_MENUCOUNT_NORMAL     = 4,
++	MME_MENUCOUNT_EDITOR     = 5,
+ };
+ 
+ static void ToolbarMapClick(Window *w)
+@@ -412,6 +414,7 @@
+ 		case MME_SHOW_EXTRAVIEWPORTS: ShowExtraViewPortWindow(); break;
+ 		case MME_SHOW_SIGNLISTS:      ShowSignList();            break;
+ 		case MME_SHOW_TOWNDIRECTORY:  if (_game_mode == GM_EDITOR) ShowTownDirectory(); break;
++		case MME_WATCH_COMPANY:       ShowWatchWindow( INVALID_COMPANY );
+ 	}
+ }
+ 
+@@ -1286,6 +1289,7 @@
+ 			case WKC_CTRL  | 'S': MenuClickSmallScreenshot(); break;
+ 			case WKC_CTRL  | 'G': MenuClickWorldScreenshot(); break;
+ 			case WKC_CTRL | WKC_ALT | 'C': if (!_networking) ShowCheatWindow(); break;
++			case WKC_CTRL | 'L': ShowSignList(); break;
+ 			case 'A': if (CanBuildVehicleInfrastructure(VEH_TRAIN)) ShowBuildRailToolbar(_last_built_railtype, 4); break; // Invoke Autorail
+ 			case 'L': ShowTerraformToolbar(); break;
+ 			case 'Q': case 'W': case 'E': case 'D': ShowTerraformToolbarWithTool(key, keycode); break;
+Index: src/lang/english.txt
+===================================================================
+--- src/lang/english.txt	(revision 19642)
++++ src/lang/english.txt	(working copy)
+@@ -367,6 +367,7 @@
+ STR_MAP_MENU_MAP_OF_WORLD                                       :Map of world
+ STR_MAP_MENU_EXTRA_VIEW_PORT                                    :Extra viewport
+ STR_MAP_MENU_SIGN_LIST                                          :Sign list
++STR_MAP_MENU_WATCH_COMPANY                                      :Watch Company
+ ############ range for town menu starts, yet the town directory is shown in the map menu in the scenario editor
+ STR_TOWN_MENU_TOWN_DIRECTORY                                    :Town directory
+ ############ end of the 'Display map' dropdown
+@@ -1138,7 +1139,7 @@
+ STR_CONFIG_SETTING_AUTORENEW_MONTHS                             :{LTBLUE}Autorenew when vehicle is {ORANGE}{STRING1}{LTBLUE} months before/after max age
+ STR_CONFIG_SETTING_AUTORENEW_MONEY                              :{LTBLUE}Autorenew minimum needed money for renew: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_ERRMSG_DURATION                              :{LTBLUE}Duration of error message: {ORANGE}{STRING1}
+-STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :{LTBLUE}Show town population in the town name label: {ORANGE}{STRING1}
++STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :{LTBLUE}Show extra information in the town name label: {ORANGE}{STRING1}
+ 
+ STR_CONFIG_SETTING_LAND_GENERATOR                               :{LTBLUE}Land generator: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_LAND_GENERATOR_ORIGINAL                      :Original
+@@ -1259,6 +1260,7 @@
+ STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Block signals only
+ STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Path signals only
+ STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :All
++STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI                          :{LTBLUE}Enable previews for station building: {ORANGE}{STRING1}
+ 
+ STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Road layout for new towns: {ORANGE}{STRING1}
+ STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
+@@ -1857,6 +1859,7 @@
+ STR_TRANSPARENT_STRUCTURES_TOOLTIP                              :{BLACK}Toggle transparency for structures like lighthouses and antennas. Ctrl+Click to lock.
+ STR_TRANSPARENT_CATENARY_TOOLTIP                                :{BLACK}Toggle transparency for catenary. Ctrl+Click to lock.
+ STR_TRANSPARENT_LOADING_TOOLTIP                                 :{BLACK}Toggle transparency for loading indicators. Ctrl+Click to lock.
++STR_TRANSPARENT_TUNNELS_TOOLTIP                                 :{BLACK}Toggle transparency for vehicles in tunnels. Ctrl+Click to lock.
+ STR_TRANSPARENT_INVISIBLE_TOOLTIP                               :{BLACK}Set objects invisible instead of transparent
+ 
+ # Base for station construction window(s)
+@@ -3630,6 +3633,12 @@
+ STR_ERROR_CAN_T_CHANGE_SIGN_NAME                                :{WHITE}Can't change sign name...
+ STR_ERROR_CAN_T_DELETE_SIGN                                     :{WHITE}Can't delete sign...
+ 
++# GUI Sign list filter
++STR_FILTER                                                      :{BLACK}Filter
++STR_FILTER_OSKTITLE                                             :{BLACK}Enter a filter string
++STR_FILTER_MATCH_CASE                                           :{BLACK}Match case
++STR_FILTER_CLEAR                                                :{BLACK}Clear filter
++
+ ##id 0x2000
+ # Town building names
+ STR_TOWN_BUILDING_NAME_TALL_OFFICE_BLOCK_1                      :Tall office block
+@@ -4028,10 +4037,18 @@
+ STR_SAVEGAME_NAME_SPECTATOR                                     :Spectator, {1:STRING1}
+ 
+ # Viewport strings
++STR_VIEWPORT_TOWN_POP_VERY_POOR_RATING                          :{WHITE}{TOWN} {RED}({COMMA})
++STR_VIEWPORT_TOWN_POP_MEDIOCRE_RATING                           :{WHITE}{TOWN} {ORANGE}({COMMA})
++STR_VIEWPORT_TOWN_POP_GOOD_RATING                               :{WHITE}{TOWN} {YELLOW}({COMMA})
+ STR_VIEWPORT_TOWN_POP                                           :{WHITE}{TOWN} ({COMMA})
++STR_VIEWPORT_TOWN_POP_EXCELLENT_RATING                          :{WHITE}{TOWN} {GREEN}({COMMA})
+ STR_VIEWPORT_TOWN                                               :{WHITE}{TOWN}
+ STR_VIEWPORT_TOWN_TINY_BLACK                                    :{TINYFONT}{BLACK}{TOWN}
++STR_VIEWPORT_TOWN_TINY_VERY_POOR_RATING                         :{TINYFONT}{RED}{TOWN}
++STR_VIEWPORT_TOWN_TINY_MEDIOCRE_RATING                          :{TINYFONT}{ORANGE}{TOWN}
++STR_VIEWPORT_TOWN_TINY_GOOD_RATING                              :{TINYFONT}{YELLOW}{TOWN}
+ STR_VIEWPORT_TOWN_TINY_WHITE                                    :{TINYFONT}{WHITE}{TOWN}
++STR_VIEWPORT_TOWN_TINY_EXCELLENT_RATING                         :{TINYFONT}{GREEN}{TOWN}
+ 
+ STR_VIEWPORT_SIGN_SMALL_BLACK                                   :{TINYFONT}{BLACK}{SIGN}
+ STR_VIEWPORT_SIGN_SMALL_WHITE                                   :{TINYFONT}{WHITE}{SIGN}
+@@ -4111,3 +4128,7 @@
+ STR_SHIP                                                        :{BLACK}{SHIP}
+ 
+ STR_TOOLBAR_RAILTYPE_VELOCITY                                   :{STRING} ({VELOCITY})
++
++STR_WATCH_WINDOW_TITLE                                          :{WHITE}Watching {RAW_STRING}.
++STR_WATCH_CLICK_TO_WATCH_COMPANY                                :{BLACK}Click here to watch company building
++STR_WATCH_CLICK_NEW_WINDOW                                      :{BLACK}Click here to open new watching window
+Index: src/settings_gui.cpp
+===================================================================
+--- src/settings_gui.cpp	(revision 19642)
++++ src/settings_gui.cpp	(working copy)
+@@ -1301,6 +1301,7 @@
+ 	SettingEntry("gui.always_build_infrastructure"),
+ 	SettingEntry("gui.persistent_buildingtools"),
+ 	SettingEntry("gui.coloured_news_year"),
++	SettingEntry("gui.imp_newstations_gui"),
+ };
+ /** Interface subpage */
+ static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
+Index: src/town.h
+===================================================================
+--- src/town.h	(revision 19642)
++++ src/town.h	(working copy)
+@@ -17,6 +17,9 @@
+ #include "command_type.h"
+ #include "town_map.h"
+ #include "subsidy_type.h"
++#include "openttd.h"
++#include "table/strings.h"
++#include "company_func.h"
+ 
+ template <typename T>
+ struct BuildingCounts {
+@@ -66,6 +69,7 @@
+ 	CompanyByte exclusivity;       ///< which company has exclusivity
+ 	uint8 exclusive_counter;       ///< months till the exclusivity expires
+ 	int16 ratings[MAX_COMPANIES];
++	StringID town_label;           ///< Label dependent on _local_company rating.
+ 
+ 	/* Maximum amount of passengers and mail that can be transported. */
+ 	uint32 max_pass;
+@@ -122,6 +126,30 @@
+ 
+ 	void InitializeLayout(TownLayout layout);
+ 
++	void UpdateLabel();
++
++	/**
++	 * Returns the correct town label, based on rating.
++	 */
++	FORCEINLINE StringID Label() const{
++		if (!(_game_mode == GM_EDITOR) && (_local_company < MAX_COMPANIES)) {
++			return STR_VIEWPORT_TOWN_POP_VERY_POOR_RATING + this->town_label;
++		} else {
++			return _settings_client.gui.population_in_label ? STR_VIEWPORT_TOWN_POP : STR_VIEWPORT_TOWN;
++		}
++	}
++
++	/**
++	 * Returns the correct town small label, based on rating.
++	 */
++	FORCEINLINE StringID SmallLabel() const{
++		if (!(_game_mode == GM_EDITOR) && (_local_company < MAX_COMPANIES)) {
++			return STR_VIEWPORT_TOWN_TINY_VERY_POOR_RATING + this->town_label;
++		} else {
++			return STR_VIEWPORT_TOWN_TINY_WHITE;
++		}
++	}
++
+ 	/** Calculate the max town noise
+ 	 * The value is counted using the population divided by the content of the
+ 	 * entry in town_noise_population corespondig to the town's tolerance.
+Index: src/rail_cmd.cpp
+===================================================================
+--- src/rail_cmd.cpp	(revision 19642)
++++ src/rail_cmd.cpp	(working copy)
+@@ -2289,6 +2289,8 @@
+ 	RailGroundType old_ground = GetRailGroundType(tile);
+ 	RailGroundType new_ground;
+ 
++	ReduceStuckCounter(tile);
++
+ 	if (old_ground == RAIL_GROUND_WATER) {
+ 		TileLoop_Water(tile);
+ 		return;
+Index: src/smallmap_gui.cpp
+===================================================================
+--- src/smallmap_gui.cpp	(revision 19642)
++++ src/smallmap_gui.cpp	(working copy)
+@@ -213,6 +213,21 @@
+ };
+ assert_compile(lengthof(_green_map_heights) == MAX_TILE_HEIGHT + 1);
+ 
++/**
++ * Colour Coding for Stuck Counter
++ */
++static const uint32 _stuck_counter_colours[] = {
++	MKCOLOUR(0xD0D0D0D0),
++	MKCOLOUR(0xCECECECE),
++	MKCOLOUR(0xBFBFBFBF),
++	MKCOLOUR(0xBDBDBDBD),
++	MKCOLOUR(0xBABABABA),
++	MKCOLOUR(0xB8B8B8B8),
++	MKCOLOUR(0xB6B6B6B6),
++	MKCOLOUR(0xB4B4B4B4),
++};
++assert_compile(lengthof(_stuck_counter_colours) == 8);
++
+ /** Height map colours for the dark green colour scheme, ordered by height. */
+ static const uint32 _dark_green_map_heights[] = {
+ 	MKCOLOUR(0x60606060),
+@@ -420,13 +435,9 @@
+ 			default:              return MKCOLOUR(0xFFFFFFFF);
+ 		}
+ 	} else if (t == MP_RAILWAY) {
+-		AndOr andor = {
+-			GetRailTypeInfo(GetRailType(tile))->map_colour * MKCOLOUR(0x00010100),
+-			_smallmap_contours_andor[t].mand
+-		};
+-
+-		const SmallMapColourScheme *cs = &_heightmap_schemes[_settings_client.gui.smallmap_land_colour];
+-		return ApplyMask(cs->default_colour, &andor);
++		byte c = GetStuckCounter(tile);
++		if (c==0) return 0;
++		return _stuck_counter_colours[c/32];
+ 	}
+ 
+ 	/* Ground colour */
+Index: src/table/settings.h
+===================================================================
+--- src/table/settings.h	(revision 19642)
++++ src/table/settings.h	(working copy)
+@@ -272,8 +272,8 @@
+ #endif
+ 	  SDTG_VAR("sprite_cache_size",SLE_UINT, S, 0, _sprite_cache_size,     4, 1, 64, 0, STR_NULL, NULL),
+ 	  SDTG_VAR("player_face",    SLE_UINT32, S, 0, _company_manager_face,0,0,0xFFFFFFFF,0, STR_NULL, NULL),
+-	  SDTG_VAR("transparency_options", SLE_UINT, S, 0, _transparency_opt,  0,0,0x1FF,0, STR_NULL, NULL),
+-	  SDTG_VAR("transparency_locks", SLE_UINT, S, 0, _transparency_lock,   0,0,0x1FF,0, STR_NULL, NULL),
++	  SDTG_VAR("transparency_options", SLE_UINT, S, 0, _transparency_opt,  0,0,0x3FF,0, STR_NULL, NULL),
++	  SDTG_VAR("transparency_locks", SLE_UINT, S, 0, _transparency_lock,   0,0,0x3FF,0, STR_NULL, NULL),
+ 	  SDTG_VAR("invisibility_options", SLE_UINT, S, 0, _invisibility_opt,  0,0, 0xFF,0, STR_NULL, NULL),
+ 	  SDTG_STR("keyboard",         SLE_STRB, S, 0, _keyboard_opt[0],       NULL,    STR_NULL, NULL),
+ 	  SDTG_STR("keyboard_caps",    SLE_STRB, S, 0, _keyboard_opt[1],       NULL,    STR_NULL, NULL),
+@@ -593,6 +593,7 @@
+ 	 SDTC_BOOL(gui.station_show_coverage,                S,  0, false,                        STR_NULL,                                       NULL),
+ 	 SDTC_BOOL(gui.persistent_buildingtools,             S,  0,  true,                        STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS,    NULL),
+ 	 SDTC_BOOL(gui.expenses_layout,                      S,  0, false,                        STR_CONFIG_SETTING_EXPENSES_LAYOUT,             RedrawScreen),
++	 SDTC_BOOL(gui.imp_newstations_gui,                  S,  0, false,                        STR_CONFIG_SETTING_IMP_NEWSTATIONS_GUI,         RedrawScreen),
+ 
+ /* For the dedicated build we'll enable dates in logs by default. */
+ #ifdef DEDICATED
+Index: src/town_cmd.cpp
+===================================================================
+--- src/town_cmd.cpp	(revision 19642)
++++ src/town_cmd.cpp	(working copy)
+@@ -150,6 +150,26 @@
+ 	return Town::Get(index);
+ }
+ 
++/**
++ * Updates the town label of the town after changes in rating. The colour scheme is:
++ * Red: Appalling and Very poor ratings.
++ * Orange: Poor and mediocre ratings.
++ * Yellow: Good rating.
++ * White: Very good rating (standard).
++ * Green: Excellent and outstanding ratings.
++ */
++void Town::UpdateLabel()
++{
++	if (!(_game_mode == GM_EDITOR) && (_local_company < MAX_COMPANIES)) {
++		int r = this->ratings[_local_company];
++		(this->town_label = 0, r <= RATING_VERYPOOR)  || // Appalling and Very Poor
++		(this->town_label++,   r <= RATING_MEDIOCRE)  || // Poor and Mediocre
++		(this->town_label++,   r <= RATING_GOOD)      || // Good
++		(this->town_label++,   r <= RATING_VERYGOOD)  || // Very Good
++		(this->town_label++,   true);                    // Excellent and Outstanding
++	}
++}
++
+ Money HouseSpec::GetRemovalCost() const
+ {
+ 	return (_price[PR_CLEAR_HOUSE] * this->removal_cost) >> 8;
+@@ -339,11 +359,11 @@
+  */
+ void Town::UpdateVirtCoord()
+ {
++	this->UpdateLabel();
+ 	Point pt = RemapCoords2(TileX(this->xy) * TILE_SIZE, TileY(this->xy) * TILE_SIZE);
+ 	SetDParam(0, this->index);
+ 	SetDParam(1, this->population);
+-	this->sign.UpdatePosition(pt.x, pt.y - 24,
+-		_settings_client.gui.population_in_label ? STR_VIEWPORT_TOWN_POP : STR_VIEWPORT_TOWN);
++	this->sign.UpdatePosition(pt.x, pt.y - 24, this->Label());
+ 
+ 	SetWindowDirty(WC_TOWN_VIEW, this->index);
+ }
+@@ -2461,6 +2481,7 @@
+ 		 */
+ 		if (t->ratings[_current_company] > RATING_BRIBE_DOWN_TO) {
+ 			t->ratings[_current_company] = RATING_BRIBE_DOWN_TO;
++			t->UpdateVirtCoord();
+ 			SetWindowDirty(WC_TOWN_AUTHORITY, t->index);
+ 		}
+ 	} else {
+@@ -2587,6 +2608,7 @@
+ 		t->ratings[i] = Clamp(t->ratings[i], RATING_MINIMUM, RATING_MAXIMUM);
+ 	}
+ 
++	t->UpdateVirtCoord();
+ 	SetWindowDirty(WC_TOWN_AUTHORITY, t->index);
+ 
+ 	ClrBit(t->flags, TOWN_IS_FUNDED);
+@@ -2792,6 +2814,7 @@
+ 	} else {
+ 		SetBit(t->have_ratings, _current_company);
+ 		t->ratings[_current_company] = rating;
++		t->UpdateVirtCoord();
+ 		SetWindowDirty(WC_TOWN_AUTHORITY, t->index);
+ 	}
+ }
+Index: src/window_type.h
+===================================================================
+--- src/window_type.h	(revision 19642)
++++ src/window_type.h	(working copy)
+@@ -106,6 +106,7 @@
+ 	WC_AI_DEBUG,
+ 	WC_AI_LIST,
+ 	WC_AI_SETTINGS,
++	WC_WATCH_COMPANY,
+ 
+ 	WC_INVALID = 0xFFFF
+ };
+Index: src/company_cmd.cpp
+===================================================================
+--- src/company_cmd.cpp	(revision 19642)
++++ src/company_cmd.cpp	(working copy)
+@@ -56,6 +56,7 @@
+ {
+ 	for (uint j = 0; j < 4; j++) this->share_owners[j] = COMPANY_SPECTATOR;
+ 	InvalidateWindowData(WC_PERFORMANCE_DETAIL, 0, INVALID_COMPANY);
++	InvalidateWindowClassesData( WC_WATCH_COMPANY, 0 );
+ }
+ 
+ Company::~Company()
+@@ -78,6 +79,7 @@
+ 	InvalidateWindowData(WC_GRAPH_LEGEND, 0, (int)index);
+ 	InvalidateWindowData(WC_PERFORMANCE_DETAIL, 0, (int)index);
+ 	InvalidateWindowData(WC_COMPANY_LEAGUE, 0, 0);
++	InvalidateWindowClassesData( WC_WATCH_COMPANY, 0 );
+ 	/* If the currently shown error message has this company in it, the close it. */
+ 	InvalidateWindowData(WC_ERRMSG, 0);
+ }
+@@ -501,6 +503,8 @@
+ 
+ 	c->num_engines = CallocT<uint16>(Engine::GetPoolSize());
+ 
++	if (!is_ai) UpdateAllTownVirtCoords();
++
+ 	return c;
+ }
+ 
+Index: src/train_cmd.cpp
+===================================================================
+--- src/train_cmd.cpp	(revision 19642)
++++ src/train_cmd.cpp	(working copy)
+@@ -3345,6 +3345,9 @@
+ 
+ 						/* Don't handle stuck trains here. */
+ 						if (HasBit(v->flags, VRF_TRAIN_STUCK)) return;
++						/* this codepath seems to be run every 5 ticks, so increase counter twice every 20 ticks */
++						IncreaseStuckCounter(v->tile);
++						if (v->tick_counter % 4 == 0) IncreaseStuckCounter(v->tile);
+ 
+ 						if (!HasSignalOnTrackdir(gp.new_tile, ReverseTrackdir(i))) {
+ 							v->cur_speed = 0;
+@@ -3500,7 +3503,7 @@
+ 			} else {
+ 				v->x_pos = gp.x;
+ 				v->y_pos = gp.y;
+-				VehicleMove(v, !(v->vehstatus & VS_HIDDEN));
++				VehicleMove(v, v->IsDrawn());
+ 				continue;
+ 			}
+ 		}
+@@ -3960,6 +3963,7 @@
+ 	/* Handle stuck trains. */
+ 	if (!mode && HasBit(v->flags, VRF_TRAIN_STUCK)) {
+ 		++v->wait_counter;
++		if (v->tick_counter % 4 == 0) IncreaseStuckCounter(v->tile);
+ 
+ 		/* Should we try reversing this tick if still stuck? */
+ 		bool turn_around = v->wait_counter % (_settings_game.pf.wait_for_pbs_path * DAY_TICKS) == 0 && _settings_game.pf.wait_for_pbs_path < 255;
+@@ -4035,7 +4039,7 @@
+ 	}
+ 
+ 	for (Train *u = v; u != NULL; u = u->Next()) {
+-		if ((u->vehstatus & VS_HIDDEN) != 0) continue;
++		if (!u->IsDrawn()) continue;
+ 
+ 		u->UpdateViewport(false, false);
+ 	}
+Index: src/command.cpp
+===================================================================
+--- src/command.cpp	(revision 19642)
++++ src/command.cpp	(working copy)
+@@ -26,6 +26,8 @@
+ #include "company_func.h"
+ #include "company_base.h"
+ #include "signal_func.h"
++#include "window_func.h"
++#include "watch_gui.h"
+ 
+ #include "table/strings.h"
+ 
+@@ -672,6 +674,16 @@
+ 		if (c != NULL) c->last_build_coordinate = tile;
+ 	}
+ 
++	/* Send Tile Number to Watching Company Windows */
++	int watching_window = 0;
++	WatchCompany *wc;
++	wc = dynamic_cast<WatchCompany*>(FindWindowById(WC_WATCH_COMPANY, watching_window));
++	while (wc!=NULL) {
++		wc->OnDoCommand( _current_company, tile );
++		watching_window++;
++		wc = dynamic_cast<WatchCompany*>(FindWindowById(WC_WATCH_COMPANY, watching_window));
++	}
++
+ 	SubtractMoneyFromCompany(res2);
+ 
+ 	/* update signals if needed */
+Index: src/rail_gui.cpp
+===================================================================
+--- src/rail_gui.cpp	(revision 19642)
++++ src/rail_gui.cpp	(working copy)
+@@ -37,6 +37,8 @@
+ #include "table/sprites.h"
+ #include "table/strings.h"
+ 
++#include <vector>
++
+ static RailType _cur_railtype;               ///< Rail type of the current build-rail toolbar.
+ static bool _remove_button_clicked;          ///< Flag whether 'remove' toggle-button is currently enabled
+ static DiagDirection _build_depot_direction; ///< Currently selected depot direction
+@@ -49,13 +51,25 @@
+ /* Map the setting: default_signal_type to the corresponding signal type */
+ static const SignalType _default_signal_type[] = {SIGTYPE_NORMAL, SIGTYPE_PBS, SIGTYPE_PBS_ONEWAY};
+ 
++struct StationClass_Testing {
++		int result;      ///< Custom station class offset
++		StringID string; ///< Custom station class name
++};
++
++typedef std::vector<StationClass_Testing *> StationClasses;
++
+ struct RailStationGUISettings {
+ 	Axis orientation;                 ///< Currently selected rail station orientation
+ 
+ 	bool newstations;                 ///< Are custom station definitions available?
++	bool imp_newstations;             ///< Use the improved newstations gui?
+ 	StationClassIDByte station_class; ///< Currently selected custom station class (if newstations is \c true )
+ 	byte station_type;                ///< Station type within the currently selected custom station class (if newstations is \c true )
+ 	byte station_count;               ///< Number of custom stations (if newstations is \c true )
++	byte station_class_count;         ///< Number of custom stations classes (if imp_newstations is \c true)
++	StationClasses station_classes;   ///< Cache of custom stations classes (if imp_newstations is \c true)
++	Dimension window_size;            ///< Last used size of the window (if imp_newstations is \c true)
++	uint window_size_line_height;     ///< Last used line_height (if imp_newstations is \c true)
+ };
+ static RailStationGUISettings _railstation; ///< Settings of the station builder GUI
+ 
+@@ -957,6 +971,16 @@
+ 	BRSW_NEWST_LIST,
+ 	BRSW_NEWST_SCROLL,
+ 
++	BRSW_NEWGUI_LIST,             ///< Matrix of custom stations names (if imp_newstations is \c true)
++	BRSW_NEWGUI_CLASS_SCROLL,     ///< (if imp_newstations is \c true)
++
++	BRSW_NEWGUI_STATIONS_LIST,    ///< Matrix of stations types within the currently selected station class (if imp_newstations is \c true)
++	BRSW_NEWGUI_STATION_SCROLL,   ///< (if imp_newstations is \c true)
++
++	BRSW_NEWGUI_STATION_COVERAGE, ///< Text area used to draw 'Accepts' and 'Supplies' texts (if imp_newstations is \c true)
++
++	BRSW_NEWGUI_RESIZE,           ///< Resize button (if imp_newstations is \c true)
++
+ 	BRSW_PLATFORM_NUM_BEGIN = BRSW_PLATFORM_NUM_1 - 1,
+ 	BRSW_PLATFORM_LEN_BEGIN = BRSW_PLATFORM_LEN_1 - 1,
+ };
+@@ -964,6 +988,8 @@
+ struct BuildRailStationWindow : public PickerWindowBase {
+ private:
+ 	uint line_height; ///< Height of a single line in the newstation selection matrix (#BRSW_NEWST_LIST widget).
++	int station_coverage_resize;  ///< Of how many pixels should the station coverage area text be resized (#BRSW_NEWGUI_STATION_COVERAGE widget).
++	Pair original_resize_heights; ///< Original resize steps in height for #BRSW_NEWGUI_LIST and #BRSW_NEWGUI_STATIONS_LIST widgets.
+ 
+ 	/**
+ 	 * Verify whether the currently selected station size is allowed after selecting a new station class/type.
+@@ -1010,6 +1036,16 @@
+ public:
+ 	BuildRailStationWindow(const WindowDesc *desc, Window *parent, bool newstation) : PickerWindowBase(parent)
+ 	{
++		/* Use the improved newstations gui? */
++		_railstation.imp_newstations = _settings_client.gui.imp_newstations_gui && newstation;
++
++		if (_railstation.imp_newstations) {
++			/* Default resize vars */
++			this->station_coverage_resize = 0;
++			this->original_resize_heights.a = 0;
++			this->original_resize_heights.b = 0;
++		}
++
+ 		this->InitNested(desc, TRANSPORT_RAIL);
+ 
+ 		this->LowerWidget(_railstation.orientation + BRSW_PLATFORM_DIR_X);
+@@ -1024,6 +1060,9 @@
+ 
+ 		_railstation.newstations = newstation;
+ 
++		/* End of constructor if using improved newstations gui */
++		if (_railstation.imp_newstations) return;
++
+ 		if (newstation) {
+ 			_railstation.station_count = GetNumCustomStations(_railstation.station_class);
+ 
+@@ -1040,9 +1079,42 @@
+ 
+ 	virtual ~BuildRailStationWindow()
+ 	{
++		if (_railstation.imp_newstations) {
++			/* Store window size. Will try to restore it on next use of improved newstations gui */
++			const uint station_coverage_resize = this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATION_COVERAGE)->current_y - (this->line_height * 2);
++			_railstation.window_size.width = this->width;
++			_railstation.window_size.height = this->height - station_coverage_resize;
++			_railstation.window_size_line_height = this->line_height;
++		}
+ 		DeleteWindowById(WC_SELECT_STATION, 0);
+ 	}
+ 
++	virtual void OnInit() {
++		/* Initialize current line height. Used by more than one widget in UpdateWidgetSize() */
++		this->line_height = FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
++
++		if (_railstation.imp_newstations) {
++			/* Cache the list of custom stations classes */
++			_railstation.station_count = GetNumCustomStations(_railstation.station_class);
++			if (!_railstation.station_classes.empty()) {
++				/* If the window is being opened again refresh the station classes */
++				_railstation.station_classes.clear();
++				_railstation.station_class_count = 0;
++			}
++			uint station_classes_count = GetNumStationClasses();
++			for (uint i = 0; i < station_classes_count; i++) {
++				if (i == STAT_CLASS_WAYP) continue;
++				_railstation.station_class_count++;
++				StationClass_Testing *station_class = new StationClass_Testing();
++				station_class->result = i;
++				station_class->string = GetStationClassName((StationClassID)i);
++				_railstation.station_classes.push_back(station_class);
++			}
++
++			this->vscroll.SetCount(_railstation.station_class_count);
++		}
++	}
++
+ 	virtual void OnPaint()
+ 	{
+ 		bool newstations = _railstation.newstations;
+@@ -1076,15 +1148,47 @@
+ 
+ 		this->DrawWidgets();
+ 
++		if (_railstation.imp_newstations && _railstation.window_size.width != 0) {
++			if (_railstation.window_size_line_height == this->line_height) {
++				if (_railstation.window_size.width != (uint)this->width || _railstation.window_size.height != (uint)this->height) {
++					/* Resize the window to the last used size */
++					const int delta_x = _railstation.window_size.width - this->width;
++					const int delta_y = _railstation.window_size.height - this->height;
++					this->ReInit(delta_x, delta_y);
++				}
++			}
++			_railstation.window_size.width = 0;
++			_railstation.window_size.height = 0;
++		}
++
+ 		/* 'Accepts' and 'Supplies' texts. */
+-		int top = this->GetWidget<NWidgetBase>(BRSW_HIGHLIGHT_ON)->pos_y + this->GetWidget<NWidgetBase>(BRSW_HIGHLIGHT_ON)->current_y + WD_PAR_VSEP_NORMAL;
++		uint left, top, right, bottom = 0;
+ 		NWidgetBase *back_nwi = this->GetWidget<NWidgetBase>(BRSW_BACKGROUND);
+-		int right = back_nwi->pos_x +  back_nwi->current_x;
+-		int bottom = back_nwi->pos_y +  back_nwi->current_y;
+-		top = DrawStationCoverageAreaText(back_nwi->pos_x + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, false) + WD_PAR_VSEP_NORMAL;
+-		top = DrawStationCoverageAreaText(back_nwi->pos_x + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, true) + WD_PAR_VSEP_NORMAL;
++		NWidgetBase *station_coverage_nwi = NULL;
++		if (_railstation.imp_newstations) {
++			/* Use the station coverage area text widget (#BRSW_NEWGUI_STATION_COVERAGE) */
++			station_coverage_nwi = this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATION_COVERAGE);
++			left = station_coverage_nwi->pos_x;
++			right = left + station_coverage_nwi->current_x;
++			top = station_coverage_nwi->pos_y;
++		} else {
++			left = back_nwi->pos_x;
++			right = back_nwi->pos_x + back_nwi->current_x;
++			top = this->GetWidget<NWidgetBase>(BRSW_HIGHLIGHT_ON)->pos_y + this->GetWidget<NWidgetBase>(BRSW_HIGHLIGHT_ON)->current_y + WD_PAR_VSEP_NORMAL;
++			bottom = back_nwi->pos_y + back_nwi->current_y;
++		}
++		top = DrawStationCoverageAreaText(left + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, false) + WD_PAR_VSEP_NORMAL;
++		top = DrawStationCoverageAreaText(left + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, true) + WD_PAR_VSEP_NORMAL;
+ 		/* Resize background if the text is not equally long as the window. */
+-		if (top > bottom || (top < bottom && back_nwi->current_y > back_nwi->smallest_y)) {
++		if (_railstation.imp_newstations) {
++			const uint text_height = top - station_coverage_nwi->pos_y + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
++			if (text_height != station_coverage_nwi->current_y) {
++				/* Sets the additional height needed to #BRSW_NEWGUI_STATION_COVERAGE to fit 
++				   the coverage area text (UpdateWidgetSize(#BRSW_NEWGUI_STATION_COVERAGE)) */
++				this->station_coverage_resize = text_height - (this->line_height * 2);
++				this->ReInit(0, this->station_coverage_resize);
++			}
++		} else if (top > bottom || (top < bottom && back_nwi->current_y > back_nwi->smallest_y)) {
+ 			ResizeWindow(this, 0, top - bottom);
+ 		}
+ 	}
+@@ -1115,10 +1219,49 @@
+ 				}
+ 				size->width = max(size->width, d.width + padding.width);
+ 
+-				this->line_height = FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
+ 				size->height = GB(this->GetWidget<NWidgetCore>(widget)->widget_data, MAT_ROW_START, MAT_ROW_BITS) * this->line_height;
+ 				break;
+ 			}
++			case BRSW_NEWGUI_LIST: {
++				/* Increase width to match the widest custom station class name */
++				Dimension d = {0, 0};
++				for (uint i = 0; i < _railstation.station_class_count; i++) {
++					SetDParam(0, _railstation.station_classes[i]->string);
++					d = maxdim(d, GetStringBoundingBox(STR_BLACK_STRING));
++				}
++				size->width = max(size->width, d.width + padding.width);
++
++				if (this->original_resize_heights.a == 0) {
++					/* Store the original height resize step (next invocations 
++					   receive current/modified resize info, not originals) */
++					this->original_resize_heights.a = resize->height;
++				}
++				/* Widget height depends of line height: cell height equals line height */
++				const uint line_count = (size->height - 1) / this->original_resize_heights.a;
++				size->height = this->line_height * line_count + 1;
++				resize->height = this->line_height;
++				break;
++			}
++			case BRSW_NEWGUI_STATIONS_LIST: {
++				if (this->original_resize_heights.b == 0) {
++					/* Store the original height resize step (next invocations 
++					   receive current/modified resize info, not originals) */
++					this->original_resize_heights.b = resize->height;
++				}
++				/* Widget height depends of line height: cell height equals four lines height */
++				const uint row_count = size->height / this->original_resize_heights.b;
++				const uint station_cell_height = this->line_height * 4;
++				size->height = station_cell_height * row_count;
++				resize->height = station_cell_height;
++				break;
++			}
++			case BRSW_NEWGUI_STATION_COVERAGE: {
++				/* Widget height is two lines eventually increased by the height needed 
++				   to fit the coverage text */
++				size->height = this->line_height * 2 + this->station_coverage_resize;
++				this->station_coverage_resize = 0;
++				break;
++			}
+ 		}
+ 	}
+ 
+@@ -1169,6 +1312,67 @@
+ 				}
+ 				break;
+ 			}
++
++			case BRSW_NEWGUI_LIST: {
++				/* Draw the custom stations classes names */
++				uint y = r.top;
++
++				for (uint16 i = this->vscroll.GetPosition(); i < _railstation.station_class_count && this->vscroll.IsVisible(i); i++) {
++					DrawString(r.left + WD_MATRIX_LEFT, r.right - WD_MATRIX_RIGHT, y + WD_MATRIX_TOP, _railstation.station_classes[i]->string,
++							_railstation.station_classes[i]->result == (StationClassID)_railstation.station_class ? TC_WHITE : TC_BLACK);
++					y += this->line_height;
++				}
++				break;
++			}
++			
++			case BRSW_NEWGUI_STATIONS_LIST: {
++				/* Draw station types of the current custom station class */
++				const NWidgetCore *stations_list_nwi = this->GetWidget<NWidgetCore>(widget);
++				const Dimension cell_dim = {stations_list_nwi->resize_x, stations_list_nwi->resize_y};
++				/* Topmost-leftest cell */
++				const Rect cell = {r.left, r.top, r.left + cell_dim.width, r.top + cell_dim.height};
++				const uint col_count = stations_list_nwi->current_x / cell_dim.width;
++
++				uint y = 0;
++				uint x = 0;
++				DrawPixelInfo *old_dpi;
++				
++				for (uint16 i = this->vscroll2.GetPosition(); i < this->vscroll2.GetCount() && this->vscroll2.IsVisible(i); i++) {
++					x = 0;
++					for (uint16 station = i * col_count; station < _railstation.station_count && station < (i + 1) * col_count; station++) {
++						/* Draw selected cell as lowered */
++						if (_railstation.station_type == station) {
++							/* Rightest cells don't overwrite scrollbar */
++							const int adjust_x = (x / cell_dim.width) + 1 == col_count ? -2 : -1;
++							/* Bottom cells don't overwrite coverage area text */
++							const int adjust_y = (y / cell_dim.height) + 1 == this->vscroll2.GetCapacity() ? -1 : 0;
++							DrawFrameRect(cell.left + x, cell.top + y, cell.right + adjust_x + x, cell.bottom + adjust_y + y, stations_list_nwi->colour, FR_LOWERED);
++						}
++
++						/* Draw station sprite */
++						if (FillDrawPixelInfo(&tmp_dpi, cell.left + x, cell.top + 1 + y, cell_dim.width, cell_dim.height + 1)) {
++							old_dpi = _cur_dpi;
++							_cur_dpi = &tmp_dpi;
++							if (!DrawStationTile(32, 16, _cur_railtype, _railstation.orientation, _railstation.station_class, station)) {
++								StationPickerDrawSprite(32, 16, STATION_RAIL, _cur_railtype, INVALID_ROADTYPE, 2 + _railstation.orientation);
++							}
++							_cur_dpi = old_dpi;
++						}
++
++						/* Draw unavailable station as disabled */
++						const StationSpec *statspec = GetCustomStationSpec(_railstation.station_class, station);
++						if (statspec != NULL && statspec->name != 0) {
++							if (HasBit(statspec->callback_mask, CBM_STATION_AVAIL) && GB(GetStationCallback(CBID_STATION_AVAILABILITY, 0, 0, statspec, NULL, INVALID_TILE), 0, 8) == 0) {
++								GfxFillRect(cell.left + 1 + x, cell.top + 1 + y, cell.right - 2 + x, cell.bottom - 1 + y, 0, FILLRECT_CHECKER);
++							}
++						}
++
++						x += cell_dim.width;
++					}
++					y += cell_dim.height;
++				}
++				break;
++			}
+ 		}
+ 	}
+ 
+@@ -1330,9 +1534,90 @@
+ 				DeleteWindowById(WC_SELECT_STATION, 0);
+ 				break;
+ 			}
++
++			// Improved newstation gui - Class selector
++			case BRSW_NEWGUI_LIST: {
++				int y = (pt.y - this->GetWidget<NWidgetBase>(widget)->pos_y) / this->line_height;
++				if (y >= this->vscroll.GetCapacity()) return;
++				y += this->vscroll.GetPosition();
++				if (y >= _railstation.station_class_count) return;
++
++				if (_railstation.station_class != _railstation.station_classes[y]->result) {
++					/* A new custom station class is selected */
++					_railstation.station_class = (StationClassID)(_railstation.station_classes[y]->result);
++					_railstation.station_type  = 0;
++					_railstation.station_count = GetNumCustomStations(_railstation.station_class);
++
++					this->CheckSelectedSize(GetCustomStationSpec(_railstation.station_class, _railstation.station_type));
++
++					/* Update stations types matrix scrollbar */
++					uint col_count = this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATIONS_LIST)->current_x / this->GetWidget<NWidgetBase>(BRSW_NEWGUI_STATIONS_LIST)->resize_x;
++					this->vscroll2.SetCount(_railstation.station_count / col_count  + (_railstation.station_count % col_count > 0));
++					this->vscroll2.SetPosition(0);
++				}
++
++				SndPlayFx(SND_15_BEEP);
++				this->SetDirty();
++				DeleteWindowById(WC_SELECT_STATION, 0);
++				break;
++			}
++
++			// Improved newstation gui - Station selector
++			case BRSW_NEWGUI_STATIONS_LIST: {
++				const StationSpec *statspec;
++				const NWidgetBase *stations_list_nwi = this->GetWidget<NWidgetBase>(widget);
++				int y = (pt.y - stations_list_nwi->pos_y) / stations_list_nwi->resize_y;
++				const int x = (pt.x - stations_list_nwi->pos_x) / stations_list_nwi->resize_x;
++				const int col_count = stations_list_nwi->current_x / stations_list_nwi->resize_x;
++
++				if (y >= this->vscroll2.GetCapacity()) return;
++				if (x >= col_count) return;
++				y += this->vscroll2.GetPosition();
++				if (y * col_count + x >= _railstation.station_count) return;
++
++				/* Check station availability callback */
++				statspec = GetCustomStationSpec(_railstation.station_class, y * col_count + x);
++				if (statspec != NULL &&
++					HasBit(statspec->callback_mask, CBM_STATION_AVAIL) &&
++					GB(GetStationCallback(CBID_STATION_AVAILABILITY, 0, 0, statspec, NULL, INVALID_TILE), 0, 8) == 0) return;
++
++				/* Select current station type */
++				_railstation.station_type = y * col_count + x;
++
++				this->CheckSelectedSize(statspec);
++
++				SndPlayFx(SND_15_BEEP);
++				this->SetDirty();
++				DeleteWindowById(WC_SELECT_STATION, 0);
++				break;
++			}
+ 		}
+ 	}
+ 
++	virtual void OnRightClick(Point pt, int widget)
++	{
++		if (widget == BRSW_NEWGUI_STATIONS_LIST) {
++			const StationSpec *statspec;
++			const NWidgetBase *stations_list_nwi = this->GetWidget<NWidgetBase>(widget);
++			int y = (pt.y - stations_list_nwi->pos_y) / stations_list_nwi->resize_y;
++			const int x = (pt.x - stations_list_nwi->pos_x) / stations_list_nwi->resize_x;
++			const int col_count = stations_list_nwi->current_x / stations_list_nwi->resize_x;
++
++			if (y >= this->vscroll2.GetCapacity()) return;
++			if (x >= col_count) return;
++			y += this->vscroll2.GetPosition();
++			if (y * col_count + x >= _railstation.station_count) return;
++
++			// Check station availability callback
++			statspec = GetCustomStationSpec(_railstation.station_class, y * col_count + x);
++
++			/* Show station type name as tooltip (forced in black) */
++			uint64 args[1];
++			args[0] = (uint64)(size_t)(statspec != NULL && statspec->name != 0 ? statspec->name : STR_STATION_CLASS_DFLT);
++			GuiShowTooltips(STR_BLACK_STRING, 1, args);
++		}
++	}
++
+ 	virtual void OnDropdownSelect(int widget, int index)
+ 	{
+ 		if (_railstation.station_class != index) {
+@@ -1355,6 +1640,44 @@
+ 	{
+ 		CheckRedrawStationCoverage(this);
+ 	}
++
++	virtual void OnResize()
++	{
++		if (_railstation.imp_newstations) {
++			/* Update custom stations classes scrollbar */
++			int old_capacity = this->vscroll.GetCapacity();
++			this->vscroll.SetCapacityFromWidget(this, BRSW_NEWGUI_LIST, 1);
++			this->GetWidget<NWidgetCore>(BRSW_NEWGUI_LIST)->widget_data = (this->vscroll.GetCapacity()  << MAT_ROW_START) + (1 << MAT_COL_START);
++			if (!this->vscroll.IsVisible(_railstation.station_class)) {
++				/* Ensure that the currently selected class is visible */
++				this->vscroll.UpdatePosition(max(old_capacity - this->vscroll.GetCapacity(), 0));
++			}
++
++			/* Update custom stations types scrollbar */
++			old_capacity = this->vscroll2.GetCapacity();
++			this->vscroll2.SetCapacityFromWidget(this, BRSW_NEWGUI_STATIONS_LIST, 0);
++			int capacity = this->vscroll2.GetCapacity();
++
++			NWidgetCore *stations_list_nwi = this->GetWidget<NWidgetCore>(BRSW_NEWGUI_STATIONS_LIST);
++
++			const uint col_count = stations_list_nwi->current_x / stations_list_nwi->resize_x;
++			this->vscroll2.SetCount(_railstation.station_count / col_count  + (_railstation.station_count % col_count > 0));
++
++			const uint old_col_count = GB(stations_list_nwi->widget_data, MAT_COL_START, MAT_COL_BITS);
++			stations_list_nwi->widget_data = (this->vscroll2.GetCapacity() << MAT_ROW_START) + (col_count << MAT_COL_START);
++
++			if (!this->vscroll2.IsVisible(_railstation.station_type / col_count)) {
++				/* Ensure that the currently selected type is visible */
++				if (old_capacity > capacity) {
++					/* Selected type was hidden by a vertical resize */
++					this->vscroll2.UpdatePosition(old_capacity - capacity);
++				} else if(old_col_count > col_count) {
++					/* Selected type was hidden by an horizontal resize */
++					this->vscroll2.UpdatePosition(_railstation.station_type - (capacity - 1) - this->vscroll2.GetPosition());
++				}
++			}
++		}
++	}
+ };
+ 
+ static const NWidgetPart _nested_station_builder_widgets[] = {
+@@ -1479,6 +1802,93 @@
+ 	EndContainer(),
+ };
+ 
++static const NWidgetPart _nested_imp_newstation_builder_widgets[] = {
++	NWidget(NWID_HORIZONTAL),
++		NWidget(WWT_CLOSEBOX, COLOUR_DARK_GREEN),
++		NWidget(WWT_CAPTION, COLOUR_DARK_GREEN), SetDataTip(STR_STATION_BUILD_RAIL_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS), SetResize(1, 0),
++	EndContainer(),
++	
++	NWidget(WWT_PANEL, COLOUR_DARK_GREEN),
++		NWidget(NWID_SPACER), SetMinimalSize(0, 3), SetResize(1, 0),
++		NWidget(NWID_HORIZONTAL),
++			NWidget(NWID_VERTICAL),
++				NWidget(NWID_HORIZONTAL), SetPIP(5, 0, 5), /* Custom stations classes selector */
++					NWidget(WWT_MATRIX, COLOUR_GREY, BRSW_NEWGUI_LIST), SetMinimalSize(122, 14 * 5 + 1), SetDataTip(0x301, STR_STATION_BUILD_STATION_CLASS_TOOLTIP), SetResize(0, 14),
++					NWidget(WWT_SCROLLBAR, COLOUR_GREY, BRSW_NEWGUI_CLASS_SCROLL),
++				EndContainer(),
++
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_ORIENTATION, STR_NULL), SetPadding(1, 2, 0, 2),
++				NWidget(NWID_HORIZONTAL),
++					NWidget(NWID_SPACER), SetMinimalSize(5, 0), SetFill(1, 0),
++					NWidget(WWT_PANEL, COLOUR_GREY, BRSW_PLATFORM_DIR_X), SetMinimalSize(66, 48), SetFill(0, 0), SetDataTip(0x0, STR_STATION_BUILD_RAILROAD_ORIENTATION_TOOLTIP), EndContainer(),
++					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
++					NWidget(WWT_PANEL, COLOUR_GREY, BRSW_PLATFORM_DIR_Y), SetMinimalSize(66, 48), SetFill(0, 0), SetDataTip(0x0, STR_STATION_BUILD_RAILROAD_ORIENTATION_TOOLTIP), EndContainer(),
++					NWidget(NWID_SPACER), SetMinimalSize(5, 0), SetFill(1, 0),
++				EndContainer(),
++				
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_NUMBER_OF_TRACKS, STR_NULL), SetPadding(2, 2, 0, 2),
++				NWidget(NWID_HORIZONTAL),
++					NWidget(NWID_SPACER), SetFill(1, 0),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_1), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_1, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_2), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_2, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_3), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_3, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_4), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_4, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_5), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_5, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_6), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_6, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_NUM_7), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_7, STR_STATION_BUILD_NUMBER_OF_TRACKS_TOOLTIP),
++					NWidget(NWID_SPACER), SetFill(1, 0),
++				EndContainer(),
++
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_PLATFORM_LENGTH, STR_NULL), SetPadding(2, 2, 0, 2),
++				NWidget(NWID_HORIZONTAL),
++					NWidget(NWID_SPACER), SetFill(1, 0),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_1), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_1, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_2), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_2, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_3), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_3, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_4), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_4, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_5), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_5, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_6), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_6, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_LEN_7), SetMinimalSize(15, 12), SetDataTip(STR_BLACK_7, STR_STATION_BUILD_PLATFORM_LENGTH_TOOLTIP),
++					NWidget(NWID_SPACER), SetFill(1, 0),
++				EndContainer(),
++				
++				NWidget(NWID_SPACER), SetMinimalSize(0, 2),
++				NWidget(NWID_HORIZONTAL),
++					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_PLATFORM_DRAG_N_DROP), SetMinimalSize(75, 12), SetDataTip(STR_STATION_BUILD_DRAG_DROP, STR_STATION_BUILD_DRAG_DROP_TOOLTIP),
++					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
++				EndContainer(),
++				
++				NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(140, 11), SetDataTip(STR_STATION_BUILD_COVERAGE_AREA_TITLE, STR_NULL), SetPadding(3, 2, 0, 2),
++				NWidget(NWID_HORIZONTAL),
++					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_HIGHLIGHT_OFF), SetMinimalSize(60, 12),
++												SetDataTip(STR_STATION_BUILD_COVERAGE_OFF, STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP),
++					NWidget(WWT_TEXTBTN, COLOUR_GREY, BRSW_HIGHLIGHT_ON), SetMinimalSize(60, 12),
++												SetDataTip(STR_STATION_BUILD_COVERAGE_ON, STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP),
++					NWidget(NWID_SPACER), SetMinimalSize(2, 0), SetFill(1, 0),
++				EndContainer(),
++			EndContainer(),
++
++			/* Custom stations type selector */
++			NWidget(WWT_MATRIX, COLOUR_GREY, BRSW_NEWGUI_STATIONS_LIST), SetMinimalSize(66, 14 * 4 * 4), SetDataTip(0x501, STR_NULL), SetResize(66, 14 * 4),
++			NWidget(WWT_SCROLL2BAR, COLOUR_GREY, BRSW_NEWGUI_STATION_SCROLL),
++		EndContainer(),
++
++		NWidget(NWID_SPACER), SetMinimalSize(0, 2), SetFill(1, 0), SetResize(1, 0),
++		/* Station coverage area text */
++		NWidget(WWT_TEXT, COLOUR_DARK_GREEN, BRSW_NEWGUI_STATION_COVERAGE), SetMinimalSize(221, 28), SetResize(1, 0), SetFill(1, 0),
++	EndContainer(),
++
++	/* Bottom bar with resize button */
++	NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetFill(1, 1),
++		NWidget(NWID_HORIZONTAL),
++			NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetFill(1, 1), SetResize(1, 0), EndContainer(),
++			NWidget(WWT_RESIZEBOX, COLOUR_DARK_GREEN, BRSW_NEWGUI_RESIZE),
++		EndContainer(),
++	EndContainer(),
++};
++
+ /** High level window description of the default station-build window */
+ static const WindowDesc _station_builder_desc(
+ 	WDP_AUTO, 0, 0,
+@@ -1495,11 +1905,22 @@
+ 	_nested_newstation_builder_widgets, lengthof(_nested_newstation_builder_widgets)
+ );
+ 
++/** High level window description of the improved newGRF station-build window */
++static const WindowDesc _imp_newstation_builder_desc(
++	WDP_AUTO, 350, 266,
++	WC_BUILD_STATION, WC_BUILD_TOOLBAR,
++	WDF_CONSTRUCTION,
++	_nested_imp_newstation_builder_widgets, lengthof(_nested_imp_newstation_builder_widgets)
++);
++
+ /** Open station build window */
+ static void ShowStationBuilder(Window *parent)
+ {
+ 	if (GetNumStationClasses() <= 2 && GetNumCustomStations(STAT_CLASS_DFLT) == 1) {
+ 		new BuildRailStationWindow(&_station_builder_desc, parent, false);
++	} else if (_settings_client.gui.imp_newstations_gui) {
++		/* Use improved newstations gui */
++		new BuildRailStationWindow(&_imp_newstation_builder_desc, parent, true);
+ 	} else {
+ 		new BuildRailStationWindow(&_newstation_builder_desc, parent, true);
+ 	}
+Index: src/settings_type.h
+===================================================================
+--- src/settings_type.h	(revision 19642)
++++ src/settings_type.h	(working copy)
+@@ -98,6 +98,7 @@
+ 	bool   station_show_coverage;            ///< whether to highlight coverage area
+ 	bool   persistent_buildingtools;         ///< keep the building tools active after usage
+ 	uint8  expenses_layout;                  ///< layout of expenses window
++	bool   imp_newstations_gui;              ///< use the new newstations selection ui
+ 
+ 	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
+ 	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
+Index: src/transparency.h
+===================================================================
+--- src/transparency.h	(revision 19642)
++++ src/transparency.h	(working copy)
+@@ -31,6 +31,7 @@
+ 	TO_STRUCTURES, ///< unmovable structures
+ 	TO_CATENARY,   ///< catenary
+ 	TO_LOADING,    ///< loading indicators
++	TO_TUNNELS,    ///< vehicles in tunnels
+ 	TO_END,
+ };
+ 
+Index: src/transparency_gui.cpp
+===================================================================
+--- src/transparency_gui.cpp	(revision 19642)
++++ src/transparency_gui.cpp	(working copy)
+@@ -34,14 +34,14 @@
+ 	TTW_WIDGET_STRUCTURES,               ///< Unmovable structures transparency toggle button.
+ 	TTW_WIDGET_CATENARY,                 ///< Catenary transparency toggle button.
+ 	TTW_WIDGET_LOADING,                  ///< Loading indicators transparency toggle button.
++	TTW_WIDGET_TUNNELS,                  ///< Vehicles in tunnels toggle button.
+ 	TTW_WIDGET_END,                      ///< End of toggle buttons.
+ 
+ 	/* Panel with buttons for invisibility */
+ 	TTW_WIDGET_BUTTONS,                  ///< Panel with 'invisibility' buttons.
+ };
+ 
+-class TransparenciesWindow : public Window
+-{
++class TransparenciesWindow : public Window {
+ public:
+ 	TransparenciesWindow(const WindowDesc *desc, int window_number) : Window()
+ 	{
+@@ -50,7 +50,7 @@
+ 
+ 	virtual void OnPaint()
+ 	{
+-		OnInvalidateData(0); // Must be sure that the widgets show the transparency variable changes, also when we use shortcuts.
++		this->OnInvalidateData(0); // Must be sure that the widgets show the transparency variable changes, also when we use shortcuts.
+ 		this->DrawWidgets();
+ 	}
+ 
+@@ -65,14 +65,15 @@
+ 			case TTW_WIDGET_BRIDGES:
+ 			case TTW_WIDGET_STRUCTURES:
+ 			case TTW_WIDGET_CATENARY:
+-			case TTW_WIDGET_LOADING: {
++			case TTW_WIDGET_LOADING:
++			case TTW_WIDGET_TUNNELS: {
+ 				uint i = widget - TTW_WIDGET_BEGIN;
+ 				if (HasBit(_transparency_lock, i)) DrawSprite(SPR_LOCK, PAL_NONE, r.left + 1, r.top + 1);
+ 				break;
+ 			}
+ 			case TTW_WIDGET_BUTTONS:
+ 				for (uint i = TTW_WIDGET_BEGIN; i < TTW_WIDGET_END; i++) {
+-					if (i == TTW_WIDGET_LOADING) continue; // Do not draw button for invisible loading indicators.
++					if (i >= TTW_WIDGET_LOADING) continue; // Do not draw button for invisible loading indicators.
+ 
+ 					const NWidgetBase *wi = this->GetWidget<NWidgetBase>(i);
+ 					DrawFrameRect(wi->pos_x + 1, r.top + 2, wi->pos_x + wi->current_x - 2, r.bottom - 2, COLOUR_PALE_GREEN,
+@@ -84,7 +85,7 @@
+ 
+ 	virtual void OnClick(Point pt, int widget, int click_count)
+ 	{
+-		if (widget >= TTW_WIDGET_BEGIN && widget < TTW_WIDGET_END) {
++		if (IsInsideMM(widget, TTW_WIDGET_BEGIN, TTW_WIDGET_END)) {
+ 			if (_ctrl_pressed) {
+ 				/* toggle the bit of the transparencies lock variable */
+ 				ToggleTransparencyLock((TransparencyOption)(widget - TTW_WIDGET_BEGIN));
+@@ -147,7 +148,8 @@
+ 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, TTW_WIDGET_STRUCTURES), SetMinimalSize(22, 22), SetFill(0, 1), SetDataTip(SPR_IMG_TRANSMITTER, STR_TRANSPARENT_STRUCTURES_TOOLTIP),
+ 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, TTW_WIDGET_CATENARY), SetMinimalSize(22, 22), SetFill(0, 1), SetDataTip(SPR_BUILD_X_ELRAIL, STR_TRANSPARENT_CATENARY_TOOLTIP),
+ 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, TTW_WIDGET_LOADING), SetMinimalSize(22, 22), SetFill(0, 1), SetDataTip(SPR_IMG_TRAINLIST, STR_TRANSPARENT_LOADING_TOOLTIP),
+-		NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetFill(1, 1), EndContainer(),
++		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, TTW_WIDGET_TUNNELS), SetMinimalSize(22, 22), SetFill(0, 1), SetDataTip(SPR_IMG_ROAD_TUNNEL, STR_TRANSPARENT_TUNNELS_TOOLTIP),
++	NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetFill(1, 1), EndContainer(),
+ 	EndContainer(),
+ 	/* Panel with 'inivisibility' buttons. */
+ 	NWidget(WWT_PANEL, COLOUR_DARK_GREEN, TTW_WIDGET_BUTTONS), SetMinimalSize(219, 13), SetDataTip(0x0, STR_TRANSPARENT_INVISIBLE_TOOLTIP),
+Index: src/watch_gui.cpp
+===================================================================
+--- src/watch_gui.cpp	(revision 0)
++++ src/watch_gui.cpp	(revision 0)
+@@ -0,0 +1,412 @@
++/* $Id: watch_gui.cpp  17678 2009-10-07 20:54:05  muxy $ */
++
++/** @file watch_gui.cpp GUI that follow other company building. */
++
++#include "stdafx.h"
++#include "watch_gui.h"
++#include "widget_type.h"
++#include "gfx_type.h"
++#include "gfx_func.h"
++#include "company_base.h"
++#include "company_gui.h"
++#include "viewport_func.h"
++#include "window_func.h"
++#include "strings_func.h"
++#include "zoom_func.h"
++#include "map_func.h"
++
++#include "network/network.h"
++#include "network/network_func.h"
++#include "network/network_base.h"
++
++#include "table/sprites.h"
++#include "table/strings.h"
++
++/** Make the widgets columns for company button, has_client and activity Blot.
++ * @param biggest_index Storage for collecting the biggest index used in the returned tree.
++ * @return Horizontal container with butons columns.
++ * @post \c *biggest_index contains the largest used index in the tree.
++ */
++static NWidgetBase *MakeCompanyButtons(int *biggest_index)
++{
++	NWidgetHorizontal *widget_container_horiz = NULL;         // Storage for all cols.
++	NWidgetVertical *widget_container_company = NULL;         // Storage for company Col.
++	NWidgetVertical *widget_container_hasclient = NULL;       // Storage for Has Client Blot.
++	NWidgetVertical *widget_container_activity = NULL;        // Storage for Activity Blot.
++	//NWidgetVertical *widget_container_action1 = NULL;         // Storage for Action 1
++
++	widget_container_horiz = new NWidgetHorizontal( );
++	widget_container_company = new NWidgetVertical( );
++	widget_container_hasclient  = new NWidgetVertical( );
++	widget_container_activity = new NWidgetVertical( );
++	//widget_container_action1 = new NWidgetVertical( );
++
++	Dimension company_sprite_size = GetSpriteSize( SPR_COMPANY_ICON );
++	company_sprite_size.width  += WD_MATRIX_LEFT + WD_MATRIX_RIGHT;
++	company_sprite_size.height += WD_MATRIX_TOP + WD_MATRIX_BOTTOM + 1; // 1 for the 'offset' of being pressed
++
++	Dimension blot_sprite_size = GetSpriteSize( SPR_BLOT );
++	blot_sprite_size.width  += WD_MATRIX_LEFT + WD_MATRIX_RIGHT;
++	blot_sprite_size.height += WD_MATRIX_TOP + WD_MATRIX_BOTTOM + 1; // 1 for the 'offset' of being pressed
++
++
++	for (int company_num = COMPANY_FIRST; company_num < MAX_COMPANIES; company_num++ ) {
++
++		/* Manage Company Buttons */
++		NWidgetBackground *company_panel = new NWidgetBackground( WWT_PANEL, COLOUR_GREY, EWW_PB_COMPANY_FIRST + company_num );
++		company_panel->SetMinimalSize( company_sprite_size.width, company_sprite_size.height );
++		company_panel->SetResize( 0, 0 );
++		company_panel->SetFill( 1, 0 );
++		company_panel->SetDataTip( 0x0, STR_WATCH_CLICK_TO_WATCH_COMPANY );
++		widget_container_company->Add( company_panel );
++
++		/* Manage Has Client Blot */
++		NWidgetBackground *hasclient_panel = new NWidgetBackground( WWT_PANEL, COLOUR_GREY, EWW_HAS_CLIENT_FIRST + company_num );
++		company_panel->SetMinimalSize( blot_sprite_size.width, blot_sprite_size.height );
++		company_panel->SetResize( 0, 0 );
++		company_panel->SetFill( 1, 0 );
++		widget_container_hasclient->Add( hasclient_panel );
++
++		/* Manage Activit Blot */
++		NWidgetBackground *activity_panel = new NWidgetBackground( WWT_PANEL, COLOUR_GREY, EWW_ACTIVITY_FIRST + company_num );
++		company_panel->SetMinimalSize( blot_sprite_size.width, blot_sprite_size.height );
++		company_panel->SetResize( 0, 0 );
++		company_panel->SetFill( 1, 0 );
++		widget_container_activity->Add( activity_panel );
++
++		/* Button Action1 */
++		/*
++		NWidgetBackground *action1_panel =  new NWidgetBackground( WWT_PANEL, COLOUR_GREY, EWW_PB_ACTION1_FIRST + company_num );
++		company_panel->SetResize( 0, 0 );
++		company_panel->SetFill( 1, 0 );
++		widget_container_action1->Add( action1_panel );
++		*/
++	}
++
++	/* Add the verticals widgets to the horizontal container */
++	widget_container_horiz->Add( widget_container_company );
++	widget_container_horiz->Add( widget_container_hasclient );
++	widget_container_horiz->Add( widget_container_activity );
++	//widget_container_horiz->Add( widget_container_action1 );
++
++	/* return the horizontal widget container */
++	return widget_container_horiz;
++}
++
++
++/**
++ * Watch Company Window Widgets Array
++ * The Company Button, Has Client Blot and Activity Blot Columns
++ * Are made through a function regarding MAX_COMPANIES value
++ */
++static const NWidgetPart _nested_watch_company_widgets[] = {
++	/* Title Bar with close box, title, shade and stick boxes */
++	NWidget(NWID_HORIZONTAL),
++		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
++		NWidget(WWT_CAPTION, COLOUR_GREY, EWW_CAPTION ), SetDataTip(STR_WATCH_WINDOW_TITLE, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
++		NWidget(WWT_SHADEBOX, COLOUR_GREY),
++		NWidget(WWT_STICKYBOX, COLOUR_GREY),
++	EndContainer( ),
++	NWidget( NWID_HORIZONTAL ),
++		NWidget( NWID_VERTICAL ),
++			NWidgetFunction( MakeCompanyButtons ),
++			/* Buton Zoom Out, In, Scrollto */
++			NWidget(NWID_HORIZONTAL),
++				NWidget( WWT_PUSHIMGBTN, COLOUR_GREY, EWW_ZOOMOUT ), SetDataTip( SPR_IMG_ZOOMOUT, STR_TOOLBAR_TOOLTIP_ZOOM_THE_VIEW_OUT),
++				NWidget( WWT_PUSHIMGBTN, COLOUR_GREY, EWW_ZOOMIN ),  SetDataTip( SPR_IMG_ZOOMIN, STR_TOOLBAR_TOOLTIP_ZOOM_THE_VIEW_IN),
++				NWidget( WWT_PUSHIMGBTN, COLOUR_GREY, EWW_CENTER ),  SetDataTip( SPR_CENTRE_VIEW_VEHICLE, STR_EXTRA_VIEW_MOVE_MAIN_TO_VIEW_TT),
++				NWidget( WWT_PANEL, COLOUR_GREY, EWW_NEW_WINDOW ),   SetDataTip( 0, STR_WATCH_CLICK_NEW_WINDOW ), EndContainer( ),
++			EndContainer( ),
++			/* Background panel for resize purpose */
++			NWidget( WWT_PANEL, COLOUR_GREY ), SetResize( 0, 1 ), EndContainer( ),
++		EndContainer( ),
++		/* Watch Pannel */
++		NWidget(WWT_PANEL, COLOUR_GREY),
++			NWidget(NWID_VIEWPORT, INVALID_COLOUR, EWW_WATCH), SetPadding(2, 2, 2, 2), SetResize(1, 1), SetFill(1, 1),
++		EndContainer( ),
++	EndContainer( ),
++	/* Status Bar with resize buton */
++	NWidget(NWID_HORIZONTAL),
++		NWidget(WWT_PANEL, COLOUR_GREY), SetFill(1, 1), SetResize(1, 0), EndContainer(),
++		NWidget(WWT_RESIZEBOX, COLOUR_GREY),
++	EndContainer( ),
++};
++
++/**
++ * Watch Company Window Descriptor
++ */
++static const WindowDesc _watch_company_desc(
++	WDP_AUTO, 300, 257,
++	WC_WATCH_COMPANY, WC_NONE,
++	WDF_UNCLICK_BUTTONS,
++	_nested_watch_company_widgets, lengthof( _nested_watch_company_widgets )
++);
++
++//static int WatchCompany::button1_state[MAX_COMPANIES];
++
++/** Watch Company Class Constructor
++ * @param desc Window Descriptor The Window Descriptor
++ * @param window_number The window number for the class
++ * @param company_to_watch Company ID for watching a particular company
++ */
++WatchCompany::WatchCompany(const WindowDesc *desc, int window_number, CompanyID company_to_watch = INVALID_COMPANY ) : Window( )
++{
++	this->watched_company = company_to_watch;
++
++	this->InitNested(desc, window_number);
++	this->owner = this->watched_company;
++
++	/* Reset activity and client count for all companies */
++	for (CompanyID i = COMPANY_FIRST; i < MAX_COMPANIES; i++) {
++		this->company_activity[i] = 0;
++		this->company_count_client[i] = 0;
++	}
++	
++	/* Init the viewport area */
++	NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(EWW_WATCH);
++	nvp->InitializeViewport(this, 0, ZOOM_LVL_NORMAL);
++	
++	Point pt;
++	/* the main window with the main view */
++	const Window *w = FindWindowById(WC_MAIN_WINDOW, 0);
++	
++	/* center on same place as main window (zoom is maximum, no adjustment needed) */
++	pt.x = w->viewport->scrollpos_x + w->viewport->virtual_width / 2;
++	pt.y = w->viewport->scrollpos_y + w->viewport->virtual_height / 2;
++
++	this->viewport->scrollpos_x = pt.x - this->viewport->virtual_width / 2;
++	this->viewport->scrollpos_y = pt.y - this->viewport->virtual_height / 2;
++	this->viewport->dest_scrollpos_x = this->viewport->scrollpos_x;
++	this->viewport->dest_scrollpos_y = this->viewport->scrollpos_y;
++
++	if ( this->watched_company != INVALID_COMPANY ) {
++		Company *c = Company::Get( this->watched_company );
++		this->ScrollToTile( c->last_build_coordinate );
++	}
++	this->InvalidateData( );
++}
++
++void WatchCompany::SetStringParameters(int widget) const
++{
++	switch (widget) {
++		case EWW_CAPTION:
++			if (this->watched_company == INVALID_COMPANY) {
++				GetString( (char *)this->company_name, STR_JUST_NOTHING, lastof(this->company_name) );
++			} else {
++				const Company *c = Company::Get( this->watched_company );
++				SetDParam( 0, c->index );
++				GetString( (char *)this->company_name, STR_COMPANY_NAME, lastof(this->company_name) );
++			}
++			SetDParamStr( 0, this->company_name );
++			break;
++	}
++}
++
++
++void WatchCompany::OnPaint()
++{
++	this->DrawWidgets();
++}
++
++void WatchCompany::DrawWidget(const Rect &r, int widget) const
++{
++	/* draw the widget */
++	/* Company Button */
++	if (IsInsideMM(widget, EWW_PB_COMPANY_FIRST, EWW_PB_COMPANY_LAST + 1)) {
++		if (this->IsWidgetDisabled(widget)) return;
++		CompanyID cid = (CompanyID)(widget - ( EWW_PB_COMPANY_FIRST ) );
++		int offset = (cid == this->watched_company) ? 1 : 0;
++		Dimension sprite_size = GetSpriteSize(SPR_COMPANY_ICON);
++		DrawCompanyIcon(cid, (r.left + r.right - sprite_size.width) / 2 + offset, (r.top + r.bottom - sprite_size.height) / 2 + offset);
++		return;
++	}
++	/* Has Client Blot */
++	if (IsInsideMM( widget, EWW_HAS_CLIENT_FIRST, EWW_HAS_CLIENT_LAST + 1 )) {
++		if ( Company::IsValidID( widget-EWW_HAS_CLIENT_FIRST ) ) {
++			/* Draw the Blot only if Company Exists */
++			Dimension sprite_size = GetSpriteSize(SPR_BLOT);
++#ifdef ENABLE_NETWORK
++			if (!_networking) { // Local game, draw the Blot
++				DrawSprite(SPR_BLOT, Company::IsValidAiID(widget-EWW_HAS_CLIENT_FIRST)?PALETTE_TO_ORANGE:PALETTE_TO_GREEN, (r.left + r.right - sprite_size.width) / 2, (r.top + r.bottom - sprite_size.height) / 2 );
++			} else { // Network game, draw the blot according to company client count
++				DrawSprite(SPR_BLOT, this->company_count_client[widget-EWW_HAS_CLIENT_FIRST]>0?PALETTE_TO_GREEN:PALETTE_TO_GREY, (r.left + r.right - sprite_size.width) / 2, (r.top + r.bottom - sprite_size.height) / 2 );
++			}
++#else
++			DrawSprite(SPR_BLOT, Company::IsValidAiID(widget-EWW_HAS_CLIENT_FIRST)?PALETTE_TO_ORANGE:PALETTE_TO_GREEN, (r.left + r.right - sprite_size.width) / 2, (r.top + r.bottom - sprite_size.height) / 2 );
++#endif
++		}
++	}
++	/* Activity Blot */
++	if (IsInsideMM( widget, EWW_ACTIVITY_FIRST, EWW_ACTIVITY_LAST + 1 )) {
++		if ( Company::IsValidID(widget-EWW_ACTIVITY_FIRST) ) {
++			/* Draw the Blot only if Company Exists */
++			Dimension sprite_size = GetSpriteSize(SPR_BLOT);
++			DrawSprite(SPR_BLOT, company_activity[widget-EWW_ACTIVITY_FIRST]>0?PALETTE_TO_RED:PALETTE_TO_GREY, (r.left + r.right - sprite_size.width) / 2, (r.top + r.bottom - sprite_size.height) / 2 );
++		}
++	}
++}
++
++void WatchCompany::OnResize()
++{
++	if (this->viewport != NULL) {
++		NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(EWW_WATCH);
++		nvp->UpdateViewportCoordinates(this);
++	}
++}
++
++void WatchCompany::OnScroll(Point delta)
++{
++	const ViewPort *vp = IsPtInWindowViewport(this, _cursor.pos.x, _cursor.pos.y);
++	if (vp == NULL) return;
++
++	this->viewport->scrollpos_x += ScaleByZoom(delta.x, vp->zoom);
++	this->viewport->scrollpos_y += ScaleByZoom(delta.y, vp->zoom);
++	this->viewport->dest_scrollpos_x = this->viewport->scrollpos_x;
++	this->viewport->dest_scrollpos_y = this->viewport->scrollpos_y;
++}
++
++void WatchCompany::OnMouseWheel( int wheel )
++{
++	ZoomInOrOutToCursorWindow(wheel < 0, this);
++}
++
++void WatchCompany::OnClick(Point pt, int widget, int click_count)
++{
++	if (IsInsideMM(widget, EWW_PB_COMPANY_FIRST, EWW_PB_COMPANY_LAST + 1)) {
++		/* Click on Company Button */
++		if (!this->IsWidgetDisabled(widget)) {
++			if (this->watched_company != INVALID_COMPANY) {
++				/* Raise the watched company button  */
++				this->RaiseWidget(this->watched_company + EWW_PB_COMPANY_FIRST);
++			}
++			if (this->watched_company == (CompanyID)(widget - EWW_PB_COMPANY_FIRST)) {
++				/* Stop watching watched_company */
++				this->watched_company = INVALID_COMPANY;
++			} else {
++				/* Lower the new watched company button */
++				this->watched_company = (CompanyID)(widget - EWW_PB_COMPANY_FIRST);
++				this->LowerWidget(this->watched_company + EWW_PB_COMPANY_FIRST);
++				Company *c = Company::Get( this->watched_company );
++				this->ScrollToTile( c->last_build_coordinate );
++			}
++			this->owner = this->watched_company;
++			this->SetDirty();
++		}
++	} else if ( IsInsideMM(widget, EWW_PB_ACTION1_FIRST, EWW_PB_ACTION1_LAST + 1)) {
++		if ( !this->IsWidgetDisabled(widget) ) {
++			this->ToggleWidgetLoweredState( widget );
++			this->SetDirty();
++		}
++	} else {
++		switch (widget) {
++			case EWW_ZOOMOUT: DoZoomInOutWindow(ZOOM_OUT, this); break;
++			case EWW_ZOOMIN: DoZoomInOutWindow(ZOOM_IN,  this); break;
++
++			case EWW_CENTER: { // location button (move main view to same spot as this view) 'Center Main View'
++				Window *w = FindWindowById(WC_MAIN_WINDOW, 0);
++				int x = this->viewport->scrollpos_x; // Where is the watch looking at
++				int y = this->viewport->scrollpos_y;
++
++				/* set the main view to same location. Based on the center, adjusting for zoom */
++				w->viewport->dest_scrollpos_x =  x - (w->viewport->virtual_width -  this->viewport->virtual_width) / 2;
++				w->viewport->dest_scrollpos_y =  y - (w->viewport->virtual_height - this->viewport->virtual_height) / 2;
++			} break;
++				
++			case EWW_NEW_WINDOW:
++				ShowWatchWindow( this->watched_company );
++				break;
++		}
++	}
++}
++
++void WatchCompany::OnInvalidateData(int data)
++{
++	/* Disable the companies who are not active */
++	for (CompanyID i = COMPANY_FIRST; i < MAX_COMPANIES; i++) {
++		this->SetWidgetDisabledState(EWW_PB_COMPANY_FIRST + i , !Company::IsValidID(i) );
++		this->SetWidgetDisabledState(EWW_PB_ACTION1_FIRST + i , !Company::IsValidID(i) );
++	}
++	/* Check if the currently selected company is still active. */
++	if (this->watched_company != INVALID_COMPANY) {
++		/* Make sure the widget is lowered */
++		this->LowerWidget(EWW_PB_COMPANY_FIRST + this->watched_company);
++		/* Check if the watched Company is still a valid one */
++		if (!Company::IsValidID(this->watched_company)) {
++			/* Invalid Company Raise the associated widget. */
++			this->RaiseWidget(this->watched_company + EWW_PB_COMPANY_FIRST );
++			this->watched_company = INVALID_COMPANY;
++		}
++	}
++#ifdef ENABLE_NETWORK
++	/* Reset company count - network only */
++	for (CompanyID i = COMPANY_FIRST; i < MAX_COMPANIES; i++) {
++		this->company_count_client[i] = 0;
++	}
++	/* Calculate client count into company - network only */
++	NetworkClientInfo *ci;
++	FOR_ALL_CLIENT_INFOS( ci ) {
++		if (Company::IsValidID(ci->client_playas)) {
++			company_count_client[ci->client_playas]+=1;
++		}
++	}
++#endif
++	HandleZoomMessage(this, this->viewport, EWW_ZOOMIN, EWW_ZOOMOUT);
++}
++
++void WatchCompany::ScrollToTile( TileIndex tile )
++{
++	/* Scroll window to the tile, only if not zero */
++	if (tile != 0) {
++		ScrollWindowTo( TileX(tile) * TILE_SIZE + TILE_SIZE / 2, TileY(tile) * TILE_SIZE + TILE_SIZE / 2, -1, this );
++	}
++}
++
++/** OnDoCommand function - Called by the DoCommand
++ *  @param company The company ID who's client is building
++ *  @param tile The tile number where action took place
++ */
++void WatchCompany::OnDoCommand( CompanyByte company, TileIndex tile )
++{
++	/* Check if its my company */
++	if (this->watched_company == company)
++	{
++		this->ScrollToTile( tile );
++	}
++	/* set the company_activity to its max in order to paint the BLOT in red
++	 * This will result by having the activity blot set to red for all companies
++	 * even the one watched. To avoid this behaviour and not to light the blot of
++	 * the watched company, the code can be moved just after the ScrollToTile call.
++	 */
++	if (tile != 0) {
++		this->company_activity[company] = MAX_ACTIVITY;
++		this->SetDirty( );
++	}
++}
++
++/** Used to decrement the activity counter
++ *
++ */
++void WatchCompany::OnTick()
++{
++	bool set_dirty = false;
++	for (CompanyID i = COMPANY_FIRST; i < MAX_COMPANIES; i++) {
++		if ( this->company_activity[i]>0 ) {
++			this->company_activity[i]--;
++			if ( this->company_activity[i]==0 ) {
++				set_dirty = true;
++			}
++		}
++	}
++	/* If one company_activity reaches 0, then redraw */
++	if (set_dirty) {
++		this->SetDirty();
++	}
++}
++
++void ShowWatchWindow( CompanyID company_to_watch = INVALID_COMPANY )
++{
++	int i = 0;
++	/* find next free window number for watch viewport */
++	while (FindWindowById(WC_WATCH_COMPANY, i) != NULL) i++;
++	new WatchCompany( &_watch_company_desc, i, company_to_watch );
++}
+Index: src/roadveh_cmd.cpp
+===================================================================
+--- src/roadveh_cmd.cpp	(revision 19642)
++++ src/roadveh_cmd.cpp	(working copy)
+@@ -1187,7 +1187,7 @@
+ 
+ 		v->x_pos = gp.x;
+ 		v->y_pos = gp.y;
+-		VehicleMove(v, !(v->vehstatus & VS_HIDDEN));
++		VehicleMove(v, v->IsDrawn());
+ 		return true;
+ 	}
+ 
+Index: src/vehicle.cpp
+===================================================================
+--- src/vehicle.cpp	(revision 19642)
++++ src/vehicle.cpp	(working copy)
+@@ -183,7 +183,15 @@
+ 	return pass;
+ }
+ 
++bool Vehicle::IsDrawn() const
++{
++	return !(this->vehstatus & VS_HIDDEN) ||
++			(!IsTransparencySet(TO_TUNNELS) &&
++				((this->type == VEH_TRAIN && Train::From(this)->track == TRACK_BIT_WORMHOLE) ||
++				(this->type == VEH_ROAD && RoadVehicle::From(this)->state == RVSB_WORMHOLE)));
++}
+ 
++
+ /**
+  * Displays a "NewGrf Bug" error message for a engine, and pauses the game if not networking.
+  * @param engine The engine that caused the problem
+@@ -618,7 +626,7 @@
+ 
+ 	/* sometimes, eg. for disaster vehicles, when company bankrupts, when removing crashed/flooded vehicles,
+ 	 * it may happen that vehicle chain is deleted when visible */
+-	if (!(this->vehstatus & VS_HIDDEN)) MarkSingleVehicleDirty(this);
++	if (this->IsDrawn()) MarkSingleVehicleDirty(this);
+ 
+ 	Vehicle *v = this->Next();
+ 	this->SetNext(NULL);
+@@ -771,7 +779,7 @@
+ 	if (v->vehstatus & VS_DEFPAL) pal = (v->vehstatus & VS_CRASHED) ? PALETTE_CRASH : GetVehiclePalette(v);
+ 
+ 	AddSortableSpriteToDraw(image, pal, v->x_pos + v->x_offs, v->y_pos + v->y_offs,
+-		v->x_extent, v->y_extent, v->z_extent, v->z_pos, (v->vehstatus & VS_SHADOW) != 0);
++		v->x_extent, v->y_extent, v->z_extent, v->z_pos, (v->vehstatus & (VS_SHADOW | VS_HIDDEN)));
+ }
+ 
+ void ViewportAddVehicles(DrawPixelInfo *dpi)
+@@ -808,7 +816,7 @@
+ 			const Vehicle *v = _vehicle_position_hash[x + y]; // already masked & 0xFFF
+ 
+ 			while (v != NULL) {
+-				if (!(v->vehstatus & VS_HIDDEN) &&
++				if (v->IsDrawn() &&
+ 						l <= v->coord.right &&
+ 						t <= v->coord.bottom &&
+ 						r >= v->coord.left &&
+@@ -836,7 +844,7 @@
+ 	y = ScaleByZoom(y, vp->zoom) + vp->virtual_top;
+ 
+ 	FOR_ALL_VEHICLES(v) {
+-		if ((v->vehstatus & (VS_HIDDEN | VS_UNCLICKABLE)) == 0 &&
++		if (v->IsDrawn() && !(v->vehstatus & VS_UNCLICKABLE) &&
+ 				x >= v->coord.left && x <= v->coord.right &&
+ 				y >= v->coord.top && y <= v->coord.bottom) {
+ 
+Index: src/viewport.cpp
+===================================================================
+--- src/viewport.cpp	(revision 19642)
++++ src/viewport.cpp	(working copy)
+@@ -1127,8 +1127,7 @@
+ 	const Town *t;
+ 	FOR_ALL_TOWNS(t) {
+ 		ViewportAddString(dpi, ZOOM_LVL_OUT_4X, &t->sign,
+-				_settings_client.gui.population_in_label ? STR_VIEWPORT_TOWN_POP : STR_VIEWPORT_TOWN,
+-				STR_VIEWPORT_TOWN_TINY_WHITE, STR_VIEWPORT_TOWN_TINY_BLACK,
++				t->Label(), t->SmallLabel(), STR_VIEWPORT_TOWN_TINY_BLACK,
+ 				t->index, t->population);
+ 	}
+ }
+Index: src/watch_gui.h
+===================================================================
+--- src/watch_gui.h	(revision 0)
++++ src/watch_gui.h	(revision 0)
+@@ -0,0 +1,63 @@
++/* $Id: watch_gui.h 17678 2009-10-07 20:54:05  muxy $ */
++
++/** @file watch_gui.h GUI Functions related to watching. */
++
++#ifndef WATCH_GUI_H
++#define WATCH_GUI_H
++
++#include "window_gui.h"
++#include "company_base.h"
++
++#define MAX_ACTIVITY 30
++
++enum WatchCompanyWidgets {
++	EWW_CAPTION,
++	EWW_PB_COMPANY_FIRST,
++	EWW_PB_COMPANY_LAST  = EWW_PB_COMPANY_FIRST + MAX_COMPANIES - 1,
++	EWW_HAS_CLIENT_FIRST,
++	EWW_HAS_CLIENT_LAST = EWW_HAS_CLIENT_FIRST + MAX_COMPANIES - 1,
++	EWW_ACTIVITY_FIRST,
++	EWW_ACTIVITY_LAST = EWW_ACTIVITY_FIRST + MAX_COMPANIES - 1,
++	EWW_PB_ACTION1_FIRST,
++	EWW_PB_ACTION1_LAST = EWW_PB_ACTION1_FIRST + MAX_COMPANIES - 1,
++	EWW_WATCH,
++	EWW_ZOOMIN,
++	EWW_ZOOMOUT,
++	EWW_CENTER,
++	EWW_NEW_WINDOW
++};
++
++class WatchCompany : public Window
++{
++
++protected:
++
++	CompanyID watched_company;                            // Company ID beeing watched.
++	int company_activity[MAX_COMPANIES];                  // int array for activity blot.
++	int company_count_client[MAX_COMPANIES];              // company client count.
++	char company_name[MAX_LENGTH_COMPANY_NAME_BYTES];     // company name for title display
++
++	void SetWatchWindowTitle( );
++	void ScrollToTile( TileIndex tile );
++
++
++public:
++
++	WatchCompany(const WindowDesc *desc, int window_number, CompanyID company_to_watch );
++
++	virtual void SetStringParameters(int widget) const;
++	virtual void OnPaint( );
++	virtual void DrawWidget(const Rect &r, int widget) const;
++	virtual void OnClick(Point pt, int widget, int click_count);
++	virtual void OnResize( );
++	virtual void OnScroll(Point delta);
++	virtual void OnMouseWheel(int wheel);
++	virtual void OnInvalidateData(int data );
++	virtual void OnTick( );
++	
++	void OnDoCommand( CompanyByte company, TileIndex tile );
++};
++
++void ShowWatchWindow( CompanyID company_to_watch );
++
++#endif // COMPANY_GUI_H 
+Index: src/signs_gui.cpp
+===================================================================
+--- src/signs_gui.cpp	(revision 19642)
++++ src/signs_gui.cpp	(working copy)
+@@ -29,12 +29,29 @@
+ #include "table/strings.h"
+ #include "table/sprites.h"
+ 
++/**
++ * Struct containing the necessary information to decide if a sign should
++ * be filtered out or not.
++ */
++struct FilterInfo {
++	const char *string;
++	bool case_sensitive;
++};
++
+ struct SignList {
+-	typedef GUIList<const Sign *> GUISignList;
++	typedef GUIList<const Sign *, FilterInfo> GUISignList;
+ 
+ 	static const Sign *last_sign;
+ 	GUISignList signs;
+ 
++	char filter_string[MAX_LENGTH_SIGN_NAME_BYTES];
++	static bool match_case;
++
++	SignList()
++	{
++		filter_string[0] = '\0';
++	}
++
+ 	void BuildSignsList()
+ 	{
+ 		if (!this->signs.NeedRebuild()) return;
+@@ -46,6 +63,7 @@
+ 		const Sign *si;
+ 		FOR_ALL_SIGNS(si) *this->signs.Append() = si;
+ 
++		this->FilterSignList();
+ 		this->signs.Compact();
+ 		this->signs.RebuildDone();
+ 	}
+@@ -75,24 +93,60 @@
+ 		/* Reset the name sorter sort cache */
+ 		this->last_sign = NULL;
+ 	}
++
++	/** Filter sign list by sign name (case sensitive setting in FilterInfo) */
++	static bool CDECL SignNameFilter(const Sign * const *a, FilterInfo filter_info)
++	{
++		/* Get sign string */
++		char buf1[MAX_LENGTH_SIGN_NAME_BYTES];
++		SetDParam(0, (*a)->index);
++		GetString(buf1, STR_SIGN_NAME, lastof(buf1));
++
++		return (filter_info.case_sensitive ? strstr(buf1, filter_info.string) : strcasestr(buf1, filter_info.string)) != NULL;
++	}
++
++	/** Filter out signs from the sign list that does not match the name filter */
++	void FilterSignList()
++	{
++		FilterInfo filter_info = {this->filter_string, this->match_case};
++		this->signs.Filter(&SignNameFilter, filter_info);
++	}
+ };
+ 
+ const Sign *SignList::last_sign = NULL;
++bool SignList::match_case = false;
+ 
+ /** Enum referring to the widgets of the sign list window */
+ enum SignListWidgets {
+ 	SLW_CAPTION,
+ 	SLW_LIST,
+ 	SLW_SCROLLBAR,
++	SLW_FILTER_TEXT,
++	SLW_FILTER_MATCH_CASE_BTN,
++	SLW_FILTER_CLEAR_BTN,
+ };
+ 
+-struct SignListWindow : Window, SignList {
+-	int text_offset; // Offset of the sign text relative to the left edge of the SLW_LIST widget.
++struct SignListWindow : QueryStringBaseWindow, SignList {
++private:
++	const Sign *selected; ///< The selected sign
+ 
+-	SignListWindow(const WindowDesc *desc, WindowNumber window_number) : Window()
++public:
++	int text_offset; ///< Offset of the sign text relative to the left edge of the SLW_LIST widget.
++
++	SignListWindow(const WindowDesc *desc, WindowNumber window_number) : QueryStringBaseWindow(MAX_LENGTH_SIGN_NAME_BYTES)
+ 	{
+ 		this->InitNested(desc, window_number);
++		this->SetWidgetLoweredState(SLW_FILTER_MATCH_CASE_BTN, SignList::match_case);
+ 
++		/* Initialize the text edit widget */
++		this->afilter = CS_ALPHANUMERAL;
++		InitializeTextBuffer(&this->text, this->edit_str_buf, MAX_LENGTH_SIGN_NAME_BYTES, MAX_LENGTH_SIGN_NAME_PIXELS); // Allow MAX_LENGTH_SIGN_NAME_BYTES characters (including \0)
++		ClearFilterTextWidget();
++
++		/* Initialize the filtering variables */
++		this->SetFilterString("");
++		this->selected = NULL;
++
+ 		/* Create initial list. */
+ 		this->signs.ForceRebuild();
+ 		this->signs.ForceResort();
+@@ -101,9 +155,76 @@
+ 		this->vscroll.SetCount(this->signs.Length());
+ 	}
+ 
++	/**
++	 * Empties the string buffer that is edited by the filter text edit widget.
++	 * It also triggers the redraw of the widget so it become visible that the string has been made empty.
++	 */
++	void ClearFilterTextWidget()
++	{
++		this->edit_str_buf[0] = '\0';
++		UpdateTextBufferSize(&this->text);
++
++		this->SetWidgetDirty(SLW_FILTER_TEXT);
++	}
++
++	/**
++	 * This function sets the filter string of the sign list. The contents of
++	 * the edit widget is not updated by this function. Depending on if the
++	 * new string is zero-length or not the clear button is made
++	 * disabled/enabled. The sign list is updated according to the new filter.
++	 */
++	void SetFilterString(const char *new_filter_string)
++	{
++		/* check if there is a new filter string */
++		if (!StrEmpty(new_filter_string)) {
++			/* Copy new filter string */
++			strecpy(this->filter_string, new_filter_string, lastof(this->filter_string));
++			this->filter_string[strlen(new_filter_string)] = '\0';
++
++			this->signs.SetFilterState(true);
++
++			this->EnableWidget(SLW_FILTER_CLEAR_BTN);
++		} else {
++			/* There is no new string -> clear this->filter_string */
++			this->filter_string[0] = '\0';
++
++			this->signs.SetFilterState(false);
++			this->DisableWidget(SLW_FILTER_CLEAR_BTN);
++			this->RaiseWidget(SLW_FILTER_CLEAR_BTN); // If a button is made disabled when it is lowered, it will not be raised by itself.
++		}
++
++		/* Repaint the clear button since its disabled state may have changed */
++		this->SetWidgetDirty(SLW_FILTER_CLEAR_BTN);
++
++		/* Rebuild the list of signs */
++		this->InvalidateData();
++
++		/* Unset the selected sign pointer if the selected sign has
++		 * been filtered out of the list.
++		 */
++		if (this->selected != NULL && this->signs.Find(this->selected) == this->signs.End()) {
++			this->selected = NULL;
++		}
++
++		if (this->selected != NULL)	this->ScrollToSelected();
++	}
++
++	/** Make sure that the currently selected sign is within the visible part of the sign list */
++	void ScrollToSelected()
++	{
++		if (this->selected) {
++			/* Get the index of the selected sign */
++			int idx = this->signs.FindIndex(this->selected);
++			if (idx == -1) return; // abort if the selected sign is not in the list anymore (got filtered away)
++
++			this->vscroll.ScrollTowards(idx);
++		}
++ 	}
++
+ 	virtual void OnPaint()
+ 	{
+ 		this->DrawWidgets();
++		if (!this->IsShaded()) this->DrawEditBox(SLW_FILTER_TEXT);
+ 	}
+ 
+ 	virtual void DrawWidget(const Rect &r, int widget) const
+@@ -130,7 +251,7 @@
+ 					if (si->owner != OWNER_NONE) DrawCompanyIcon(si->owner, icon_left, y + sprite_offset_y);
+ 
+ 					SetDParam(0, si->index);
+-					DrawString(text_left, text_right, y, STR_SIGN_NAME, TC_YELLOW);
++					DrawString(text_left, text_right, y, STR_SIGN_NAME, this->selected == si ? TC_BLUE : TC_YELLOW);
+ 					y += this->resize.step_height;
+ 				}
+ 				break;
+@@ -145,18 +266,150 @@
+ 
+ 	virtual void OnClick(Point pt, int widget, int click_count)
+ 	{
+-		if (widget == SLW_LIST) {
+-			uint id_v = (pt.y - this->GetWidget<NWidgetBase>(SLW_LIST)->pos_y - WD_FRAMERECT_TOP) / this->resize.step_height;
++		switch (widget) {
++			case SLW_LIST: { // <- needed or the compiler will complain
++				uint id_v = (pt.y - this->GetWidget<NWidgetBase>(SLW_LIST)->pos_y - WD_FRAMERECT_TOP) / this->resize.step_height;
+ 
+-			if (id_v >= this->vscroll.GetCapacity()) return;
+-			id_v += this->vscroll.GetPosition();
+-			if (id_v >= this->vscroll.GetCount()) return;
++				if (id_v >= this->vscroll.GetCapacity()) return;
++				id_v += this->vscroll.GetPosition();
++				if (id_v >= this->vscroll.GetCount()) return;
+ 
+-			const Sign *si = this->signs[id_v];
+-			ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++				const Sign *si = this->signs[id_v];
++				ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++				break;
++			}
++			case SLW_FILTER_CLEAR_BTN:
++				this->ClearFilterTextWidget();
++				this->SetFilterString(0);
++				this->selected = NULL;
++				break;
++
++			case SLW_FILTER_MATCH_CASE_BTN:
++				SignList::match_case = !SignList::match_case;
++				this->SetWidgetLoweredState(SLW_FILTER_MATCH_CASE_BTN, SignList::match_case);
++				/* Rebuild the list of signs */
++				this->InvalidateData();
++				break;
+ 		}
+ 	}
+ 
++	virtual void OnTimeout()
++	{
++		if (!this->IsWidgetDisabled(SLW_FILTER_CLEAR_BTN)) {
++			this->RaiseWidget(SLW_FILTER_CLEAR_BTN);
++			this->SetWidgetDirty(SLW_FILTER_CLEAR_BTN);
++		}
++	}
++
++	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
++	{
++		EventState state = ES_NOT_HANDLED;
++		switch (this->HandleEditBoxKey(SLW_FILTER_TEXT, key, keycode, state)) {
++			case HEBR_EDITING:
++				this->SetFilterString(this->text.buf);
++				break;
++
++			case HEBR_CONFIRM: { // Enter pressed -> goto selected sign in list (or first if no selected sign)
++				uint n_signs = this->signs.Length();
++				if (n_signs >= 1) {
++					const Sign *si = this->selected ? this->selected : this->signs[0];
++					ScrollMainWindowToTile(TileVirtXY(si->x, si->y));
++				}
++				return state;
++			}
++
++			case HEBR_CANCEL: // ESC pressed, clear filter
++				this->ClearFilterTextWidget(); // Empty the text in the EditBox widget
++				this->SetFilterString(0);      // Use empty text as filter text (= view all signs)
++				this->UnfocusFocusedWidget();  // Unfocus the text box
++				this->selected = NULL;         // Deselect sign in sign list
++				return state;
++
++			case HEBR_NOT_FOCUSED: // The filter text box is not globaly focused
++				if (keycode == 'F') { // Hotkey to enable filter box
++					this->SetFocusedWidget(SLW_FILTER_TEXT);
++					SetFocusedWindow(this); // The user has asked to give focus to the text box, so make sure this window is focused.
++					state = ES_HANDLED;
++				}
++				break;
++
++			default:
++				NOT_REACHED();
++		}
++
++		if (state == ES_HANDLED) OnOSKInput(SLW_FILTER_TEXT);
++
++		/* Selection of signs using arrow up/down , page up/down and ctrl + home/end keys.
++		 * This only happens if the edit box is globaly focused.
++		 */
++		int selected_idx = this->selected ? this->signs.FindIndex(this->selected) : 0;
++		if (selected_idx == -1) selected_idx = 0; // FindIndex could return -1 if a non-available sign is selected
++		if (state != ES_HANDLED && this->IsWidgetGloballyFocused(SLW_FILTER_TEXT)) {
++			switch (keycode) {
++				case WKC_UP:
++					/* scroll up by one */
++					selected_idx--;
++					selected_idx = Clamp(selected_idx, 0, (int)this->signs.Length() - 1);
++					state = ES_HANDLED;
++					break;
++
++				case WKC_DOWN:
++					/* scroll down by one */
++					selected_idx++;
++					selected_idx = Clamp(selected_idx, 0, (int)this->signs.Length() - 1);
++					state = ES_HANDLED;
++					break;
++
++				case WKC_PAGEUP:
++					/* scroll up a page */
++					selected_idx = max(0, selected_idx - (int)this->vscroll.GetCapacity());
++					state = ES_HANDLED;
++					break;
++
++				case WKC_PAGEDOWN:
++					/* scroll down a page */
++					selected_idx = min(selected_idx + this->vscroll.GetCapacity(), (int)this->signs.Length() - 1);
++					state = ES_HANDLED;
++					break;
++
++				case WKC_CTRL | WKC_HOME: // Home key without ctrl is processed by the edit box
++					/* jump to beginning */
++					selected_idx = 0;
++					state = ES_HANDLED;
++					break;
++
++				case WKC_CTRL | WKC_END: // End key without ctrl is processed by the edit box
++					/* jump to end */
++					selected_idx = (int)this->signs.Length() - 1;
++					state = ES_HANDLED;
++					break;
++			}
++
++			if (state == ES_HANDLED) {
++				/* Update the selected pointer */
++				this->selected = this->signs[selected_idx];
++
++				/* Make sure the selected sign is visible */
++				this->ScrollToSelected();
++
++				/* Repaint the window */
++				this->SetDirty();
++			}
++		}
++
++		return state;
++	}
++
++	virtual void OnOSKInput(int widget)
++	{
++		if (widget == SLW_FILTER_TEXT) this->SetFilterString(this->text.buf);
++	}
++
++	virtual void OnMouseLoop()
++	{
++		this->HandleEditBox(SLW_FILTER_TEXT);
++ 	}
++
+ 	virtual void OnResize()
+ 	{
+ 		this->vscroll.SetCapacityFromWidget(this, SLW_LIST, WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM);
+@@ -205,10 +458,21 @@
+ 		NWidget(WWT_STICKYBOX, COLOUR_GREY),
+ 	EndContainer(),
+ 	NWidget(NWID_HORIZONTAL),
+-		NWidget(WWT_PANEL, COLOUR_GREY, SLW_LIST), SetMinimalSize(WD_FRAMETEXT_LEFT + 16 + MAX_LENGTH_SIGN_NAME_PIXELS + WD_FRAMETEXT_RIGHT, 50),
+-							SetResize(1, 10), SetFill(1, 0), EndContainer(),
+ 		NWidget(NWID_VERTICAL),
+-			NWidget(WWT_SCROLLBAR, COLOUR_GREY, SLW_SCROLLBAR),
++			NWidget(WWT_PANEL, COLOUR_GREY, SLW_LIST), SetMinimalSize(WD_FRAMETEXT_LEFT + 16 + MAX_LENGTH_SIGN_NAME_PIXELS + WD_FRAMETEXT_RIGHT, 50),
++								SetResize(1, 10), SetFill(1, 1), EndContainer(),
++			NWidget(NWID_HORIZONTAL),
++				NWidget(WWT_PANEL, COLOUR_GREY), SetFill(1, 1),
++					NWidget(WWT_EDITBOX, COLOUR_GREY, SLW_FILTER_TEXT), SetMinimalSize(80, 12), SetResize(1, 0), SetFill(1, 0), SetPadding(2, 2, 2, 2),
++				EndContainer(),
++				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, SLW_FILTER_MATCH_CASE_BTN), SetDataTip(STR_FILTER_MATCH_CASE, STR_NULL),
++				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, SLW_FILTER_CLEAR_BTN), SetDataTip(STR_FILTER_CLEAR, STR_NULL),
++			EndContainer(),
++		EndContainer(),
++		NWidget(NWID_VERTICAL),
++			NWidget(NWID_VERTICAL), SetFill(0, 1),
++				NWidget(WWT_SCROLLBAR, COLOUR_GREY, SLW_SCROLLBAR),
++			EndContainer(),
+ 			NWidget(WWT_RESIZEBOX, COLOUR_GREY),
+ 		EndContainer(),
+ 	EndContainer(),
+Index: src/vehicle_base.h
+===================================================================
+--- src/vehicle_base.h	(revision 19642)
++++ src/vehicle_base.h	(working copy)
+@@ -210,6 +210,12 @@
+ 	virtual const char *GetTypeString() const { return "base vehicle"; }
+ 
+ 	/**
++	 * Is this vehicle drawn?
++	 * @return true if it is drawn
++	 */
++	bool IsDrawn() const;
++
++	/**
+ 	 * Marks the vehicles to be redrawn and updates cached variables
+ 	 *
+ 	 * This method marks the area of the vehicle on the screen as dirty.
+Index: src/rail_map.h
+===================================================================
+--- src/rail_map.h	(revision 19642)
++++ src/rail_map.h	(working copy)
+@@ -563,4 +563,27 @@
+ 	_me[t].m7 = 0;
+ }
+ 
++
++static inline void IncreaseStuckCounter(TileIndex t)
++{
++	if (!IsTileType(t, MP_RAILWAY)) return;
++	if (_me[t].m7 == 255) return;
++	_me[t].m7++;
++}
++
++
++static inline void ReduceStuckCounter(TileIndex t)
++{
++	if (!IsTileType(t, MP_RAILWAY)) return;
++	_me[t].m7 -= _me[t].m7/4;
++}
++
++
++static inline byte GetStuckCounter(TileIndex t)
++{
++	if (!IsTileType(t, MP_RAILWAY)) return 0;
++	return _me[t].m7;
++
++}
++
+ #endif /* RAIL_MAP_H */
+Index: source.list
+===================================================================
+--- source.list	(revision 19642)
++++ source.list	(working copy)
+@@ -306,6 +306,7 @@
+ vehiclelist.h
+ viewport_func.h
+ viewport_type.h
++watch_gui.h
+ water.h
+ waypoint_base.h
+ waypoint_func.h
+@@ -408,6 +409,7 @@
+ tree_gui.cpp
+ vehicle_gui.cpp
+ viewport_gui.cpp
++watch_gui.cpp
+ waypoint_gui.cpp
+ 
+ # Widgets
